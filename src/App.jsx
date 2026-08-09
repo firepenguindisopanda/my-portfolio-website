@@ -127,8 +127,6 @@ const ToggleThemeProvider = () => {
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
               <Route path="/" element={<PageShell><Home /></PageShell>} />
-              {/* The landing card and the main page used to be separate routes;
-                  /about is kept so existing links and shares still resolve. */}
               <Route path="/about" element={<Navigate to="/" replace />} />
               <Route path="/projects/:projectId" element={<PageShell><ProjectDetail /></PageShell>} />
               <Route path="/fullstack" element={<PageShell><FullstackPortfolio /></PageShell>} />
