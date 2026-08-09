@@ -1,0 +1,17 @@
+{
+  "features": [
+    { "name": "viewed_via_email", "importance": 0.445 },
+    { "name": "offers_completed", "importance": 0.149 },
+    { "name": "view_to_completion_rate", "importance": 0.068 },
+    { "name": "reward", "importance": 0.042 },
+    { "name": "offer_type_bogo", "importance": 0.035 },
+    { "name": "duration", "importance": 0.028 },
+    { "name": "bogo_completed", "importance": 0.022 },
+    { "name": "view_rate", "importance": 0.021 },
+    { "name": "channel_social", "importance": 0.020 },
+    { "name": "completion_rate", "importance": 0.016 }
+  ],
+  "total_features": 10,
+  "model_type": "XGBoost",
+  "dataset": "Starbucks Offer Completion"
+}

@@ -1,0 +1,85 @@
+{
+  "name": "react-portfolio-website",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@fontsource/lora": "^5.2.8",
+    "@fontsource/roboto": "^5.0.5",
+    "@fontsource/source-sans-pro": "^5.2.5",
+    "@fontsource/space-grotesk": "^5.3.0",
+    "@mui/icons-material": "^5.14.1",
+    "@mui/lab": "^5.0.0-alpha.145",
+    "@mui/material": "^5.14.10",
+    "@posthog/react": "^1.9.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^13.5.0",
+    "framer-motion": "^11.2.4",
+    "posthog-js": "^1.376.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.4.0",
+    "react-markdown": "^10.1.0",
+    "react-player": "^2.13.0",
+    "react-router-dom": "^6.26.2",
+    "react-syntax-highlighter": "^16.1.0",
+    "recharts": "^3.8.1",
+    "remark-gfm": "^4.0.1",
+    "swiper": "^8.4.7",
+    "typewriter-effect": "^2.19.0",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "postbuild": "node scripts/generate-seo.mjs",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ci": "vitest run",
+    "lint": "eslint src --ext .js,.jsx --report-unused-disable-directives",
+    "lint:fix": "eslint src --ext .js,.jsx --fix",
+    "firebase-deploy": "firebase deploy -m 'Updated the design and layout'",
+    "analyze": "npm run build && npx source-map-explorer 'build/static/js/*.js'"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "overrides": {
+    "rolldown": "1.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@testing-library/dom": "^10.4.1",
+    "@vitejs/plugin-react": "^6.0.2",
+    "eslint": "^9.39.4",
+    "eslint-plugin-jest": "^29.15.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-testing-library": "^7.16.2",
+    "firebase-tools": "^13.15.3",
+    "jsdom": "^29.1.1",
+    "source-map-explorer": "^2.5.3",
+    "vite": "^8.0.14",
+    "vitest": "^4.1.7"
+  }
+}

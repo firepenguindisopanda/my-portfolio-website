@@ -1,0 +1,45 @@
+{
+  "dataset": {
+    "total_rows": 684807,
+    "total_features_after_encoding": 57,
+    "credit_card_rows": 284807,
+    "credit_card_rows_available": 284807,
+    "credit_card_features": 30,
+    "online_payment_rows": 200000,
+    "online_payment_rows_available": 6362620,
+    "online_payment_features": 8,
+    "bank_account_rows": 200000,
+    "bank_account_rows_available": 1000000,
+    "bank_account_features": 30
+  },
+  "target": {
+    "total_fraud_cases": 2956,
+    "total_legit_cases": 681851,
+    "credit_fraud_rate_pct": 0.17,
+    "credit_imbalance_ratio": "578:1",
+    "online_fraud_rate_pct": 0.13,
+    "online_imbalance_ratio": "774:1",
+    "bank_fraud_rate_pct": 1.1,
+    "bank_imbalance_ratio": "90:1"
+  },
+  "methodology": {
+    "preprocessing": "All transforms fitted inside a pipeline on the training split only and refitted within every CV fold - imputation, skew-based log transforms, encoding and scaling",
+    "sampling": "Online Payment and Bank Account capped at 200K stratified rows to keep 5-fold cross-validation tractable; Credit Card uses all 284,807",
+    "imbalance_strategy": "Single explicit strategy (class_weight), chosen by a four-arm ablation. SMOTE plus class weighting is a no-op, not a double correction: after SMOTE balances the classes the weights are exactly [1.0, 1.0]",
+    "missing_data": "Bank Account encodes missing values as negative sentinels (prev_address_months_count is -1 in 71.9% of rows); these are mapped to NaN with an explicit was-missing indicator",
+    "hyperparameters": "Random forest leaf size tuned by cross-validation on the training split (Credit Card selected min_samples_leaf=1)",
+    "test_split": "80/20 stratified split, seed 42, 5-fold CV",
+    "cost_optimization": "Threshold chosen by minimising Z = $100 x FN + $1 x FP, with the full cost surface published",
+    "uncertainty": "Bootstrap confidence intervals on every metric; model comparisons use paired tests (McNemar, DeLong, paired bootstrap on average precision)",
+    "statistical_testing": "28 of 30 features significant after Benjamini-Hochberg correction, but only 15 with a large effect size - at this sample size, rank by effect size rather than p-value",
+    "final_models": "Bank Account Application Fraud: XGBoost @ 0.12, Credit Card Fraud: XGBoost @ 0.02, Online Payment Fraud: XGBoost @ 0.01"
+  },
+  "algorithms": [
+    "Dummy (most_frequent)",
+    "Dummy (stratified)",
+    "Logistic Regression",
+    "Random Forest",
+    "XGBoost"
+  ],
+  "generated_at": "2026-08-09T00:02:15.399663+00:00"
+}
