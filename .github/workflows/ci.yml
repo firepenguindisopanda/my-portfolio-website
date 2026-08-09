@@ -3,10 +3,10 @@ name: CI - Tests
 on:
   push:
     branches:
-      - 'new-layout'
+      - 'main'
   pull_request:
     branches:
-      - 'new-layout'
+      - 'main'
 
 jobs:
   test:
