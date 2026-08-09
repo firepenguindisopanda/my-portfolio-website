@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fraud Detection Analysis - Report</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1d23; --muted: #5b6472; --line: #e3e7ee;
+    --card: #f7f9fc; --accent: #4c72b0; --fraud: #d62728; --ok: #2ca02c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#12151a; --fg:#e6e9ef; --muted:#9aa4b2; --line:#252a33;
+            --card:#1a1e26; --accent:#7b9fd4; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); line-height:1.65;
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px 80px; }
+  header { border-bottom:1px solid var(--line); padding:48px 0 28px; margin-bottom:8px; }
+  h1 { font-size:2.1rem; margin:0 0 8px; letter-spacing:-0.02em; }
+  h2 { font-size:1.5rem; margin:44px 0 14px; padding-top:14px; border-top:1px solid var(--line); }
+  h3 { font-size:1.12rem; margin:28px 0 10px; }
+  .lede { color:var(--muted); font-size:1.05rem; max-width:70ch; }
+  nav { position:sticky; top:0; background:var(--bg); border-bottom:1px solid var(--line);
+        padding:10px 0; z-index:10; margin-bottom:8px; }
+  nav a { color:var(--muted); text-decoration:none; margin-right:18px; font-size:0.88rem; }
+  nav a:hover { color:var(--accent); }
+  table { border-collapse:collapse; width:100%; margin:16px 0; font-size:0.9rem; }
+  th, td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); }
+  th { font-weight:600; color:var(--muted); font-size:0.8rem; text-transform:uppercase;
+       letter-spacing:0.04em; }
+  tbody tr:hover { background:var(--card); }
+  .num { text-align:right; font-variant-numeric: tabular-nums; }
+  .best { font-weight:700; color:var(--ok); }
+  .cards { display:flex; gap:14px; flex-wrap:wrap; margin:20px 0; }
+  .card { flex:1 1 210px; background:var(--card); border:1px solid var(--line);
+          border-radius:12px; padding:16px 18px; }
+  .card .v { font-size:1.8rem; font-weight:700; line-height:1.2; }
+  .card .l { font-size:0.8rem; color:var(--muted); margin-top:4px; }
+  .callout { border-left:4px solid var(--fraud); background:rgba(214,39,40,0.07);
+             padding:12px 16px; margin:18px 0; border-radius:0 8px 8px 0; }
+  .note { border-left:4px solid var(--accent); background:rgba(76,114,176,0.07);
+          padding:12px 16px; margin:18px 0; border-radius:0 8px 8px 0; }
+  figure { margin:20px 0; }
+  img { max-width:100%; height:auto; border:1px solid var(--line); border-radius:8px;
+        display:block; }
+  figcaption { color:var(--muted); font-size:0.85rem; margin-top:6px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:18px; }
+  .scroll { overflow-x:auto; }
+  code { background:var(--card); padding:2px 6px; border-radius:4px; font-size:0.88em; }
+  footer { margin-top:56px; padding-top:20px; border-top:1px solid var(--line);
+           color:var(--muted); font-size:0.85rem; }
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a href="#summary">Summary</a><a href="#data">Data</a><a href="#eda">EDA</a>
+  <a href="#performance">Performance</a><a href="#cost">Cost</a>
+  <a href="#evidence">Evidence</a><a href="#features">Drivers</a>
+  <a href="#limitations">Limitations</a>
+</div></nav>
+
+<div class="wrap">
+<header>
+  <h1>Fraud Detection: three datasets, one cost function</h1>
+  <p class="lede">A fraud model can be 99.8% accurate and catch zero fraud. This
+  report measures what matters instead, sets the decision threshold from the cost
+  of a missed fraud, and reports every result with its uncertainty.</p>
+  <p class="lede" style="font-size:0.85rem">
+    Generated 2026-08-09T00:02:15.399663+00:00 from commit <code>83ec70c7968e</code> -
+    every figure below is read from <code>artifacts/metrics.json</code>.
+  </p>
+</header>
+
+<h2 id="summary">1. Executive summary</h2>
+<div class="cards">
+  <div class="card"><div class="v">0.891</div>
+    <div class="l">Best average precision<br>XGBoost on Online Payment Fraud</div></div>
+  <div class="card"><div class="v">686x</div>
+    <div class="l">Better than random ranking</div></div>
+  <div class="card"><div class="v">3</div>
+    <div class="l">Datasets - 684,807 rows analysed</div></div>
+</div>
+
+<div class="callout">
+  <strong>The accuracy paradox, measured.</strong> On Bank Account Application Fraud, a model
+  that predicts "never fraud" for every transaction scores
+  <strong>98.90% accuracy</strong> and catches
+  <strong>zero</strong> of the 441 frauds. Its average precision is
+  0.0110 - exactly the base rate, which is what
+  "no better than chance" looks like.
+</div>
+
+<p>Headline results, best model per dataset:</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Dataset</th><th>Fraud rate</th><th>Best model</th>
+    <th class="num">Avg precision</th><th class="num">95% CI</th>
+    <th class="num">Lift</th><th class="num">ROC-AUC</th><th class="num">Fraud in test</th></tr></thead>
+  <tbody>
+    <tr><td>Bank Account Application Fraud</td>
+      <td class="num">1.10%</td>
+      <td>XGBoost</td>
+      <td class="num best">0.1359</td>
+      <td class="num">0.109-0.169</td>
+      <td class="num">12x</td>
+      <td class="num">0.8738</td>
+      <td class="num">441</td></tr>
+    <tr><td>Credit Card Fraud</td>
+      <td class="num">0.17%</td>
+      <td>XGBoost</td>
+      <td class="num best">0.8760</td>
+      <td class="num">0.811-0.931</td>
+      <td class="num">509x</td>
+      <td class="num">0.9755</td>
+      <td class="num">98</td></tr>
+    <tr><td>Online Payment Fraud</td>
+      <td class="num">0.13%</td>
+      <td>XGBoost</td>
+      <td class="num best">0.8914</td>
+      <td class="num">0.820-0.955</td>
+      <td class="num">686x</td>
+      <td class="num">0.9996</td>
+      <td class="num">52</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <strong>Why average precision and not accuracy or ROC-AUC?</strong> Below a 1%
+  base rate, accuracy is dominated by the majority class and ROC-AUC by the
+  true-negative mass - both stay flattering for models that are not useful.
+  Average precision summarises the precision-recall curve, which is the curve a
+  fraud team operates on.
+</div>
+
+<h2 id="data">2. The data</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>Dataset</th><th class="num">Rows used</th><th class="num">Of total</th>
+    <th class="num">Fraud rate</th><th class="num">Imbalance</th>
+    <th class="num">Train / test</th><th class="num">Fraud in test</th></tr></thead>
+  <tbody>
+    <tr><td>Bank Account Application Fraud</td>
+      <td class="num">200,000</td>
+      <td class="num">1,000,000</td>
+      <td class="num">1.103%</td>
+      <td class="num">90:1</td>
+      <td class="num">160,000 / 40,000</td>
+      <td class="num">441</td></tr>
+    <tr><td>Credit Card Fraud</td>
+      <td class="num">284,807</td>
+      <td class="num">284,807</td>
+      <td class="num">0.173%</td>
+      <td class="num">578:1</td>
+      <td class="num">227,845 / 56,962</td>
+      <td class="num">98</td></tr>
+    <tr><td>Online Payment Fraud</td>
+      <td class="num">200,000</td>
+      <td class="num">6,362,620</td>
+      <td class="num">0.129%</td>
+      <td class="num">774:1</td>
+      <td class="num">160,000 / 40,000</td>
+      <td class="num">52</td></tr>
+  </tbody>
+</table>
+</div>
+<p style="color:var(--muted);font-size:0.9rem">Two datasets are capped to keep
+cross-validation tractable - an explicit compute budget, recorded in the run
+configuration rather than left implicit.</p>
+
+<h2 id="eda">3. Exploratory analysis</h2>
+  <h3>Bank Account Application Fraud</h3>
+  <div class="grid">
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_correlations.webp" alt="Strongest linear correlations with the fraud label" loading="lazy">
+      <figcaption>Strongest linear correlations with the fraud label</figcaption></figure>
+  </div>
+  <h3>Credit Card Fraud</h3>
+  <div class="grid">
+    <figure><img src="report_assets/Credit_Card_Fraud_correlations.webp" alt="Strongest linear correlations with the fraud label" loading="lazy">
+      <figcaption>Strongest linear correlations with the fraud label</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_temporal_fraud.webp" alt="Fraud rate over time" loading="lazy">
+      <figcaption>Fraud rate over time</figcaption></figure>
+  </div>
+  <h3>Online Payment Fraud</h3>
+  <div class="grid">
+    <figure><img src="report_assets/Online_Payment_Fraud_correlations.webp" alt="Strongest linear correlations with the fraud label" loading="lazy">
+      <figcaption>Strongest linear correlations with the fraud label</figcaption></figure>
+  </div>
+
+<h2 id="performance">4. Model performance</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>Dataset</th><th>Model</th><th class="num">Avg precision</th>
+    <th class="num">ROC-AUC</th><th class="num">Precision</th><th class="num">Recall</th>
+    <th class="num">F1</th><th class="num">TPR@5%FPR</th><th class="num">Brier skill</th></tr></thead>
+  <tbody>
+    <tr><td>Bank Account Application Fraud</td>
+      <td class="best">XGBoost</td>
+      <td class="num">0.1359</td>
+      <td class="num">0.8738</td>
+      <td class="num">0.0837</td>
+      <td class="num">0.5306</td>
+      <td class="num">0.1445</td>
+      <td class="num">0.4739</td>
+      <td class="num">-3.749</td></tr>
+    <tr><td>Bank Account Application Fraud</td>
+      <td>Random Forest</td>
+      <td class="num">0.1329</td>
+      <td class="num">0.8848</td>
+      <td class="num">0.1792</td>
+      <td class="num">0.2812</td>
+      <td class="num">0.2189</td>
+      <td class="num">0.4875</td>
+      <td class="num">-1.339</td></tr>
+    <tr><td>Bank Account Application Fraud</td>
+      <td>Logistic Regression</td>
+      <td class="num">0.1191</td>
+      <td class="num">0.8904</td>
+      <td class="num">0.0447</td>
+      <td class="num">0.8118</td>
+      <td class="num">0.0847</td>
+      <td class="num">0.4875</td>
+      <td class="num">-11.633</td></tr>
+    <tr><td>Bank Account Application Fraud</td>
+      <td>Dummy (most_frequent)</td>
+      <td class="num">0.0110</td>
+      <td class="num">0.5000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0500</td>
+      <td class="num">-0.011</td></tr>
+    <tr><td>Bank Account Application Fraud</td>
+      <td>Dummy (stratified)</td>
+      <td class="num">0.0110</td>
+      <td class="num">0.4967</td>
+      <td class="num">0.0045</td>
+      <td class="num">0.0045</td>
+      <td class="num">0.0045</td>
+      <td class="num">0.0436</td>
+      <td class="num">-1.022</td></tr>
+    <tr><td>Credit Card Fraud</td>
+      <td class="best">XGBoost</td>
+      <td class="num">0.8760</td>
+      <td class="num">0.9755</td>
+      <td class="num">0.8817</td>
+      <td class="num">0.8367</td>
+      <td class="num">0.8586</td>
+      <td class="num">0.9286</td>
+      <td class="num">0.744</td></tr>
+    <tr><td>Credit Card Fraud</td>
+      <td>Random Forest</td>
+      <td class="num">0.8590</td>
+      <td class="num">0.9572</td>
+      <td class="num">0.9610</td>
+      <td class="num">0.7551</td>
+      <td class="num">0.8457</td>
+      <td class="num">0.9196</td>
+      <td class="num">0.763</td></tr>
+    <tr><td>Credit Card Fraud</td>
+      <td>Logistic Regression</td>
+      <td class="num">0.7113</td>
+      <td class="num">0.9711</td>
+      <td class="num">0.0603</td>
+      <td class="num">0.9184</td>
+      <td class="num">0.1131</td>
+      <td class="num">0.9184</td>
+      <td class="num">-12.943</td></tr>
+    <tr><td>Credit Card Fraud</td>
+      <td>Dummy (most_frequent)</td>
+      <td class="num">0.0017</td>
+      <td class="num">0.5000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0500</td>
+      <td class="num">-0.002</td></tr>
+    <tr><td>Credit Card Fraud</td>
+      <td>Dummy (stratified)</td>
+      <td class="num">0.0017</td>
+      <td class="num">0.4992</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0484</td>
+      <td class="num">-0.963</td></tr>
+    <tr><td>Online Payment Fraud</td>
+      <td class="best">XGBoost</td>
+      <td class="num">0.8914</td>
+      <td class="num">0.9996</td>
+      <td class="num">0.8235</td>
+      <td class="num">0.8077</td>
+      <td class="num">0.8155</td>
+      <td class="num">1.0000</td>
+      <td class="num">0.714</td></tr>
+    <tr><td>Online Payment Fraud</td>
+      <td>Random Forest</td>
+      <td class="num">0.8252</td>
+      <td class="num">0.9988</td>
+      <td class="num">0.9487</td>
+      <td class="num">0.7115</td>
+      <td class="num">0.8132</td>
+      <td class="num">1.0000</td>
+      <td class="num">0.586</td></tr>
+    <tr><td>Online Payment Fraud</td>
+      <td>Logistic Regression</td>
+      <td class="num">0.4158</td>
+      <td class="num">0.9976</td>
+      <td class="num">0.0424</td>
+      <td class="num">1.0000</td>
+      <td class="num">0.0814</td>
+      <td class="num">1.0000</td>
+      <td class="num">-15.074</td></tr>
+    <tr><td>Online Payment Fraud</td>
+      <td>Dummy (most_frequent)</td>
+      <td class="num">0.0013</td>
+      <td class="num">0.5000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0500</td>
+      <td class="num">-0.001</td></tr>
+    <tr><td>Online Payment Fraud</td>
+      <td>Dummy (stratified)</td>
+      <td class="num">0.0013</td>
+      <td class="num">0.4994</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0000</td>
+      <td class="num">0.0490</td>
+      <td class="num">-0.849</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Are the differences real?</h3>
+  <p><strong>Bank Account Application Fraud</strong></p>
+  <ul>
+    <li>Logistic Regression vs Random Forest: ΔAP = -0.0138
+      (95% CI -0.0327 to +0.0034),
+      McNemar p = 0.0000 ->
+      <strong>not significant</strong></li>
+    <li>Logistic Regression vs XGBoost: ΔAP = -0.0168
+      (95% CI -0.0399 to +0.0053),
+      McNemar p = 0.0000 ->
+      <strong>not significant</strong></li>
+    <li>Random Forest vs XGBoost: ΔAP = -0.0030
+      (95% CI -0.0226 to +0.0146),
+      McNemar p = 0.0000 ->
+      <strong>not significant</strong></li>
+  </ul>
+  <p><strong>Credit Card Fraud</strong></p>
+  <ul>
+    <li>Logistic Regression vs Random Forest: ΔAP = -0.1477
+      (95% CI -0.2264 to -0.0662),
+      McNemar p = 0.0000 ->
+      <strong>significant</strong></li>
+    <li>Logistic Regression vs XGBoost: ΔAP = -0.1646
+      (95% CI -0.2434 to -0.0859),
+      McNemar p = 0.0000 ->
+      <strong>significant</strong></li>
+    <li>Random Forest vs XGBoost: ΔAP = -0.0170
+      (95% CI -0.0546 to +0.0087),
+      McNemar p = 1.0000 ->
+      <strong>not significant</strong></li>
+  </ul>
+  <p><strong>Online Payment Fraud</strong></p>
+  <ul>
+    <li>Logistic Regression vs Random Forest: ΔAP = -0.4094
+      (95% CI -0.5168 to -0.2718),
+      McNemar p = 0.0000 ->
+      <strong>significant</strong></li>
+    <li>Logistic Regression vs XGBoost: ΔAP = -0.4756
+      (95% CI -0.5847 to -0.3337),
+      McNemar p = 0.0000 ->
+      <strong>significant</strong></li>
+    <li>Random Forest vs XGBoost: ΔAP = -0.0663
+      (95% CI -0.1172 to -0.0219),
+      McNemar p = 0.7905 ->
+      <strong>significant</strong></li>
+  </ul>
+<div class="note">These are <strong>paired</strong> tests: both models score the same
+transactions, so their errors are correlated and an unpaired comparison would
+misstate the uncertainty. Where an interval spans zero, preferring the higher
+point estimate is not supported by the evidence.</div>
+
+<div class="grid">
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_pr_curves.webp" alt="Precision-recall curves - the right curve for imbalanced data" loading="lazy">
+      <figcaption>Precision-recall curves - the right curve for imbalanced data</figcaption></figure>
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_roc_curves.webp" alt="ROC curves; flattering at this base rate, shown for completeness" loading="lazy">
+      <figcaption>ROC curves; flattering at this base rate, shown for completeness</figcaption></figure>
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_calibration.webp" alt="Reliability diagram: do the predicted probabilities mean anything?" loading="lazy">
+      <figcaption>Reliability diagram: do the predicted probabilities mean anything?</figcaption></figure>
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_lift_gain.webp" alt="Fraud caught per unit of review effort" loading="lazy">
+      <figcaption>Fraud caught per unit of review effort</figcaption></figure>
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_threshold_sensitivity.webp" alt="Precision, recall and F1 across the threshold range" loading="lazy">
+      <figcaption>Precision, recall and F1 across the threshold range</figcaption></figure>
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_cost_heatmap.webp" alt="Cost surface across thresholds and FN:FP cost ratios" loading="lazy">
+      <figcaption>Cost surface across thresholds and FN:FP cost ratios</figcaption></figure>
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_business_impact.webp" alt="Business impact by model at the default threshold" loading="lazy">
+      <figcaption>Business impact by model at the default threshold</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_pr_curves.webp" alt="Precision-recall curves - the right curve for imbalanced data" loading="lazy">
+      <figcaption>Precision-recall curves - the right curve for imbalanced data</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_roc_curves.webp" alt="ROC curves; flattering at this base rate, shown for completeness" loading="lazy">
+      <figcaption>ROC curves; flattering at this base rate, shown for completeness</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_calibration.webp" alt="Reliability diagram: do the predicted probabilities mean anything?" loading="lazy">
+      <figcaption>Reliability diagram: do the predicted probabilities mean anything?</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_lift_gain.webp" alt="Fraud caught per unit of review effort" loading="lazy">
+      <figcaption>Fraud caught per unit of review effort</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_threshold_sensitivity.webp" alt="Precision, recall and F1 across the threshold range" loading="lazy">
+      <figcaption>Precision, recall and F1 across the threshold range</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_cost_heatmap.webp" alt="Cost surface across thresholds and FN:FP cost ratios" loading="lazy">
+      <figcaption>Cost surface across thresholds and FN:FP cost ratios</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_business_impact.webp" alt="Business impact by model at the default threshold" loading="lazy">
+      <figcaption>Business impact by model at the default threshold</figcaption></figure>
+    <figure><img src="report_assets/Online_Payment_Fraud_pr_curves.webp" alt="Precision-recall curves - the right curve for imbalanced data" loading="lazy">
+      <figcaption>Precision-recall curves - the right curve for imbalanced data</figcaption></figure>
+    <figure><img src="report_assets/Online_Payment_Fraud_roc_curves.webp" alt="ROC curves; flattering at this base rate, shown for completeness" loading="lazy">
+      <figcaption>ROC curves; flattering at this base rate, shown for completeness</figcaption></figure>
+    <figure><img src="report_assets/Online_Payment_Fraud_calibration.webp" alt="Reliability diagram: do the predicted probabilities mean anything?" loading="lazy">
+      <figcaption>Reliability diagram: do the predicted probabilities mean anything?</figcaption></figure>
+    <figure><img src="report_assets/Online_Payment_Fraud_lift_gain.webp" alt="Fraud caught per unit of review effort" loading="lazy">
+      <figcaption>Fraud caught per unit of review effort</figcaption></figure>
+    <figure><img src="report_assets/Online_Payment_Fraud_threshold_sensitivity.webp" alt="Precision, recall and F1 across the threshold range" loading="lazy">
+      <figcaption>Precision, recall and F1 across the threshold range</figcaption></figure>
+    <figure><img src="report_assets/Online_Payment_Fraud_cost_heatmap.webp" alt="Cost surface across thresholds and FN:FP cost ratios" loading="lazy">
+      <figcaption>Cost surface across thresholds and FN:FP cost ratios</figcaption></figure>
+    <figure><img src="report_assets/Online_Payment_Fraud_business_impact.webp" alt="Business impact by model at the default threshold" loading="lazy">
+      <figcaption>Business impact by model at the default threshold</figcaption></figure>
+</div>
+
+<h2 id="cost">5. Cost-based threshold selection</h2>
+<p>The objective is <code>Z = $100 x FN + $1 x FP</code>.
+The 0.5 default is optimal only when a missed fraud costs the same as a false
+alarm, which it never does.</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Dataset</th><th>Model</th><th class="num">Optimal threshold</th>
+    <th class="num">Fraud caught</th><th class="num">False alarms</th>
+    <th class="num">Cost Z</th><th class="num">Cost at 0.5</th>
+    <th class="num">vs doing nothing</th></tr></thead>
+  <tbody>
+    <tr><td>Bank Account Application Fraud</td><td>XGBoost</td>
+      <td class="num best">0.12</td>
+      <td class="num">374/441
+        (85%)</td>
+      <td class="num">10,354</td>
+      <td class="num">$17,054</td>
+      <td class="num">$23,263</td>
+      <td class="num best">-61%</td></tr>
+    <tr><td>Credit Card Fraud</td><td>XGBoost</td>
+      <td class="num best">0.02</td>
+      <td class="num">88/98
+        (90%)</td>
+      <td class="num">83</td>
+      <td class="num">$1,083</td>
+      <td class="num">$1,611</td>
+      <td class="num best">-89%</td></tr>
+    <tr><td>Online Payment Fraud</td><td>XGBoost</td>
+      <td class="num best">0.01</td>
+      <td class="num">50/52
+        (96%)</td>
+      <td class="num">190</td>
+      <td class="num">$390</td>
+      <td class="num">$1,009</td>
+      <td class="num best">-92%</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="note">The recommendation is <em>conditional on the cost ratio</em>, so the
+full cost surface is published rather than a single threshold - whoever owns the
+losses owns the assumption.</div>
+
+<h2 id="evidence">6. Statistical evidence</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>Dataset</th><th class="num">Features tested</th>
+    <th class="num">Significant (BH)</th><th class="num">Large effect</th>
+    <th class="num">Negligible effect</th></tr></thead>
+  <tbody>
+    <tr><td>Bank Account Application Fraud</td>
+      <td class="num">25</td>
+      <td class="num">24</td>
+      <td class="num">0</td>
+      <td class="num">13</td></tr>
+    <tr><td>Credit Card Fraud</td>
+      <td class="num">30</td>
+      <td class="num">28</td>
+      <td class="num">15</td>
+      <td class="num">8</td></tr>
+    <tr><td>Online Payment Fraud</td>
+      <td class="num">7</td>
+      <td class="num">7</td>
+      <td class="num">2</td>
+      <td class="num">2</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout"><strong>Statistical significance stops discriminating at this
+sample size.</strong> With hundreds of thousands of rows, a difference far too small
+to act on still clears any significance threshold. Rank by <em>effect size</em>.</div>
+
+<div class="grid">
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_effect_vs_pvalue.webp" alt="Effect size against significance" loading="lazy">
+      <figcaption>Effect size against significance</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_effect_vs_pvalue.webp" alt="Effect size against significance" loading="lazy">
+      <figcaption>Effect size against significance</figcaption></figure>
+    <figure><img src="report_assets/Online_Payment_Fraud_effect_vs_pvalue.webp" alt="Effect size against significance" loading="lazy">
+      <figcaption>Effect size against significance</figcaption></figure>
+</div>
+
+<h2 id="features">7. What drives the predictions</h2>
+<p>Coefficients come from a separate <em>unpenalised</em> logistic fit on
+<em>unresampled</em> training data, because scikit-learn's penalised fit provides no
+valid standard errors. Features are standardised, so <code>exp(β)</code> is the odds
+multiplier per one standard deviation.</p>
+<div class="grid">
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_odds_ratios.webp" alt="Logistic regression odds ratios with 95% confidence intervals" loading="lazy">
+      <figcaption>Logistic regression odds ratios with 95% confidence intervals</figcaption></figure>
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_unified_importance.webp" alt="Feature importance across methods, each normalised to sum to 1" loading="lazy">
+      <figcaption>Feature importance across methods, each normalised to sum to 1</figcaption></figure>
+    <figure><img src="report_assets/Bank_Account_Application_Fraud_feature_comparison.webp" alt="Importance comparison across models" loading="lazy">
+      <figcaption>Importance comparison across models</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_odds_ratios.webp" alt="Logistic regression odds ratios with 95% confidence intervals" loading="lazy">
+      <figcaption>Logistic regression odds ratios with 95% confidence intervals</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_unified_importance.webp" alt="Feature importance across methods, each normalised to sum to 1" loading="lazy">
+      <figcaption>Feature importance across methods, each normalised to sum to 1</figcaption></figure>
+    <figure><img src="report_assets/Credit_Card_Fraud_feature_comparison.webp" alt="Importance comparison across models" loading="lazy">
+      <figcaption>Importance comparison across models</figcaption></figure>
+    <figure><img src="report_assets/Online_Payment_Fraud_odds_ratios.webp" alt="Logistic regression odds ratios with 95% confidence intervals" loading="lazy">
+      <figcaption>Logistic regression odds ratios with 95% confidence intervals</figcaption></figure>
+    <figure><img src="report_assets/Online_Payment_Fraud_unified_importance.webp" alt="Feature importance across methods, each normalised to sum to 1" loading="lazy">
+      <figcaption>Feature importance across methods, each normalised to sum to 1</figcaption></figure>
+    <figure><img src="report_assets/Online_Payment_Fraud_feature_comparison.webp" alt="Importance comparison across models" loading="lazy">
+      <figcaption>Importance comparison across models</figcaption></figure>
+</div>
+<div class="note">Impurity and gain importance are computed on <em>training</em> data and
+favour high-cardinality continuous features. Permutation importance is measured
+on the held-out split against average precision - the defensible one. These are
+associations, not causes.</div>
+
+<h2 id="limitations">8. Limitations and next steps</h2>
+<ul>
+  <li><strong>Small positive counts.</strong> The Credit Card test split holds
+    98 fraud cases; every interval is wide and the top
+    models are largely indistinguishable.</li>
+  <li><strong>Sampled data.</strong> Two datasets are capped at 200,000 rows - an
+    explicit compute budget.</li>
+  <li><strong>Probabilities are not calibrated to the population base rate</strong>
+    when class weighting is used. Rankings and odds ratios are unaffected.</li>
+  <li><strong>The cost ratio is an assumption, not a measurement.</strong></li>
+  <li><strong>Evaluation is static</strong> - no drift, no adversarial adaptation, no
+    analyst feedback loop.</li>
+</ul>
+<p><strong>Next:</strong> temporal validation on the Bank Account <code>month</code>
+column; probability calibration so the cost-optimal threshold matches its
+theoretical value; graph features for application fraud; cost-sensitive learning
+in place of post-hoc thresholding.</p>
+<p>The dataset that did not work has its own
+<a href="../docs/bank_account_postmortem.md">post-mortem</a>.</p>
+
+<footer>
+  Python 3.11.15 - scikit-learn 1.8.0 -
+  xgboost 3.2.0 - seed 42 -
+  imbalance strategy <code>class_weight</code>
+</footer>
+</div>
+</body>
+</html>

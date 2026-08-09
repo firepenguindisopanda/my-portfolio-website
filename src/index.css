@@ -1,0 +1,77 @@
+/*
+ * No @import of Google Fonts here. It used to pull five families - Cedarville
+ * Cursive, Lora, Quintessential, Ubuntu, Zen Antique - none of which the app
+ * referenced, and a CSS @import blocks rendering until it resolves. Typefaces
+ * come from @fontsource, bundled and loaded per theme in App.jsx.
+ */
+
+/*
+ * Global reset is owned by MUI's CssBaseline; this file only adds what it
+ * doesn't cover. Do NOT set font-family, outline or list-style on `*` here -
+ * a universal rule overrides the theme typography on every unstyled element
+ * and strips keyboard focus rings.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-color: #0B0C10;
+  --color-bg-variant: #840707;
+  --color-primary: #788592;
+  --color-primary-variant: rgba(77, 181, 255, 0.5);
+  --color-white: #fff;
+  --color-light: rgba(255, 255, 255, 0.5);
+  --container-width-lg: 75%;
+  --container-width-md: 86%;
+  --container-width-sm: 90%;
+  --transition: all 400ms ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/*
+ * Last line of defence against sideways scrolling on phones. One over-wide
+ * child - a markdown table, a bare URL - used to widen the whole document, and
+ * because the AppBar is fixed to the viewport it then stopped short of the
+ * right edge as soon as you panned across. Content that legitimately needs the
+ * width scrolls in its own container instead - see the markdown table wrapper
+ * in pages/ProjectDetail.jsx.
+ *
+ * `clip` rather than `hidden`, because `hidden` makes the root a scroll
+ * container and silently breaks every `position: sticky` descendant - which
+ * the case-study contents rail now is. `clip` does the same visual job without
+ * creating one. The `hidden` declaration stays as the fallback for browsers
+ * predating `overflow: clip` (Safari < 16).
+ */
+html,
+body {
+  overflow-x: hidden;
+}
+
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/panda-struggle.ico" />
+  <link rel="apple-touch-icon" href="/panda-struggle.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0A0F14" />
+
+  <title>Nicholas Smith - Software Engineer</title>
+  <meta name="description"
+    content="Nicholas Smith is a software engineer in Port of Spain working across full-stack web, mobile and machine learning. Projects, experience and contact details." />
+  <meta name="author" content="Nicholas Smith" />
+  <link rel="canonical" href="https://nicksportfolio.tech/" />
+
+  <!--
+    Fonts are bundled through @fontsource and imported from src/App.jsx, so
+    there is nothing to fetch from Google Fonts. The previous markup preconnected
+    to fonts.googleapis.com and fonts.gstatic.com twice each and pulled two
+    families the app never used.
+  -->
+
+  <!-- Open Graph / Facebook / LinkedIn -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://nicksportfolio.tech/" />
+  <meta property="og:site_name" content="Nicholas Smith" />
+  <meta property="og:title" content="Nicholas Smith - Software Engineer" />
+  <meta property="og:description"
+    content="Full-stack web, mobile and machine learning. See the projects, the experience, and how to get in touch." />
+  <!--
+    Must be a raster image at 1200x630. This was previously panda-struggle.svg,
+    and LinkedIn, X, Slack and Facebook all refuse to render SVG in link
+    previews - every shared link showed a blank card.
+  -->
+  <meta property="og:image" content="https://nicksportfolio.tech/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Nicholas Smith, Software Engineer - React, Node.js, Python, AI/ML" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://nicksportfolio.tech/" />
+  <meta name="twitter:title" content="Nicholas Smith - Software Engineer" />
+  <meta name="twitter:description"
+    content="Full-stack web, mobile and machine learning. See the projects, the experience, and how to get in touch." />
+  <meta name="twitter:image" content="https://nicksportfolio.tech/og-image.png" />
+
+  <!-- Structured data: helps search engines render a person/knowledge panel -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Nicholas Smith",
+      "url": "https://nicksportfolio.tech/",
+      "image": "https://nicksportfolio.tech/og-image.png",
+      "jobTitle": "Software Engineer",
+      "email": "mailto:nicholas122008@hotmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Port of Spain",
+        "addressCountry": "TT"
+      },
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "The University of the West Indies, St. Augustine"
+      },
+      "knowsAbout": [
+        "Software Engineering",
+        "Full-Stack Web Development",
+        "Machine Learning",
+        "Data Science",
+        "Android Development"
+      ],
+      "sameAs": [
+        "https://github.com/firepenguindisopanda",
+        "https://www.linkedin.com/in/nicholas-smith-933125148/",
+        "https://www.codewars.com/users/firepenguindisopanda",
+        "https://leetcode.com/NickSmith/",
+        "https://codeforces.com/profile/nicosmith.smith3"
+      ]
+    }
+  </script>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <script type="module" src="/src/index.jsx"></script>
+</body>
+
+</html>

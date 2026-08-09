@@ -1,0 +1,90 @@
+name: CI - Tests
+
+on:
+  push:
+    branches:
+      - 'new-layout'
+  pull_request:
+    branches:
+      - 'new-layout'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['22.17.1']
+
+    steps:
+      - name: Checout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Linting
+        run: npm run lint
+
+      - name: Run tests
+        env:
+          CI: true
+        run: npm run test:ci
+  
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['22.17.1']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Install deps
+        run: npm install
+      - name: Build
+        # Vite inlines VITE_ variables at build time. .env is gitignored, so
+        # without these the artifact ships with analytics silently disabled.
+        env:
+          VITE_PUBLIC_POSTHOG_KEY: ${{ secrets.VITE_PUBLIC_POSTHOG_KEY }}
+          VITE_PUBLIC_POSTHOG_HOST: ${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
+        run: npm run build
+      - name: Verify analytics made it into the bundle
+        run: |
+          if ! grep -rq "phc_" build/assets/*.js; then
+            echo "::error::No PostHog project key found in the build output."
+            echo "Set the VITE_PUBLIC_POSTHOG_KEY repository secret."
+            exit 1
+          fi
+          echo "PostHog key present in bundle."
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: build
+
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/new-layout' && github.event_name == 'push'
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Download build
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: build
+  #         path: build
+  #     - name: Install firebase-tools
+  #       run: npm install -g firebase-tools
+  #     - name: Firebase deploy
+  #       env:
+  #         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+  #       run: firebase deploy --only hosting --token "$FIREBASE_TOKEN"

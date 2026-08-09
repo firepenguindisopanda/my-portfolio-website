@@ -1,0 +1,55 @@
+{
+  "dataset": {
+    "total_customers": 17000,
+    "total_offers": 10,
+    "total_events": 306534,
+    "total_transactions": 138953,
+    "customer_features": 55,
+    "interaction_features": 75,
+    "interaction_rows": 174583,
+    "date_range_days": 29
+  },
+  "target": {
+    "positive_pct": 19.2,
+    "negative_pct": 80.8,
+    "positive_count": 33579,
+    "negative_count": 141004,
+    "imbalance_ratio": "4.2:1"
+  },
+  "offer_funnel": {
+    "received": 76277,
+    "viewed": 57725,
+    "completed": 33579,
+    "view_rate_pct": 75.7,
+    "completion_rate_pct": 44.0,
+    "view_to_completion_rate_pct": 58.2,
+    "time_to_view_mean_hours": 24.9,
+    "time_to_view_median_hours": 18.0
+  },
+  "demographics": {
+    "age_mean": 54.4,
+    "age_median": 55.0,
+    "income_mean": 65405,
+    "income_median": 64000,
+    "missing_gender_pct": 12.8,
+    "missing_income_pct": 12.8,
+    "male_pct": 49.9,
+    "female_pct": 36.1
+  },
+  "methodology": {
+    "models_compared": "Logistic Regression, Random Forest, Gradient Boosting, XGBoost",
+    "clustering": "K-Means (k=4) with stability analysis (ARI=0.85)",
+    "causal_inference": "ATE with bootstrap CIs, PSM, Welch's t-test, Cohen's d",
+    "clusters_found": 4,
+    "recommendation_lift_pct": 7.9,
+    "cross_validation": "5-fold Stratified CV",
+    "statistical_rigor": "Hypothesis tests, effect sizes, Bootstrap CIs",
+    "threshold_optimization": "Optimal F1 threshold = 0.42"
+  },
+  "algorithms": [
+    "Logistic Regression",
+    "Random Forest",
+    "Gradient Boosting",
+    "XGBoost"
+  ]
+}

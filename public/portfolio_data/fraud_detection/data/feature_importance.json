@@ -1,0 +1,90 @@
+{
+  "features": [
+    {
+      "name": "V14",
+      "importance": 0.2392
+    },
+    {
+      "name": "V4",
+      "importance": 0.1565
+    },
+    {
+      "name": "V12",
+      "importance": 0.1544
+    },
+    {
+      "name": "V10",
+      "importance": 0.0927
+    },
+    {
+      "name": "Amount",
+      "importance": 0.0447
+    },
+    {
+      "name": "V1",
+      "importance": 0.0427
+    },
+    {
+      "name": "V11",
+      "importance": 0.0395
+    },
+    {
+      "name": "V3",
+      "importance": 0.0336
+    },
+    {
+      "name": "V26",
+      "importance": 0.0284
+    },
+    {
+      "name": "V28",
+      "importance": 0.0204
+    },
+    {
+      "name": "V8",
+      "importance": 0.0173
+    },
+    {
+      "name": "Time",
+      "importance": 0.0173
+    },
+    {
+      "name": "V24",
+      "importance": 0.0151
+    },
+    {
+      "name": "V16",
+      "importance": 0.0132
+    },
+    {
+      "name": "V2",
+      "importance": 0.0132
+    },
+    {
+      "name": "V22",
+      "importance": 0.0131
+    },
+    {
+      "name": "V17",
+      "importance": 0.0107
+    },
+    {
+      "name": "V19",
+      "importance": 0.0104
+    },
+    {
+      "name": "V21",
+      "importance": 0.01
+    },
+    {
+      "name": "V6",
+      "importance": 0.0097
+    }
+  ],
+  "total_features": 20,
+  "model_type": "XGBoost",
+  "dataset": "Credit Card Fraud",
+  "method": "Permutation importance (held-out split, average precision)",
+  "note": "Permutation importance is measured on data the model never saw, by how much average precision drops when a feature is shuffled. Gini and gain importance are training-set quantities biased toward high-cardinality features.",
+  "generated_at": "2026-08-09T00:02:15.399663+00:00"
+}

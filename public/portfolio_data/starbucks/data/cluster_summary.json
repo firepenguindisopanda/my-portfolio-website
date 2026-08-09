@@ -1,0 +1,82 @@
+{
+  "segments": [
+    {
+      "id": 0,
+      "name": "Unengaged Unknowns",
+      "size_pct": 12.8,
+      "customer_count": 2170,
+      "avg_spend_30d": 18.53,
+      "clv_proxy_annual": 222,
+      "offer_roi": null,
+      "primary_offer": "Informational",
+      "completion_rate": 11.4,
+      "bogo_completion_rate": 9.3,
+      "discount_completion_rate": 15.8,
+      "view_rate": 80.6,
+      "avg_income": 64000,
+      "avg_age": 55.0,
+      "gender_split": "100% Unknown"
+    },
+    {
+      "id": 1,
+      "name": "Discount Seekers",
+      "size_pct": 24.9,
+      "customer_count": 4228,
+      "avg_spend_30d": 152.50,
+      "clv_proxy_annual": 1830,
+      "offer_roi": 15.7,
+      "primary_offer": "Discount",
+      "completion_rate": 69.7,
+      "bogo_completion_rate": 56.0,
+      "discount_completion_rate": 89.2,
+      "view_rate": 78.1,
+      "avg_income": 68345,
+      "avg_age": 55.6,
+      "gender_split": "53% Male"
+    },
+    {
+      "id": 2,
+      "name": "BOGO Advocates",
+      "size_pct": 28.5,
+      "customer_count": 4837,
+      "avg_spend_30d": 180.80,
+      "clv_proxy_annual": 2170,
+      "offer_roi": 7.4,
+      "primary_offer": "BOGO",
+      "completion_rate": 70.9,
+      "bogo_completion_rate": 87.1,
+      "discount_completion_rate": 72.5,
+      "view_rate": 82.4,
+      "avg_income": 72368,
+      "avg_age": 57.0,
+      "gender_split": "54% Female"
+    },
+    {
+      "id": 3,
+      "name": "Passive Browsers",
+      "size_pct": 33.9,
+      "customer_count": 5765,
+      "avg_spend_30d": 37.45,
+      "clv_proxy_annual": 449,
+      "offer_roi": null,
+      "primary_offer": "Informational",
+      "completion_rate": 14.8,
+      "bogo_completion_rate": 15.6,
+      "discount_completion_rate": 19.5,
+      "view_rate": 67.3,
+      "avg_income": 57405,
+      "avg_age": 51.3,
+      "gender_split": "71% Male"
+    }
+  ],
+  "kpi_summary": {
+    "total_addressable_market": 17000,
+    "total_30d_revenue": 1775409,
+    "avg_revenue_per_customer": 104.44,
+    "estimated_annual_revenue": 21304907,
+    "revenue_concentration": "53.3% of customers generate 85.6% of revenue",
+    "recommendation_lift_pct": 7.9,
+    "ab_test_required_sample": 3277,
+    "ab_test_feasible": true
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "random_forest": {
+    "f1": 0.8457,
+    "precision": 0.961,
+    "recall": 0.7551,
+    "roc_auc": 0.9572,
+    "accuracy": 0.9995,
+    "average_precision": 0.859,
+    "ap_lift": 499.2727,
+    "tpr_at_fpr_05": 0.9196,
+    "brier_skill": 0.763
+  },
+  "xgboost": {
+    "f1": 0.8586,
+    "precision": 0.8817,
+    "recall": 0.8367,
+    "roc_auc": 0.9755,
+    "accuracy": 0.9995,
+    "average_precision": 0.876,
+    "ap_lift": 509.149,
+    "tpr_at_fpr_05": 0.9286,
+    "brier_skill": 0.7443
+  },
+  "logistic_regression": {
+    "f1": 0.1131,
+    "precision": 0.0603,
+    "recall": 0.9184,
+    "roc_auc": 0.9711,
+    "accuracy": 0.9752,
+    "average_precision": 0.7113,
+    "ap_lift": 413.4476,
+    "tpr_at_fpr_05": 0.9184,
+    "brier_skill": -12.9431
+  },
+  "baseline_dummy": {
+    "f1": 0.0,
+    "precision": 0.0,
+    "recall": 0.0,
+    "roc_auc": 0.5,
+    "accuracy": 0.9983,
+    "average_precision": 0.0017,
+    "ap_lift": 1.0,
+    "tpr_at_fpr_05": 0.05,
+    "brier_skill": -0.0017
+  },
+  "best": {
+    "f1": 0.8586,
+    "precision": 0.8817,
+    "recall": 0.8367,
+    "roc_auc": 0.9755,
+    "accuracy": 0.9995,
+    "average_precision": 0.876,
+    "ap_lift": 509.149,
+    "tpr_at_fpr_05": 0.9286,
+    "brier_skill": 0.7443
+  },
+  "best_model": "XGBoost",
+  "headline_metric": "average_precision",
+  "average_precision": 0.876,
+  "average_precision_ci": [
+    0.8109,
+    0.9313
+  ],
+  "ap_lift": 509.1,
+  "ap_baseline": 0.00172,
+  "improvement": {
+    "ap_lift_over_chance": 509.1,
+    "f1_over_baseline_pct": 100.0,
+    "recall_gain_pct": 83.7
+  },
+  "cv_folds": 5,
+  "cv_average_precision_mean": 0.8526,
+  "cv_average_precision_ci": [
+    0.8301,
+    0.8752
+  ],
+  "training_samples": 227845,
+  "test_samples": 56962,
+  "n_positive_test": 98,
+  "datasets_trained": 3,
+  "imbalance_ratio": "578:1",
+  "fraud_pct": 0.17,
+  "confusion_matrix": {
+    "tn": 56853,
+    "fp": 11,
+    "fn": 16,
+    "tp": 82
+  },
+  "best_per_dataset": {
+    "bank_account": {
+      "model": "XGBoost",
+      "dataset_label": "Bank Account Application Fraud",
+      "average_precision": 0.1359,
+      "ap_lift": 12.3,
+      "roc_auc": 0.8738,
+      "f1": 0.1445,
+      "precision": 0.0837,
+      "recall": 0.5306,
+      "tpr_at_fpr_05": 0.4739,
+      "n_positive_test": 441,
+      "threshold": 0.12,
+      "cost_optimized_fn": 67,
+      "cost_optimized_fp": 10354,
+      "fraud_caught_pct": 84.8,
+      "cost_reduction_pct": 61.3,
+      "total_cost": 17054,
+      "cost_of_doing_nothing": 44100
+    },
+    "credit_card": {
+      "model": "XGBoost",
+      "dataset_label": "Credit Card Fraud",
+      "average_precision": 0.876,
+      "ap_lift": 509.1,
+      "roc_auc": 0.9755,
+      "f1": 0.8586,
+      "precision": 0.8817,
+      "recall": 0.8367,
+      "tpr_at_fpr_05": 0.9286,
+      "n_positive_test": 98,
+      "threshold": 0.02,
+      "cost_optimized_fn": 10,
+      "cost_optimized_fp": 83,
+      "fraud_caught_pct": 89.8,
+      "cost_reduction_pct": 88.9,
+      "total_cost": 1083,
+      "cost_of_doing_nothing": 9800
+    },
+    "online_payment": {
+      "model": "XGBoost",
+      "dataset_label": "Online Payment Fraud",
+      "average_precision": 0.8914,
+      "ap_lift": 685.7,
+      "roc_auc": 0.9996,
+      "f1": 0.8155,
+      "precision": 0.8235,
+      "recall": 0.8077,
+      "tpr_at_fpr_05": 1.0,
+      "n_positive_test": 52,
+      "threshold": 0.01,
+      "cost_optimized_fn": 2,
+      "cost_optimized_fp": 190,
+      "fraud_caught_pct": 96.2,
+      "cost_reduction_pct": 92.5,
+      "total_cost": 390,
+      "cost_of_doing_nothing": 5200
+    }
+  },
+  "cost_model": {
+    "cost_fn": 100.0,
+    "cost_fp": 1.0,
+    "description": "Z = $100 x false negative + $1 x false alarm"
+  },
+  "generated_at": "2026-08-09T00:02:15.399663+00:00",
+  "git_sha": "83ec70c7968e"
+}

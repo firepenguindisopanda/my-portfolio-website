@@ -1,0 +1,78 @@
+{
+  "ate_results": [
+    {
+      "offer_type": "Any Offer",
+      "control_mean": 12.53,
+      "treatment_mean": 12.78,
+      "ate_dollars": 0.25,
+      "ate_percent": 2.0,
+      "cohens_d": 0.018,
+      "p_value": 0.009,
+      "ci_lower": 0.17,
+      "ci_upper": 0.32,
+      "significant": true,
+      "effect_size_label": "negligible"
+    },
+    {
+      "offer_type": "BOGO",
+      "control_mean": 12.57,
+      "treatment_mean": 12.80,
+      "ate_dollars": 0.24,
+      "ate_percent": 1.9,
+      "cohens_d": 0.015,
+      "p_value": 0.004,
+      "ci_lower": 0.15,
+      "ci_upper": 0.32,
+      "significant": true,
+      "effect_size_label": "negligible"
+    },
+    {
+      "offer_type": "Discount",
+      "control_mean": 13.00,
+      "treatment_mean": 12.75,
+      "ate_dollars": -0.25,
+      "ate_percent": -1.9,
+      "cohens_d": -0.019,
+      "p_value": 0.005,
+      "ci_lower": -0.34,
+      "ci_upper": -0.16,
+      "significant": true,
+      "effect_size_label": "negligible"
+    },
+    {
+      "offer_type": "Informational",
+      "control_mean": 12.78,
+      "treatment_mean": 12.78,
+      "ate_dollars": 0.00,
+      "ate_percent": 0.0,
+      "cohens_d": 0.0001,
+      "p_value": 0.976,
+      "ci_lower": -0.08,
+      "ci_upper": 0.08,
+      "significant": false,
+      "effect_size_label": "negligible"
+    }
+  ],
+  "propensity_score_matching": {
+    "bogo_matched_ate": 0.18,
+    "discount_matched_ate": -0.22,
+    "informational_matched_ate": -0.01,
+    "balance_improvement": "Covariates balanced post-matching"
+  },
+  "heterogeneous_effects": [
+    { "segment": "Unengaged Unknowns", "best_offer": "Informational", "best_ate": 0.13, "worst_offer": "Discount", "worst_ate": -0.01 },
+    { "segment": "Discount Seekers", "best_offer": "Informational", "best_ate": 0.06, "worst_offer": "BOGO", "worst_ate": -1.53 },
+    { "segment": "BOGO Advocates", "best_offer": "Informational", "best_ate": 1.30, "worst_offer": "Discount", "worst_ate": -0.53 },
+    { "segment": "Passive Browsers", "best_offer": "Informational", "best_ate": 2.34, "worst_offer": "BOGO", "worst_ate": -2.90 }
+  ],
+  "ab_test_simulation": {
+    "baseline_rate": 43.5,
+    "treatment_rate": 47.0,
+    "absolute_lift_pp": 3.5,
+    "lift_percent": 7.9,
+    "required_sample_per_group": 3277,
+    "feasible": true,
+    "empirical_power": 0.796,
+    "recommended_duration_days": 30
+  }
+}
