@@ -120,6 +120,22 @@ describe('presentation modes', () => {
     });
   });
 
+  it.each(modes)('%s writes the focus ring so it can actually win', (_key, theme) => {
+    // Found by tabbing through a real browser: the ring matched :focus-visible
+    // and still computed to `outline-style: none`. MUI's ButtonBase, Chip and
+    // input styles each emit `outline: 0` on their own generated class, which
+    // scores (0,1,0) - exactly what a bare `:focus-visible` scores - and MUI's
+    // styles are injected after CssBaseline, so on the tie they won. Every
+    // button, chip and input on the site had an invisible focus ring.
+    //
+    // The `body` type selector takes the rule to (0,1,1) and it wins outright.
+    const overrides = theme.components.MuiCssBaseline.styleOverrides;
+
+    expect(Object.keys(overrides)).toContain('body :focus-visible');
+    expect(Object.keys(overrides)).not.toContain(':focus-visible');
+    expect(overrides['body :focus-visible'].outline).toBe(`2px solid ${theme.custom.focusRing}`);
+  });
+
   it('gives every mode an accent in its own region of the wheel', () => {
     // Measured as hue separation, not contrast ratio. Contrast compares
     // lightness, and two accents can be equally dark while being obviously

@@ -21,7 +21,7 @@ const CredlyBadge = ({ badgeId, title, width = 180, height = 162 }) => (
     height={height}
     loading="lazy"
     referrerPolicy="no-referrer-when-downgrade"
-    style={{ border: 0, display: 'block', width, height, colorScheme: 'light' }}
+    style={{ border: 0, display: 'block', width, height, maxWidth: '100%', colorScheme: 'light' }}
   />
 );
 

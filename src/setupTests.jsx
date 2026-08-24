@@ -142,6 +142,10 @@ vi.mock('framer-motion', () => {
     __esModule: true,
     motion,
     AnimatePresence: ({ children }) => <>{children}</>,
+    // App.jsx wraps the tree in this to set one reduced-motion policy for the
+    // whole site. The mock renders motion components statically anyway, so it
+    // only has to exist and pass its children through.
+    MotionConfig: ({ children }) => <>{children}</>,
     useAnimation: () => ({ start: vi.fn(), stop: vi.fn() }),
     useInView: () => true,
     useScroll: () => ({ scrollY: { get: () => 0 }, scrollYProgress: { get: () => 0 } }),
