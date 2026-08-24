@@ -4,7 +4,6 @@ import {
     Typography,
     Button,
     Grid,
-    Card,
     CardContent,
     CardActions,
     Tabs,
@@ -21,6 +20,7 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import { alpha } from '@mui/material/styles';
 import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
+import Surface from '../Surface/Surface';
 import {
     featuredCertificates,
     otherCertificates,
@@ -31,7 +31,7 @@ import {
 const CertificateCard = ({ cert, compact = false }) => {
     const theme = useTheme();
     return (
-        <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Surface flush sx={{ overflow: 'hidden' }}>
             <Box
                 component="img"
                 src={cert.image}
@@ -74,7 +74,7 @@ const CertificateCard = ({ cert, compact = false }) => {
                     </Button>
                 </CardActions>
             )}
-        </Card>
+        </Surface>
     );
 };
 
@@ -149,7 +149,7 @@ const AcademicAchievements = () => {
                 <Grid container spacing={2.5}>
                     {awards.map((award) => (
                         <Grid item xs={12} sm={6} key={award.title}>
-                            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Surface flush>
                                 <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
                                     <Stack direction="row" spacing={1.25} alignItems="flex-start" sx={{ mb: 1 }}>
                                         <EmojiEventsIcon sx={{ color: 'primary.main', fontSize: 22, mt: 0.25 }} />
@@ -180,7 +180,7 @@ const AcademicAchievements = () => {
                                         </Button>
                                     </CardActions>
                                 )}
-                            </Card>
+                            </Surface>
                         </Grid>
                     ))}
                 </Grid>
