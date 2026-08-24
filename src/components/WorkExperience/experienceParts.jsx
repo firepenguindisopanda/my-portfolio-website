@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button, Chip, Stack, Typography, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
@@ -45,21 +45,24 @@ export const DetailsToggle = ({ experience, expanded, onToggle, sx }) => (
 /**
  * The task list behind an entry.
  *
- * Height-animated on open. Under prefers-reduced-motion framer-motion resolves
- * these to their end state immediately, so the list is simply there.
+ * Height-animated on open, and guarded here rather than left to the global
+ * MotionConfig in App.jsx: `reducedMotion: 'user'` disables transform and
+ * layout animations, but a height animation is neither, so it would keep
+ * playing for someone who asked for no motion. The panel opens instantly.
  */
 export const ExperienceDetails = ({ experience, expanded, sx }) => {
   const theme = useTheme();
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <AnimatePresence initial={false}>
       {expanded && (
         <motion.div
           id={`experience-detail-${experience.id}`}
-          initial={{ height: 0, opacity: 0 }}
+          initial={prefersReducedMotion ? false : { height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: theme.custom.motion.duration }}
+          exit={prefersReducedMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0 : theme.custom.motion.duration }}
           style={{ overflow: 'hidden' }}
         >
           <Stack spacing={1.5} sx={{ pt: 1.5, ...sx }}>

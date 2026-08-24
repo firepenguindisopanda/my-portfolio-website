@@ -235,7 +235,16 @@ const buildComponents = ({ divider, hoverBorder, scrollThumb, hoverLift, radius,
       // at 55-60% alpha it resolved to 2.86:1 on Exhibit and 2.97:1 on Notebook
       // - under the 3:1 that WCAG 1.4.11 requires of a focus indicator. A
       // keyboard user cannot see a ring tuned to be subtle.
-      ':focus-visible': { outline: `2px solid ${focusRing}`, outlineOffset: 2 },
+      //
+      // `body :focus-visible`, not `:focus-visible`. MUI's ButtonBase, Chip and
+      // input styles each emit `outline: 0` on their own generated class, which
+      // is specificity (0,1,0) - exactly what a bare pseudo-class scores. On a
+      // tie the later stylesheet wins, and MUI's component styles are injected
+      // after CssBaseline, so this rule lost on every button, chip and input on
+      // the site. Adding the `body` type selector takes it to (0,1,1) and it
+      // wins outright. Verified in a real browser: before this, tabbing to a nav
+      // button computed `outline-style: none` while matching :focus-visible.
+      'body :focus-visible': { outline: `2px solid ${focusRing}`, outlineOffset: 2 },
     },
   },
   MuiButton: {

@@ -38,11 +38,11 @@ const OnlineLearningBadges = () => {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: {
-            xs: 'repeat(2, minmax(0, 1fr))',
-            sm: 'repeat(3, minmax(0, 1fr))',
-            md: 'repeat(4, minmax(0, 1fr))',
-          },
+          // auto-fit against the badge's real width rather than a fixed column
+          // count. Two columns at 320px gave each cell 134px for a 180px
+          // iframe, so every badge was clipped on one edge - an iframe does not
+          // scale its contents down, it just crops them.
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
           gap: 2.5,
         }}
       >

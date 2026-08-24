@@ -133,6 +133,29 @@ describe('design system constraints', () => {
     expect(RADIUS_SCALE).toEqual([0, 2, 4, 8]);
   });
 
+  it('declares one reduced-motion policy for framer-motion', () => {
+    // Four modes carry four motion characters and the slowest travels 16px over
+    // 0.7s. A global policy covers every framer animation on the site including
+    // components nobody has touched in months, which per-component guards
+    // demonstrably did not - four files were animating unguarded before this.
+    expect(read('App.jsx')).toMatch(/<MotionConfig\s+reducedMotion="user">/);
+  });
+
+  it('guards the animations that policy cannot reach', () => {
+    // `reducedMotion: 'user'` skips transform and layout animations and leaves
+    // everything else playing, and GSAP is not framer's to govern at all. So
+    // two kinds still need their own check: any GSAP timeline, and any height
+    // animation - a panel expanding from 0 is neither transform nor layout.
+    const needsOwnGuard = /gsap\.(timeline|from|fromTo)|height: 0/;
+    const guards = /prefersReducedMotion|useReducedMotion|gsapEnabled/;
+
+    const unguarded = sourceText
+      .filter(({ text }) => needsOwnGuard.test(text) && !guards.test(text))
+      .map((o) => o.file);
+
+    expect(unguarded).toEqual([]);
+  });
+
   it('keeps low elevations flat in every theme', async () => {
     const { themePersonalities } = await import('../utilities/themeConfig');
     Object.values(themePersonalities).forEach((theme) => {

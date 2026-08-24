@@ -21,7 +21,7 @@ import {
     TimelineContent,
     TimelineDot,
 } from '@mui/lab'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { alpha } from '@mui/material/styles'
 import CardMembershipIcon from '@mui/icons-material/CardMembership'
 import WorkIcon from '@mui/icons-material/Work'
@@ -180,6 +180,7 @@ const sections = [
 
 const ExtraCurricular = () => {
     const [expandedCards, setExpandedCards] = useState(new Set())
+    const prefersReducedMotion = useReducedMotion()
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -316,10 +317,13 @@ const ExtraCurricular = () => {
             <AnimatePresence>
                 {expandedCards.has(section.id) && (
                     <motion.div
-                        initial={{ height: 0, opacity: 0 }}
+                        // Guarded here rather than by the global MotionConfig:
+                        // reducedMotion 'user' skips transform and layout
+                        // animations, and a height animation is neither.
+                        initial={prefersReducedMotion ? false : { height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        exit={prefersReducedMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                        transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
                         style={{ overflow: 'hidden' }}
                     >
                         <CardContent sx={{ borderTop: `1px solid ${theme.palette.divider}`, px: 2, py: 1 }}>
