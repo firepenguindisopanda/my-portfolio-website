@@ -78,11 +78,22 @@ describe('rendering cost', () => {
   });
 
   it('lazy-loads images that are not above the fold', () => {
-    ['components/Projects/Projects.jsx', 'components/AcademicAchievements/AcademicAchievements.jsx'].forEach(
-      (file) => {
-        expect({ file, lazy: /loading="lazy"/.test(read(file)) }).toEqual({ file, lazy: true });
-      }
-    );
+    // By directory, not by file: the project renderers moved the screenshot out
+    // of Projects.jsx and into shared parts, and a check pinned to one filename
+    // would have gone quietly vacuous rather than failing. Every below-the-fold
+    // component that renders an image has to opt into lazy loading, wherever in
+    // that component's directory the image ends up living.
+    ['components/Projects', 'components/AcademicAchievements'].forEach((dir) => {
+      const files = sourceText.filter(
+        ({ file, text }) => file.startsWith(dir) && /component="img"|<img\b/.test(text)
+      );
+
+      expect({ dir, rendersImages: files.length > 0 }).toEqual({ dir, rendersImages: true });
+
+      files.forEach(({ file, text }) => {
+        expect({ file, lazy: /loading="lazy"/.test(text) }).toEqual({ file, lazy: true });
+      });
+    });
   });
 });
 
