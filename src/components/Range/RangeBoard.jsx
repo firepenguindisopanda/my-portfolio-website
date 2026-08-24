@@ -68,7 +68,10 @@ const RangeBoard = () => {
         });
       });
     },
-    { scope: boardRef, dependencies: [prefersReducedMotion, motion, renderer] }
+    // See SectionHeading: without this, a mode switch re-runs the hook without
+    // reverting, so the previous mode's tweens and ScrollTriggers are left
+    // behind on every switch.
+    { scope: boardRef, dependencies: [prefersReducedMotion, motion, renderer], revertOnUpdate: true }
   );
 
   return (

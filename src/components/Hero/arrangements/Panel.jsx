@@ -44,7 +44,11 @@ const Panel = ({ onSeeWork }) => {
         .from('.hero-tick', { autoAlpha: 0, duration: 0.3, stagger: 0.04 }, 0.85)
         .from('.hero-ledger', { autoAlpha: 0, y: 12, duration: 0.45 }, 0.75);
     },
-    { scope: rootRef, dependencies: [prefersReducedMotion] }
+    // Each mode renders a different arrangement, so this one remounts rather
+    // than re-running on a mode switch and cannot strand its own `from` state
+    // the way SectionHeading could. `revertOnUpdate` is here so the whole
+    // GSAP surface follows one rule, and so that stops being load-bearing.
+    { scope: rootRef, dependencies: [prefersReducedMotion], revertOnUpdate: true }
   );
 
   return (

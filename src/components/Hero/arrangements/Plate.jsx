@@ -46,7 +46,11 @@ const Plate = ({ onSeeWork }) => {
         .from('.hero-item', { autoAlpha: 0, y: distance, duration, stagger }, 0.35)
         .from('.hero-ledger', { autoAlpha: 0, y: distance, duration }, 0.55);
     },
-    { scope: rootRef, dependencies: [prefersReducedMotion, theme.custom.motion] }
+    // Each mode renders a different arrangement, so this one remounts rather
+    // than re-running on a mode switch and cannot strand its own `from` state
+    // the way SectionHeading could. `revertOnUpdate` is here so the whole
+    // GSAP surface follows one rule, and so that stops being load-bearing.
+    { scope: rootRef, dependencies: [prefersReducedMotion, theme.custom.motion], revertOnUpdate: true }
   );
 
   return (

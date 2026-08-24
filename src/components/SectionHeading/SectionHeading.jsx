@@ -82,7 +82,14 @@ const SectionHeading = ({ eyebrow, title, description, action, id, count }) => {
         scrollTrigger: trigger,
       });
     },
-    { scope: rootRef, dependencies: [prefersReducedMotion, motion, rule] }
+    // `revertOnUpdate` is not optional here. Switching mode changes `motion`,
+    // so this re-runs - and without a revert, @gsap/react leaves the previous
+    // mode's tween and its inline styles in place. Any heading still sitting at
+    // its hidden `from` state (i.e. below the fold) is then the state the new
+    // `gsap.from` records as its DESTINATION, so the heading animates back into
+    // `visibility: hidden` and never comes out of it. Reverting first restores
+    // the natural state, which is what the new tween has to land on.
+    { scope: rootRef, dependencies: [prefersReducedMotion, motion, rule], revertOnUpdate: true }
   );
 
   const eyebrowText = eyebrow && (
