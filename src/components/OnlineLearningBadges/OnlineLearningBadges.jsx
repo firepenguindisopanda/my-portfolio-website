@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Link, Stack, Card, useTheme } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
 import CredlyBadge from '../EmbededBadges/CredlyBadge';
 
@@ -26,7 +27,7 @@ const OnlineLearningBadges = () => {
   const theme = useTheme();
 
   return (
-    <Box sx={{ py: { xs: 6, md: 9 } }}>
+    <Section>
       <SectionHeading
         eyebrow="Verified"
         title="Credly badges"
@@ -83,7 +84,7 @@ const OnlineLearningBadges = () => {
           </Card>
         ))}
       </Box>
-    </Box>
+    </Section>
   );
 };
 

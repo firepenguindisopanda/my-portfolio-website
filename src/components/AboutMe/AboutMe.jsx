@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { SiCodewars, SiLeetcode, SiCodeforces } from 'react-icons/si';
 import { LuHelpingHand } from 'react-icons/lu';
 import { GiArtificialIntelligence } from 'react-icons/gi';
+import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
 import { profile } from '../../data/profile';
 
@@ -77,18 +78,19 @@ const InfoCard = ({ icon, title, children }) => {
  */
 const AboutMe = () => {
   const prefersReducedMotion = useReducedMotion();
+  const { motion: revealMotion } = useTheme().custom;
 
   const reveal = prefersReducedMotion
     ? {}
     : {
-        initial: { opacity: 0, y: 8 },
+        initial: { opacity: 0, y: revealMotion.distance },
         whileInView: { opacity: 1, y: 0 },
         viewport: { once: true, margin: '-40px' },
-        transition: { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
+        transition: { duration: revealMotion.duration, ease: revealMotion.ease },
       };
 
   return (
-    <Box sx={{ py: { xs: 6, md: 9 } }}>
+    <Section>
       <SectionHeading eyebrow="Background" title="About" />
 
       <Grid container spacing={4}>
@@ -106,7 +108,9 @@ const AboutMe = () => {
 
         <Grid item xs={12} md={5}>
           <motion.div
-            {...(prefersReducedMotion ? {} : { ...reveal, transition: { ...reveal.transition, delay: 0.08 } })}
+            {...(prefersReducedMotion
+              ? {}
+              : { ...reveal, transition: { ...reveal.transition, delay: revealMotion.stagger } })}
           >
             <Stack spacing={2}>
               <InfoCard icon={<LuHelpingHand size={17} />} title="Mentoring">
@@ -148,7 +152,7 @@ const AboutMe = () => {
           </motion.div>
         </Grid>
       </Grid>
-    </Box>
+    </Section>
   );
 };
 

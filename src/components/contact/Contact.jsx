@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import emailjs from '@emailjs/browser';
 import { usePostHog } from '@posthog/react';
+import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
 import { profile } from '../../data/profile';
 
@@ -98,7 +99,7 @@ const Contact = () => {
   };
 
   return (
-    <Box sx={{ py: { xs: 6, md: 9 } }}>
+    <Section>
       <SectionHeading
         eyebrow="Contact"
         title="Get in touch"
@@ -171,7 +172,7 @@ const Contact = () => {
           {notification.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </Section>
   );
 };
 

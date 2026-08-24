@@ -3,10 +3,11 @@ import { flushSync } from 'react-dom'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 
-// Space Grotesk is the display face in every theme and JetBrains Mono carries
-// every label and evidence line, so both load eagerly regardless of theme.
-// IBM Plex Sans is the default theme's body face and joins them; the remaining
-// personalities pull their body family on demand in useThemeFonts below.
+// The eager set is exactly Instrument's pair plus the utility face: Space
+// Grotesk (its display), IBM Plex Sans (its body) and JetBrains Mono, which
+// carries labels and evidence lines in every mode and so can never be deferred.
+// Instrument is the default, so this is the fonts one visitor needs and no more
+// - the other three modes pull their own pair on demand in useThemeFonts below.
 import '@fontsource/space-grotesk/500.css';
 import '@fontsource/space-grotesk/600.css';
 import '@fontsource/space-grotesk/700.css';
@@ -57,11 +58,29 @@ export const useAppTheme = () => React.useContext(ThemeContext);
  * previously imported up front.
  */
 const THEME_FONTS = {
-  'ocean-mist': () => import('@fontsource/inter'),
-  'forest-canopy': () => import('@fontsource/source-sans-pro'),
+  // Exhibit: Bodoni Moda for h1/h2, Inter for everything else.
+  'ocean-mist': () => Promise.all([
+    import('@fontsource/bodoni-moda/700.css'),
+    import('@fontsource/inter/400.css'),
+    import('@fontsource/inter/500.css'),
+  ]),
+  // Notebook: Lora only - its display face is JetBrains Mono, already eager.
+  'forest-canopy': () => Promise.all([
+    import('@fontsource/lora/400.css'),
+    import('@fontsource/lora/600.css'),
+  ]),
+  // Ledger: no longer shares Instrument's body face, so it has its own pair.
+  'corporate-clean': () => Promise.all([
+    import('@fontsource/ibm-plex-sans-condensed/600.css'),
+    import('@fontsource/public-sans/400.css'),
+    import('@fontsource/public-sans/600.css'),
+  ]),
 };
 
-const loadedFonts = new Set(['technical-precision', 'corporate-clean']);
+// Per weight, not per family: `import('@fontsource/inter')` pulled every weight
+// the family ships, which for a mode that uses two of them is most of a
+// megabyte spent on faces nothing renders.
+const loadedFonts = new Set(['technical-precision']);
 
 const useThemeFonts = (themeKey) => {
   useEffect(() => {
