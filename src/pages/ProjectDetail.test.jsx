@@ -18,7 +18,7 @@ describe('ProjectDetail navigation and scroll state', () => {
     vi.clearAllMocks();
   });
 
-  test('Back to All Projects passes projectsScrollY back via navigate state', async () => {
+  test('Back to all projects navigates home and scrolls to the projects section', async () => {
     const mockNavigate = vi.fn();
     router.useNavigate.mockImplementation(() => mockNavigate);
     router.useLocation.mockImplementation(() => ({ pathname: '/projects/ai-pitchdeck-generator', state: {} }));
@@ -38,9 +38,36 @@ describe('ProjectDetail navigation and scroll state', () => {
     // carries the title - so the body is what proves the markdown rendered.
     await screen.findByText(/This is a test markdown/i);
 
-    window.history.replaceState({ projectsScrollY: 999 }, '');
-    const backButton = screen.getByRole('button', { name: /Back to All Projects/i });
+    const backButton = screen.getByRole('button', { name: /Back to all projects/i });
     fireEvent.click(backButton);
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    // The label promises the projects section, so the click must always land
+    // there rather than wherever history came from.
+    expect(mockNavigate).toHaveBeenCalledWith('/', { state: { scrollTo: 'projects' } });
+  });
+
+  test('the case-study footer offers a previous and a next write-up', async () => {
+    const mockNavigate = vi.fn();
+    router.useNavigate.mockImplementation(() => mockNavigate);
+    router.useLocation.mockImplementation(() => ({ pathname: '/projects/ai-pitchdeck-generator', state: {} }));
+    router.useParams.mockImplementation(() => ({ projectId: 'ai-pitchdeck-generator' }));
+
+    global.fetch = vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve('# Hello\nThis is a test markdown') }));
+
+    render(
+      <ThemeProvider theme={createTheme(getThemePersonality('technical-precision'))}>
+        <MemoryRouter>
+          <ProjectDetail />
+        </MemoryRouter>
+      </ThemeProvider>
+    );
+
+    await screen.findByText(/This is a test markdown/i);
+
+    const footer = screen.getByRole('navigation', { name: /More case studies/i });
+    expect(footer).toBeInTheDocument();
+
+    const nextButton = screen.getByRole('button', { name: /Next case study/i });
+    fireEvent.click(nextButton);
+    expect(mockNavigate).toHaveBeenCalledWith(expect.stringMatching(/^\/projects\/.+/));
   });
 });

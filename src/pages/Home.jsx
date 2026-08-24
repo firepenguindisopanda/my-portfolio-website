@@ -4,6 +4,7 @@ import { Container, Box, Fab } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import ScrollTop from '../components/BackToTop/BackToTop';
 import Hero from '../components/Hero/Hero';
+import RangeBoard from '../components/Range/RangeBoard';
 import AboutMe from '../components/AboutMe/AboutMe';
 import Projects from '../components/Projects/Projects';
 import WorkExperience from '../components/WorkExperience/WorkExperience';
@@ -61,6 +62,10 @@ const Home = () => {
         <Box id="back-to-top-anchor" />
 
         <Hero onSeeWork={scrollToProjects} />
+
+        <Box component="section" id="range" sx={{ scrollMarginTop: SECTION_OFFSET }}>
+          <RangeBoard />
+        </Box>
 
         <Box component="section" id="projects" ref={projectsRef} sx={{ scrollMarginTop: SECTION_OFFSET }}>
           <Projects />

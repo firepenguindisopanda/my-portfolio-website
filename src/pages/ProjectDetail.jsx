@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import LazySpaceEmbed from '../components/SpacesEmbed/LazySpaceEmbed';
+import CaseStudyFooter from '../components/CaseStudyFooter/CaseStudyFooter';
 import { FeatureImportanceChart, PredictionVsActualChart, ModelMetricsCard, EDASummarySection, ClusterSummaryCard, CausalAtteChart } from '../components/MLCharts';
 
 /** Heading id shared by the rendered h2 and the contents rail, so they cannot disagree. */
@@ -848,19 +849,17 @@ const ProjectDetail = () => {
         </Container>
       )}
 
-      <Container maxWidth="lg" sx={{ pb: 8 }}>
-        <Box sx={{ textAlign: 'center' }}>
+      <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 }, pb: 8 }}>
+        <CaseStudyFooter currentId={project.id} />
+
+        <Box sx={{ textAlign: 'center', mt: 4 }}>
           <Button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/', { state: { scrollTo: 'projects' } })}
             startIcon={<ArrowBackIcon />}
             variant="outlined"
             size="large"
-            sx={{ borderRadius: 3 }}
-            component={motion.button}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
-            Back to All Projects
+            Back to all projects
           </Button>
         </Box>
       </Container>

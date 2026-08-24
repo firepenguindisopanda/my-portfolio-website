@@ -98,7 +98,16 @@ export const profile = {
     codeforces: 'https://codeforces.com/profile/nicosmith.smith3',
   },
 
-  skills: ['React', 'Node.js', 'Python', 'AI/ML'],
+  skills: [
+    'React',
+    'TypeScript',
+    'Node.js',
+    'Python',
+    'Rust',
+    'Data Science',
+    'Machine Learning',
+    'LLMs & Multi-Agent Systems',
+  ],
 };
 
 /** In-page sections, in the order they appear on the home page. */

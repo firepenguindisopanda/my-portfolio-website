@@ -74,9 +74,30 @@ const DISPLAY_FONT = "'Space Grotesk','sans-serif'";
  */
 const buildTypography = ({ body, heading = DISPLAY_FONT, headingWeight = 600 }) => ({
   fontFamily: body,
-  h1: { fontFamily: heading, fontSize: 44, fontWeight: 700, lineHeight: 1.06, letterSpacing: '-0.035em' },
-  h2: { fontFamily: heading, fontSize: 30, fontWeight: headingWeight, lineHeight: 1.18, letterSpacing: '-0.025em' },
-  h3: { fontFamily: heading, fontSize: 21, fontWeight: headingWeight, lineHeight: 1.3, letterSpacing: '-0.015em' },
+  // The three display sizes are fluid: they track the viewport between phone
+  // and desktop instead of stepping at breakpoints, so the hero name reaches
+  // real display size on a wide screen without overflowing a 320px one.
+  h1: {
+    fontFamily: heading,
+    fontSize: 'clamp(2.625rem, 1.9rem + 3.2vw, 4.25rem)',
+    fontWeight: 700,
+    lineHeight: 1.04,
+    letterSpacing: '-0.035em',
+  },
+  h2: {
+    fontFamily: heading,
+    fontSize: 'clamp(1.75rem, 1.45rem + 1.3vw, 2.375rem)',
+    fontWeight: headingWeight,
+    lineHeight: 1.15,
+    letterSpacing: '-0.025em',
+  },
+  h3: {
+    fontFamily: heading,
+    fontSize: 'clamp(1.2rem, 1.1rem + 0.45vw, 1.45rem)',
+    fontWeight: headingWeight,
+    lineHeight: 1.3,
+    letterSpacing: '-0.015em',
+  },
   h4: { fontFamily: body, fontSize: 17, fontWeight: 600, lineHeight: 1.4 },
   h5: { fontFamily: body, fontSize: 16, fontWeight: 600, lineHeight: 1.5 },
   h6: { fontFamily: body, fontSize: 14, fontWeight: 600, lineHeight: 1.5 },
@@ -175,7 +196,7 @@ const buildCustom = ({ divider, hoverBorder, hoverLift, sectionSpacing, headingF
 //  what has not.
 
 const TP = {
-  divider: 'rgba(139,156,168,0.18)',
+  divider: 'rgba(139,156,168,0.22)',
   hoverBorder: 'rgba(76,194,224,0.55)',
   overlay: '0 8px 24px rgba(0,0,0,0.55)',
 };
@@ -188,7 +209,9 @@ const technicalPrecision = {
     mode: 'dark',
     primary: { main: '#4CC2E0', light: '#7BD6EC', dark: '#2A9CBA', contrastText: '#04161C' },
     secondary: { main: '#8FB8C9', light: '#B0CEDA', dark: '#65909F', contrastText: '#04161C' },
-    background: { default: '#0A0F14', paper: '#111A21' },
+    // A step darker than before: the deeper ground makes the cyan readouts
+    // and the hairline dividers register as drawn lines rather than tints.
+    background: { default: '#080D12', paper: '#101922' },
     text: { primary: '#E6EDF3', secondary: '#8B9CA8', disabled: '#5A6874' },
     divider: TP.divider,
     error: { main: '#E5584B' },
@@ -225,7 +248,9 @@ const oceanMist = {
     mode: 'light',
     primary: { main: '#0E7490', light: '#0891B2', dark: '#155E75', contrastText: '#FFFFFF' },
     secondary: { main: '#0F766E', light: '#0D9488', dark: '#115E59', contrastText: '#FFFFFF' },
-    background: { default: '#F5F9FB', paper: '#FFFFFF' },
+    // A touch cooler and dimmer than the paper, so white cards read as raised
+    // surfaces without needing a shadow to say so.
+    background: { default: '#F1F6F8', paper: '#FFFFFF' },
     text: { primary: '#0F172A', secondary: '#475569', disabled: '#94A3B8' },
     divider: OM.divider,
     error: { main: '#DC2626' },
@@ -262,7 +287,7 @@ const forestCanopy = {
     mode: 'dark',
     primary: { main: '#40916C', light: '#52B788', dark: '#2D6A4F', contrastText: '#08170F' },
     secondary: { main: '#D4A373', light: '#E9C46A', dark: '#BC6C25', contrastText: '#1A1A1A' },
-    background: { default: '#14120F', paper: '#1F1C18' },
+    background: { default: '#12100D', paper: '#1D1A15' },
     text: { primary: '#EDEBE7', secondary: '#A69F94', disabled: '#736E66' },
     divider: FC.divider,
     error: { main: '#EF4444' },
