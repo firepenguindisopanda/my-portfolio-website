@@ -14,10 +14,11 @@ export const domains = [
   {
     code: 'UI',
     name: 'Web design & frontend',
-    stat: { value: 4, label: 'theme personalities' },
-    source: 'this site - try the palette control in the top bar',
+    stat: { value: 4, label: 'presentation modes' },
+    source: 'this site - switch mode in the top bar',
     claim:
-      'Four switchable palettes share one token system on this site: same type scale, radii and motion, different mood.',
+      'Four modes on this site share one component set and one token system, and differ in ' +
+      'palette, typeface, density, radius, motion and layout - the same content, art-directed four ways.',
     flagships: [
       { id: 'portfolio-website', name: 'portfolio-website' },
       { id: 'chimp-test-game', name: 'chimp-test' },
