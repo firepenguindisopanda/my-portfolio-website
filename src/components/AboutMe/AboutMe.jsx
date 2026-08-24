@@ -7,6 +7,7 @@ import { LuHelpingHand } from 'react-icons/lu';
 import { GiArtificialIntelligence } from 'react-icons/gi';
 import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
+import Surface from '../Surface/Surface';
 import { profile } from '../../data/profile';
 
 /**
@@ -29,19 +30,7 @@ const competitiveProfiles = [
 const InfoCard = ({ icon, title, children }) => {
   const theme = useTheme();
   return (
-    <Box
-      sx={{
-        height: '100%',
-        p: 2.5,
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: `${theme.custom.radius.container}px`,
-        border: theme.custom.card.border,
-        bgcolor: 'background.paper',
-        transition: 'border-color 0.2s ease',
-        '&:hover': { borderColor: theme.custom.card.hoverBorderColor },
-      }}
-    >
+    <Surface>
       <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mb: 1.5 }}>
         <Box
           sx={{
@@ -64,7 +53,7 @@ const InfoCard = ({ icon, title, children }) => {
       </Stack>
       <Divider sx={{ mb: 1.5 }} />
       <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>{children}</Box>
-    </Box>
+    </Surface>
   );
 };
 

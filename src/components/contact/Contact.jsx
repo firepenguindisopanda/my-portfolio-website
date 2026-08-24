@@ -2,8 +2,6 @@ import React, { useRef, useState } from 'react';
 import { MdOutlineEmail } from 'react-icons/md';
 import { BsWhatsapp } from 'react-icons/bs';
 import {
-  Card,
-  CardContent,
   Box,
   Button,
   Grid,
@@ -19,6 +17,7 @@ import emailjs from '@emailjs/browser';
 import { usePostHog } from '@posthog/react';
 import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
+import Surface from '../Surface/Surface';
 import { profile } from '../../data/profile';
 
 const EMAILJS = {
@@ -31,8 +30,7 @@ const EMAILJS = {
 const ChannelCard = ({ icon, label, value, href, onClick }) => {
   const theme = useTheme();
   return (
-    <Card sx={{ height: '100%' }}>
-      <CardContent sx={{ p: 2.5 }}>
+    <Surface>
         <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mb: 1 }}>
           <Box sx={{ color: theme.palette.primary.main, display: 'flex', fontSize: '1.25rem' }}>{icon}</Box>
           <Typography variant="h5" component="h3">
@@ -51,8 +49,7 @@ const ChannelCard = ({ icon, label, value, href, onClick }) => {
         >
           {value}
         </Link>
-      </CardContent>
-    </Card>
+    </Surface>
   );
 };
 

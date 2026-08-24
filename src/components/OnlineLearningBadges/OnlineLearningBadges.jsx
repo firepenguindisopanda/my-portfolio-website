@@ -1,8 +1,9 @@
 import React from 'react';
-import { Box, Typography, Link, Stack, Card, useTheme } from '@mui/material';
+import { Box, Typography, Link, Stack, useTheme } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
+import Surface from '../Surface/Surface';
 import CredlyBadge from '../EmbededBadges/CredlyBadge';
 
 /**
@@ -46,7 +47,7 @@ const OnlineLearningBadges = () => {
         }}
       >
         {badges.map((badge) => (
-          <Card key={badge.id} sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Surface key={badge.id} sx={{ alignItems: 'center' }}>
             <Box
               sx={{
                 width: '100%',
@@ -81,7 +82,7 @@ const OnlineLearningBadges = () => {
                 <ArrowForwardIcon sx={{ fontSize: 12 }} />
               </Link>
             </Stack>
-          </Card>
+          </Surface>
         ))}
       </Box>
     </Section>
