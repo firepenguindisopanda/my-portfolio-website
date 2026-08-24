@@ -43,6 +43,13 @@
 export const RADIUS_SCALE = [0, 2, 4, 8];
 
 /**
+ * Width of Notebook's margin rail, in pixels, shared by Section (which reserves
+ * it) and SectionHeading (which sets its eyebrow out into it). One constant, so
+ * the annotation and the text it annotates cannot drift out of alignment.
+ */
+export const RAIL_WIDTH = 180;
+
+/**
  * MUI resolves `borderRadius: n` as `n * shape.borderRadius`, so each theme
  * pins shape.borderRadius to its own control radius.
  *
@@ -290,6 +297,11 @@ const buildLayout = ({
   measure,
   gutter,
   surface,
+  // `heading.align` and `heading.eyebrow` were in the phase 0 contract and came
+  // out again: all four modes set them to 'left' and 'mono', so they were dead
+  // keys describing a decision nothing acted on. The mono eyebrow is not a
+  // per-mode choice anyway - it is the through-line, enforced by `overline` in
+  // buildTypography.
   heading,
   hero,
   range,
@@ -305,6 +317,11 @@ const buildLayout = ({
   measure,
   gutter,
   surface,
+  // `heading.align` and `heading.eyebrow` were in the phase 0 contract and came
+  // out again: all four modes set them to 'left' and 'mono', so they were dead
+  // keys describing a decision nothing acted on. The mono eyebrow is not a
+  // per-mode choice anyway - it is the through-line, enforced by `overline` in
+  // buildTypography.
   heading,
   hero,
   range,
@@ -357,7 +374,7 @@ const TP = {
     // as numbered channels rather than stacked bands.
     gutter: 'channel',
     surface: 'card',
-    heading: { align: 'left', rule: 'bar', eyebrow: 'mono', count: false },
+    heading: { rule: 'bar', count: false },
     hero: 'panel',
     range: 'grid',
     projects: 'cards',
@@ -421,7 +438,7 @@ const OM = {
     gutter: 'none',
     surface: 'plate',
     // No rule under the heading. The air after it is the separator.
-    heading: { align: 'left', rule: 'none', eyebrow: 'mono', count: false },
+    heading: { rule: 'none', count: false },
     hero: 'plate',
     range: 'strip',
     projects: 'plates',
@@ -488,7 +505,7 @@ const FC = {
     // which is what makes this mode a record rather than a page.
     gutter: 'rail',
     surface: 'card',
-    heading: { align: 'left', rule: 'rail', eyebrow: 'mono', count: false },
+    heading: { rule: 'rail', count: false },
     hero: 'cover',
     range: 'annotated',
     projects: 'entries',
@@ -553,7 +570,7 @@ const CC = {
     gutter: 'none',
     // Ruled rows, not cards. The only mode where a bordered box is wrong.
     surface: 'rule',
-    heading: { align: 'left', rule: 'full', eyebrow: 'mono', count: true },
+    heading: { rule: 'full', count: true },
     hero: 'masthead',
     range: 'table',
     projects: 'table',

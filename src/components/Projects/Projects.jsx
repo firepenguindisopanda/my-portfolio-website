@@ -291,6 +291,7 @@ const Projects = () => {
                 eyebrow="Selected work"
                 title="Projects"
                 description="Things I've designed, built and shipped. Each one links to a write-up, the live site, or the source."
+                count={`${filtered.length} shown`}
             />
 
             <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1, mb: 3 }}>
