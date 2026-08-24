@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, alpha } from '@mui/material/styles';
 import { usePostHog } from '@posthog/react';
 import {
     AppBar,
@@ -66,10 +66,23 @@ function DrawerAppBar(props) {
 
     const handleDrawerToggle = () => setMobileOpen((open) => !open);
 
+    /**
+     * The reveal circle grows from the menu item that was chosen, so the
+     * switch reads as an action with a source rather than a page-wide flash.
+     * The rect is read synchronously - the item is gone by the time the
+     * timeout fires - and the short delay lets the dropdown finish closing,
+     * otherwise the view-transition snapshot catches it mid-dismiss.
+     */
     const handleThemeChange = (event) => {
         const newTheme = event.target.value;
         posthog?.capture('theme_changed', { theme: newTheme, previous_theme: current });
-        setTheme(newTheme);
+
+        const el = event.currentTarget instanceof Element ? event.currentTarget : null;
+        const rect = el?.getBoundingClientRect();
+        const origin = rect
+            ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+            : undefined;
+        setTimeout(() => setTheme(newTheme, origin), 230);
     };
 
     /** Scrolls to a section, navigating home first if we are on another page. */
@@ -177,7 +190,15 @@ function DrawerAppBar(props) {
                 position="fixed"
                 elevation={0}
                 sx={{
-                    bgcolor: 'background.paper',
+                    // Translucent over a blur, so the page is felt scrolling
+                    // underneath. The solid fallback colour stands in where
+                    // backdrop-filter is unsupported.
+                    bgcolor: alpha(theme.palette.background.default, 0.72),
+                    '@supports not (backdrop-filter: blur(1px))': {
+                        bgcolor: 'background.paper',
+                    },
+                    backdropFilter: 'saturate(1.5) blur(12px)',
+                    WebkitBackdropFilter: 'saturate(1.5) blur(12px)',
                     color: 'text.primary',
                     borderBottom: '1px solid',
                     borderColor: 'divider',
@@ -227,9 +248,25 @@ function DrawerAppBar(props) {
                                         onClick={() => goToSection(section.id)}
                                         color="inherit"
                                         sx={{
+                                            position: 'relative',
                                             fontWeight: isActive ? 700 : 500,
                                             color: isActive ? 'primary.main' : 'text.secondary',
                                             '&:hover': { color: 'text.primary', bgcolor: 'action.hover' },
+                                            // The active-section underline slides between links as
+                                            // the reader scrolls: each button carries its own bar and
+                                            // scales it in, which reads as one moving indicator.
+                                            '&::after': {
+                                                content: '""',
+                                                position: 'absolute',
+                                                left: 10,
+                                                right: 10,
+                                                bottom: 4,
+                                                height: 2,
+                                                bgcolor: 'primary.main',
+                                                transform: isActive ? 'scaleX(1)' : 'scaleX(0)',
+                                                transformOrigin: 'center',
+                                                transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                                            },
                                         }}
                                     >
                                         {section.label}

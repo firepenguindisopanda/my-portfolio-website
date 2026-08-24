@@ -61,6 +61,27 @@ body {
   }
 }
 
+/*
+ * Theme switching runs as a View Transition: the new theme is revealed by a
+ * clip circle grown from the theme control (see setTheme in App.jsx). The
+ * browser's default crossfade would blend the two themes into a muddy
+ * mid-state, so both default animations are switched off - the only motion is
+ * the clip-path animated in JS on ::view-transition-new(root).
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

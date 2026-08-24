@@ -211,11 +211,7 @@ const Hero = ({ onSeeWork }) => {
               {profile.role} &middot; {profile.location}
             </Typography>
 
-            <Typography
-              variant="h1"
-              component="h1"
-              sx={{ mb: 2.5, fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' } }}
-            >
+            <Typography variant="h1" component="h1" sx={{ mb: 2.5 }}>
               {/* Each word in its own overflow-hidden line so the timeline can
                   unmask them; screen readers still get one plain string. */}
               {profile.name.split(' ').map((word, i) => (
@@ -239,7 +235,7 @@ const Hero = ({ onSeeWork }) => {
               <Typography
                 sx={{
                   fontFamily: theme.custom.displayFont,
-                  fontSize: { xs: '1.125rem', md: '1.3125rem' },
+                  fontSize: 'clamp(1.125rem, 1rem + 0.6vw, 1.4375rem)',
                   fontWeight: 500,
                   lineHeight: 1.4,
                   letterSpacing: '-0.015em',
