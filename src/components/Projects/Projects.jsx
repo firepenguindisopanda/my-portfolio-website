@@ -129,28 +129,40 @@ const ProjectCard = ({ project, index }) => {
             >
                 {project.screenshot ? (
                     <Box
-                        component="img"
-                        src={project.screenshot}
-                        alt={`${project.title} screenshot`}
-                        loading="lazy"
-                        width={1200}
-                        height={675}
                         sx={{
-                            width: '100%',
-                            // height:auto is load-bearing - without it the height attribute
-                            // above makes both dimensions definite and aspectRatio is ignored,
-                            // stretching the band to a 675px portrait strip.
-                            height: 'auto',
-                            aspectRatio: '16 / 9',
-                            objectFit: 'cover',
-                            // Slightly below the top edge, so thumbnails taller than 16/9
-                            // show their middle instead of only their header.
-                            objectPosition: '50% 25%',
-                            display: 'block',
+                            overflow: 'hidden',
                             borderBottom: '1px solid',
                             borderColor: 'divider',
                         }}
-                    />
+                    >
+                        <Box
+                            component="img"
+                            src={project.screenshot}
+                            alt={`${project.title} screenshot`}
+                            loading="lazy"
+                            width={1200}
+                            height={675}
+                            sx={{
+                                width: '100%',
+                                // height:auto is load-bearing - without it the height attribute
+                                // above makes both dimensions definite and aspectRatio is ignored,
+                                // stretching the band to a 675px portrait strip.
+                                height: 'auto',
+                                aspectRatio: '16 / 9',
+                                objectFit: 'cover',
+                                // Slightly below the top edge, so thumbnails taller than 16/9
+                                // show their middle instead of only their header.
+                                objectPosition: '50% 25%',
+                                display: 'block',
+                                transition: 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)',
+                                '.MuiCard-root:hover &': { transform: 'scale(1.035)' },
+                                '@media (prefers-reduced-motion: reduce)': {
+                                    transition: 'none',
+                                    '.MuiCard-root:hover &': { transform: 'none' },
+                                },
+                            }}
+                        />
+                    </Box>
                 ) : (
                     <IconPlaceholder techIcons={project.techIcons} theme={theme} />
                 )}

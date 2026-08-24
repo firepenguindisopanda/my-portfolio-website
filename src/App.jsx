@@ -110,12 +110,59 @@ const ToggleThemeProvider = () => {
   useThemeFonts(themeKey);
   useThemeSuperProperty(themeKey);
 
+  /**
+   * Theme changes sweep in as an expanding circle from the control that asked
+   * for them, via the View Transitions API. The browser snapshots the old
+   * theme, the new one renders underneath, and the clip circle grown over the
+   * snapshot is what the visitor sees - no gradient, no fade, one wipe.
+   *
+   * Falls back to an instant switch when the API is missing (jsdom, older
+   * Firefox/Safari) or the visitor prefers reduced motion.
+   */
+  const setTheme = useCallback((name, origin) => {
+    const reduceMotion =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!document.startViewTransition || reduceMotion) {
+      setThemeKey(name);
+      return;
+    }
+
+    const x = origin?.x ?? window.innerWidth - 48;
+    const y = origin?.y ?? 32;
+    // Radius to the farthest viewport corner, so the circle always covers it.
+    const radius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    const transition = document.startViewTransition(() => {
+      flushSync(() => setThemeKey(name));
+    });
+
+    transition.ready
+      .then(() => {
+        document.documentElement.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+          {
+            duration: 600,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            pseudoElement: '::view-transition-new(root)',
+          }
+        );
+      })
+      .catch(() => {
+        // Snapshot can fail mid-navigation; the theme has still switched.
+      });
+  }, []);
+
   const personality = React.useMemo(() => getThemePersonality(themeKey), [themeKey]);
   const theme = React.useMemo(() => createTheme(personality), [personality]);
 
   const contextValue = React.useMemo(
-    () => ({ current: themeKey, setTheme: setThemeKey }),
-    [themeKey]
+    () => ({ current: themeKey, setTheme }),
+    [themeKey, setTheme]
   );
 
   return (

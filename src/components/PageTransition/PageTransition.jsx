@@ -1,34 +1,34 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
+/**
+ * Route transitions: a short rise-and-fade in, a quicker fade out. No scale -
+ * zooming the whole page reads as an effect, where a rise reads as arrival.
+ */
 const PageTransition = ({ children }) => {
   const location = useLocation();
+  const prefersReducedMotion = useReducedMotion();
 
-  const pageVariants = {
-    initial: {
-      opacity: 0,
-      scale: 0.95,
-      y: 20
-    },
-    enter: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: {
-        duration: 0.4,
-        ease: [0.61, 1, 0.88, 1]
+  const pageVariants = prefersReducedMotion
+    ? {
+        initial: { opacity: 1 },
+        enter: { opacity: 1 },
+        exit: { opacity: 1 },
       }
-    },
-    exit: {
-      opacity: 0,
-      scale: 1.05,
-      transition: {
-        duration: 0.3,
-        ease: [0.61, 1, 0.88, 1]
-      }
-    }
-  };
+    : {
+        initial: { opacity: 0, y: 14 },
+        enter: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+        },
+        exit: {
+          opacity: 0,
+          y: -8,
+          transition: { duration: 0.22, ease: [0.4, 0, 1, 1] },
+        },
+      };
 
   return (
     <AnimatePresence mode="wait">
