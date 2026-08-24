@@ -5,6 +5,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { alpha } from '@mui/material/styles';
 import { useReducedMotion } from 'framer-motion';
 import { usePostHog } from '@posthog/react';
+import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
 import { domains } from '../../data/domains';
 import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
@@ -154,7 +155,7 @@ const RangeBoard = () => {
   );
 
   return (
-    <Box ref={boardRef} sx={{ py: { xs: 6, md: 9 } }}>
+    <Section ref={boardRef}>
       <SectionHeading
         eyebrow="Range"
         title="Six domains, one standard"
@@ -177,7 +178,7 @@ const RangeBoard = () => {
           <RangePanel key={domain.code} domain={domain} onFlagship={openFlagship} />
         ))}
       </Box>
-    </Box>
+    </Section>
   );
 };
 

@@ -30,6 +30,7 @@ import DeveloperModeIcon from '@mui/icons-material/DeveloperMode'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading'
 
 const MotionCard = motion(Card)
@@ -242,13 +243,13 @@ const WorkExperience = () => {
     const renderCard = (experience, expColor) => (
         <MotionCard
             variants={{
-                hidden: { opacity: 0, y: 8 },
+                hidden: { opacity: 0, y: theme.custom.motion.distance },
                 visible: { opacity: 1, y: 0 },
             }}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: theme.custom.motion.duration, ease: theme.custom.motion.ease }}
             sx={{ width: '100%', overflow: 'hidden' }}
         >
             <CardContent sx={{ px: 2, py: 1.5 }}>
@@ -339,7 +340,7 @@ const WorkExperience = () => {
     )
 
     return (
-        <Box sx={{ py: { xs: 6, md: 9 } }}>
+        <Section>
             <SectionHeading
                 eyebrow="Where I've worked"
                 title="Experience"
@@ -347,7 +348,7 @@ const WorkExperience = () => {
             />
 
             {isMobile ? renderListView() : renderTimelineView()}
-        </Box>
+        </Section>
     )
 }
 

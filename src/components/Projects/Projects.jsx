@@ -18,6 +18,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { motion, useReducedMotion } from 'framer-motion';
 import { alpha } from '@mui/material/styles';
+import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
 import { projects as projectsData } from '../../data/projects';
 import useScrollRestore from '../../hooks/useScrollRestore';
@@ -103,13 +104,20 @@ const ProjectCard = ({ project, index }) => {
         navigate(`/projects/${project.id}`);
     };
 
+    const reveal = theme.custom.motion;
     const motionProps = prefersReducedMotion
         ? {}
         : {
-              initial: { opacity: 0, y: 8 },
+              initial: { opacity: 0, y: reveal.distance },
               whileInView: { opacity: 1, y: 0 },
               viewport: { once: true, margin: '-40px' },
-              transition: { duration: 0.35, delay: Math.min(index, 5) * 0.06, ease: [0.4, 0, 0.2, 1] },
+              transition: {
+                  duration: reveal.duration,
+                  // Capped at six steps: past that the last card in a long grid
+                  // arrives late enough to read as broken rather than staggered.
+                  delay: Math.min(index, 5) * reveal.stagger,
+                  ease: reveal.ease,
+              },
           };
 
     return (
@@ -278,7 +286,7 @@ const Projects = () => {
     const hiddenCount = filtered.length - visible.length;
 
     return (
-        <Box sx={{ py: { xs: 6, md: 9 } }}>
+        <Section>
             <SectionHeading
                 eyebrow="Selected work"
                 title="Projects"
@@ -317,7 +325,7 @@ const Projects = () => {
                     </Button>
                 </Box>
             )}
-        </Box>
+        </Section>
     );
 };
 

@@ -44,11 +44,11 @@ describe('bundle and loading', () => {
     const app = read('App.jsx');
     const eager = app.match(/^import '@fontsource\/([a-z-]+)/gm) || [];
     const families = new Set(eager.map((line) => line.split('/')[1]));
-    // Space Grotesk (display face in every theme), IBM Plex Sans (default
-    // theme's body face, reused by Corporate Clean) and JetBrains Mono
-    // (labels and evidence lines everywhere). The other two body faces load
-    // on demand. Three is the ceiling; a fourth means a theme's body font
-    // has leaked into the eager set.
+    // Space Grotesk and IBM Plex Sans (Instrument's pair - Instrument is the
+    // default) plus JetBrains Mono, which carries labels and evidence lines in
+    // every mode and so cannot be deferred. The other three modes pull their
+    // own pair on demand. Three is the ceiling; a fourth means a mode's face
+    // has leaked into the eager set and every visitor pays for it.
     expect(families.size).toBeLessThanOrEqual(3);
   });
 
@@ -99,12 +99,27 @@ describe('design system constraints', () => {
     expect(offenders.map((o) => o.file)).toEqual([]);
   });
 
-  it('pins every theme to the shared 4px/8px radius scale', async () => {
-    const { themePersonalities, RADIUS } = await import('../utilities/themeConfig');
+  /**
+   * Radius is per mode now - a ledger sheet and a gallery plate are square,
+   * an instrument panel is not - so the old assertion that every theme shared
+   * one 4px/8px scale no longer describes the system. What still has to hold is
+   * that no mode invents a radius: they differ within RADIUS_SCALE, never
+   * outside it. That covers all four modes rather than one shared pair.
+   */
+  it('draws every radius from the shared scale', async () => {
+    const { themePersonalities, RADIUS_SCALE } = await import('../utilities/themeConfig');
+
     Object.values(themePersonalities).forEach((theme) => {
-      expect(theme.shape.borderRadius).toBe(RADIUS.control);
+      const { control, container } = theme.custom.radius;
+      expect(RADIUS_SCALE).toContain(control);
+      expect(RADIUS_SCALE).toContain(container);
+      // MUI multiplies `borderRadius: n` by shape.borderRadius, so a mode whose
+      // shape drifts from its own control radius silently rescales every chip,
+      // button and input in that mode.
+      expect(theme.shape.borderRadius).toBe(control);
     });
-    expect(RADIUS).toEqual({ control: 4, container: 8 });
+
+    expect(RADIUS_SCALE).toEqual([0, 2, 4, 8]);
   });
 
   it('keeps low elevations flat in every theme', async () => {

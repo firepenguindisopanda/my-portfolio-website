@@ -19,6 +19,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import { alpha } from '@mui/material/styles';
+import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
 import {
     featuredCertificates,
@@ -90,7 +91,7 @@ const AcademicAchievements = () => {
     const [showAll, setShowAll] = useState(false);
 
     return (
-        <Box sx={{ py: { xs: 6, md: 9 } }}>
+        <Section>
             <SectionHeading
                 eyebrow="Credentials"
                 title="Certificates & awards"
@@ -184,7 +185,7 @@ const AcademicAchievements = () => {
                     ))}
                 </Grid>
             )}
-        </Box>
+        </Section>
     );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography, Chip, Stack, Grid, ButtonBase, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
+import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
 
 /**
@@ -55,7 +56,7 @@ const TechnicalExperiences = () => {
   const active = skillCategories[activeIndex];
 
   return (
-    <Box sx={{ py: { xs: 6, md: 9 } }}>
+    <Section>
       <SectionHeading
         eyebrow="Toolkit"
         title="Skills"
@@ -141,7 +142,7 @@ const TechnicalExperiences = () => {
           </Box>
         </Grid>
       </Grid>
-    </Box>
+    </Section>
   );
 };
 

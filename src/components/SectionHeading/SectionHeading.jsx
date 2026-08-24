@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Box, Typography, Stack } from '@mui/material';
+import { Box, Typography, Stack, useTheme } from '@mui/material';
 import { useReducedMotion } from 'framer-motion';
 import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
 
@@ -18,28 +18,33 @@ import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
 const SectionHeading = ({ eyebrow, title, description, action, id }) => {
   const rootRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
+  const { motion } = useTheme().custom;
 
   useGSAP(
     () => {
       if (!gsapEnabled || prefersReducedMotion) return;
 
+      const trigger = { trigger: rootRef.current, start: 'top 88%', once: true };
+
       gsap.from('.heading-copy', {
         autoAlpha: 0,
-        y: 10,
-        duration: 0.45,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: rootRef.current, start: 'top 88%', once: true },
+        y: motion.distance,
+        duration: motion.duration,
+        ease: motion.gsapEase,
+        scrollTrigger: trigger,
       });
       gsap.from('.heading-rule', {
         scaleX: 0,
         transformOrigin: 'left center',
-        duration: 0.5,
+        duration: motion.duration,
+        // The rule follows the copy rather than racing it. This is a sequencing
+        // beat within one heading, not a motion character, so it stays local.
         delay: 0.15,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: rootRef.current, start: 'top 88%', once: true },
+        ease: motion.gsapEase,
+        scrollTrigger: trigger,
       });
     },
-    { scope: rootRef, dependencies: [prefersReducedMotion] }
+    { scope: rootRef, dependencies: [prefersReducedMotion, motion] }
   );
 
   return (

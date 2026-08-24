@@ -33,6 +33,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import CCUDEVTECHLEAD from '../../assets/CCU_Tech_lead.pdf'
+import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading'
 
 const MotionCard = motion(Card)
@@ -369,7 +370,7 @@ const ExtraCurricular = () => {
     )
 
     return (
-        <Box sx={{ py: { xs: 6, md: 9 } }}>
+        <Section>
             <SectionHeading
                 eyebrow="Beyond the day job"
                 title="Mentorship & community"
@@ -414,7 +415,7 @@ const ExtraCurricular = () => {
                     </Grid>
                 </Grid>
             </Box>
-        </Box>
+        </Section>
     )
 }
 
