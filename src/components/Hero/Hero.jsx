@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -11,7 +11,7 @@ import {
   useTheme,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 import { FaGithub, FaLinkedinIn } from 'react-icons/fa';
 import { HiOutlineMail } from 'react-icons/hi';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -20,6 +20,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { usePostHog } from '@posthog/react';
 import PROFILE from '../../assets/Nicholas_Smith_profile_pic.webp';
 import { profile } from '../../data/profile';
+import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
 
 const socials = [
   { icon: FaGithub, label: 'GitHub', href: profile.links.github },
@@ -28,19 +29,44 @@ const socials = [
 ];
 
 /**
+ * Calibration marks on the portrait corners: the one photograph on the page,
+ * framed the way the rest of the site frames its measurements. Two hairline
+ * strokes per corner, accent coloured, nothing else.
+ */
+const CornerTick = ({ corner }) => {
+  const offsets = {
+    tl: { top: -7, left: -7, borderTop: '2px solid', borderLeft: '2px solid' },
+    tr: { top: -7, right: -7, borderTop: '2px solid', borderRight: '2px solid' },
+    bl: { bottom: -7, left: -7, borderBottom: '2px solid', borderLeft: '2px solid' },
+    br: { bottom: -7, right: -7, borderBottom: '2px solid', borderRight: '2px solid' },
+  };
+  return (
+    <Box
+      className="hero-tick"
+      aria-hidden
+      sx={{
+        position: 'absolute',
+        width: 16,
+        height: 16,
+        borderColor: 'primary.main',
+        ...offsets[corner],
+      }}
+    />
+  );
+};
+
+/**
  * The three-row ledger under the hero copy.
  *
  * This is the page's thesis rather than an ornament: the claim above it is
  * "systems that check their own work", and these are three named instances of
- * that, each linking to the case study that substantiates it. It replaced a row
- * of React / Node / Python / AI-ML chips, which said nothing the projects below
- * do not already say better.
+ * that, each linking to the case study that substantiates it.
  */
 const EvidenceLedger = ({ items, label, onNavigate }) => {
   const theme = useTheme();
 
   return (
-    <Box sx={{ mt: { xs: 4, md: 5 } }}>
+    <Box className="hero-ledger" sx={{ mt: { xs: 4, md: 5 } }}>
       {/* Ties the rows to the framing line above them, so they do not read as
           an unexplained list of project names. */}
       <Typography variant="overline" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
@@ -116,10 +142,10 @@ const EvidenceLedger = ({ items, label, onNavigate }) => {
 };
 
 /**
- * Page hero. This was previously a standalone "business card" route at `/`,
- * which meant the front door showed a name and two buttons and nothing else.
- * It is now the top of the main page, so a visitor can scroll straight from
- * here into the work.
+ * Page hero. One orchestrated GSAP timeline instead of uniform per-element
+ * fades: overline, then the name unmasking word by word, then the copy, with
+ * the portrait wiping in alongside. Under prefers-reduced-motion nothing runs
+ * and the content is simply there, because every tween is a `from`.
  */
 const Hero = ({ onSeeWork }) => {
   const theme = useTheme();
@@ -127,17 +153,36 @@ const Hero = ({ onSeeWork }) => {
   const posthog = usePostHog();
   const prefersReducedMotion = useReducedMotion();
   const [imgError, setImgError] = useState(false);
+  const rootRef = useRef(null);
 
-  const rise = prefersReducedMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: 8 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.35, ease: [0.4, 0, 0.2, 1] },
-      };
+  useGSAP(
+    () => {
+      if (!gsapEnabled || prefersReducedMotion) return;
 
-  const stagger = (index) =>
-    prefersReducedMotion ? {} : { ...rise, transition: { ...rise.transition, delay: index * 0.06 } };
+      const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+      tl.from('.hero-overline', { autoAlpha: 0, y: 10, duration: 0.35 })
+        .from(
+          '.hero-word',
+          { yPercent: 110, duration: 0.55, stagger: 0.09, ease: 'power3.out' },
+          0.08
+        )
+        .from(
+          '.hero-item',
+          { autoAlpha: 0, y: 12, duration: 0.4, stagger: 0.07 },
+          0.4
+        )
+        .fromTo(
+          '.hero-portrait',
+          { clipPath: 'inset(0 0 100% 0)' },
+          { clipPath: 'inset(0 0 0% 0)', duration: 0.65, ease: 'power2.inOut' },
+          0.25
+        )
+        .from('.hero-tick', { autoAlpha: 0, duration: 0.3, stagger: 0.04 }, 0.85)
+        .from('.hero-ledger', { autoAlpha: 0, y: 12, duration: 0.45 }, 0.75);
+    },
+    { scope: rootRef, dependencies: [prefersReducedMotion] }
+  );
 
   const openLedgerItem = (item) => {
     posthog?.capture('hero_ledger_clicked', { project_id: item.id });
@@ -145,7 +190,7 @@ const Hero = ({ onSeeWork }) => {
   };
 
   return (
-    <Box component="section" sx={{ pt: { xs: 4, md: 7 }, pb: { xs: 2, md: 3 } }}>
+    <Box ref={rootRef} component="section" sx={{ pt: { xs: 4, md: 7 }, pb: { xs: 2, md: 3 } }}>
       <Container maxWidth="lg" disableGutters>
         <Box
           sx={{
@@ -157,23 +202,40 @@ const Hero = ({ onSeeWork }) => {
         >
           {/* Copy */}
           <Box>
-            <motion.div {...stagger(0)}>
-              <Typography variant="overline" color="primary.main" sx={{ display: 'block', mb: 2 }}>
-                {profile.role} &middot; {profile.location}
-              </Typography>
-            </motion.div>
+            <Typography
+              className="hero-overline"
+              variant="overline"
+              color="primary.main"
+              sx={{ display: 'block', mb: 2 }}
+            >
+              {profile.role} &middot; {profile.location}
+            </Typography>
 
-            <motion.div {...stagger(1)}>
-              <Typography
-                variant="h1"
-                component="h1"
-                sx={{ mb: 2.5, fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' } }}
-              >
-                {profile.name}
-              </Typography>
-            </motion.div>
+            <Typography
+              variant="h1"
+              component="h1"
+              sx={{ mb: 2.5, fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' } }}
+            >
+              {/* Each word in its own overflow-hidden line so the timeline can
+                  unmask them; screen readers still get one plain string. */}
+              {profile.name.split(' ').map((word, i) => (
+                <React.Fragment key={word}>
+                  {/* A real space text node between the masks, so copy-paste
+                      and screen readers still get "Nicholas Smith". */}
+                  {i > 0 && ' '}
+                  <Box
+                    component="span"
+                    sx={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom' }}
+                  >
+                    <Box component="span" className="hero-word" sx={{ display: 'inline-block' }}>
+                      {word}
+                    </Box>
+                  </Box>
+                </React.Fragment>
+              ))}
+            </Typography>
 
-            <motion.div {...stagger(2)}>
+            <Box className="hero-item">
               <Typography
                 sx={{
                   fontFamily: theme.custom.displayFont,
@@ -188,20 +250,20 @@ const Hero = ({ onSeeWork }) => {
               >
                 {profile.thesis}
               </Typography>
-            </motion.div>
+            </Box>
 
-            <motion.div {...stagger(3)}>
+            <Box className="hero-item">
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5, maxWidth: 620 }}>
                 {profile.proof}
               </Typography>
-            </motion.div>
+            </Box>
 
             {/*
               * These duplicate what the projects below already demonstrate, and
               * are kept for the readers who are not reading: recruiter keyword
               * scanners and ATS-style tooling match on the plain skill names.
               */}
-            <motion.div {...stagger(4)}>
+            <Box className="hero-item">
               <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1, mb: 3.5 }}>
                 {profile.skills.map((skill) => (
                   <Chip
@@ -216,9 +278,9 @@ const Hero = ({ onSeeWork }) => {
                   />
                 ))}
               </Stack>
-            </motion.div>
+            </Box>
 
-            <motion.div {...stagger(5)}>
+            <Box className="hero-item">
               <Stack direction="row" spacing={1.5} sx={{ flexWrap: 'wrap', gap: 1.5, mb: 3 }}>
                 <Button
                   variant="contained"
@@ -243,9 +305,9 @@ const Hero = ({ onSeeWork }) => {
                   Resume
                 </Button>
               </Stack>
-            </motion.div>
+            </Box>
 
-            <motion.div {...stagger(6)}>
+            <Box className="hero-item">
               <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', gap: 1 }}>
                 {socials.map(({ icon: Icon, label, href }) => (
                   <IconButton
@@ -287,18 +349,22 @@ const Hero = ({ onSeeWork }) => {
                   )}
                 </Box>
               </Stack>
-            </motion.div>
+            </Box>
           </Box>
 
           {/* Portrait */}
-          <motion.div
-            {...(prefersReducedMotion ? {} : { ...rise, transition: { ...rise.transition, delay: 0.12 } })}
+          <Box
+            sx={{
+              position: 'relative',
+              width: '100%',
+              maxWidth: { xs: 240, md: 300 },
+              mx: { xs: 'auto', md: 0 },
+            }}
           >
             <Box
+              className="hero-portrait"
               sx={{
                 width: '100%',
-                maxWidth: { xs: 240, md: 300 },
-                mx: { xs: 'auto', md: 0 },
                 aspectRatio: '3 / 4',
                 borderRadius: `${theme.custom.radius.container}px`,
                 overflow: 'hidden',
@@ -326,16 +392,18 @@ const Hero = ({ onSeeWork }) => {
                 />
               )}
             </Box>
-          </motion.div>
+            <CornerTick corner="tl" />
+            <CornerTick corner="tr" />
+            <CornerTick corner="bl" />
+            <CornerTick corner="br" />
+          </Box>
         </Box>
 
-        <motion.div {...(prefersReducedMotion ? {} : { ...rise, transition: { ...rise.transition, delay: 0.3 } })}>
-          <EvidenceLedger
-            items={profile.heroLedger}
-            label={profile.heroLedgerLabel}
-            onNavigate={openLedgerItem}
-          />
-        </motion.div>
+        <EvidenceLedger
+          items={profile.heroLedger}
+          label={profile.heroLedgerLabel}
+          onNavigate={openLedgerItem}
+        />
       </Container>
     </Box>
   );

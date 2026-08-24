@@ -1,4 +1,5 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react'
+import React, { useState, useEffect, Suspense, lazy, useCallback } from 'react'
+import { flushSync } from 'react-dom'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 
@@ -21,6 +22,7 @@ import { Box, CircularProgress, Toolbar } from '@mui/material';
 import { getThemePersonality } from './utilities/themeConfig';
 import PageTransition from './components/PageTransition/PageTransition';
 import DrawerAppBar from './components/DrawerAppBar/DrawerAppBar';
+import ScrollProgress from './components/ScrollProgress/ScrollProgress';
 import SiteFooter from './components/SiteFooter/SiteFooter';
 import ConsentBanner from './components/ConsentBanner/ConsentBanner';
 import { usePostHog } from '@posthog/react';
@@ -44,7 +46,7 @@ const LoadingFallback = () => (
 // Context to share theme switching
 const ThemeContext = React.createContext({
   current: 'technical-precision',
-  setTheme: (_name) => { },
+  setTheme: (_name, _origin) => { },
 });
 
 export const useAppTheme = () => React.useContext(ThemeContext);
@@ -88,6 +90,7 @@ const useThemeSuperProperty = (themeKey) => {
 /** Chrome shared by every route: one app bar, the page, then the footer. */
 const PageShell = ({ children }) => (
   <>
+    <ScrollProgress />
     <DrawerAppBar />
     <Toolbar />
     <PageTransition>{children}</PageTransition>
