@@ -19,35 +19,18 @@ import {
     MenuItem,
     useMediaQuery,
     Typography,
-    Select,
-    Tooltip,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import PaletteIcon from '@mui/icons-material/Palette';
 import { useAppTheme } from '../../App';
-import { themeLabels, themeOrder } from '../../utilities/themeConfig';
+import ModeMenu from '../ModeMenu/ModeMenu';
 import { profile, sections, portfolioPages } from '../../data/profile';
 import useSectionSpy from '../../hooks/useSectionSpy';
 
 // Capped against the viewport so the drawer still leaves a dismiss target on a
 // 320px screen, where a flat 280px covers almost everything.
 const drawerWidth = 'min(280px, 85vw)';
-
-const ThemeSwatch = ({ swatch, mode }) => (
-    <Box
-        sx={{
-            width: 12,
-            height: 12,
-            borderRadius: '50%',
-            bgcolor: swatch,
-            border: '1px solid',
-            borderColor: mode === 'dark' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.25)',
-            flexShrink: 0,
-        }}
-    />
-);
 
 function DrawerAppBar(props) {
     const { window } = props;
@@ -161,22 +144,7 @@ function DrawerAppBar(props) {
                 >
                     View Resume
                 </Button>
-                <Select
-                    value={current}
-                    onChange={handleThemeChange}
-                    size="small"
-                    fullWidth
-                    inputProps={{ 'aria-label': 'Colour theme' }}
-                >
-                    {themeOrder.map((key) => (
-                        <MenuItem key={key} value={key}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <ThemeSwatch swatch={themeLabels[key].swatch} mode={themeLabels[key].mode} />
-                                {themeLabels[key].label}
-                            </Box>
-                        </MenuItem>
-                    ))}
-                </Select>
+                <ModeMenu current={current} onChange={handleThemeChange} variant="drawer" />
             </Box>
         </Box>
     );
@@ -299,32 +267,10 @@ function DrawerAppBar(props) {
                                 ))}
                             </Menu>
 
-                            <Tooltip title="Colour theme">
-                                <Select
-                                    value={current}
-                                    onChange={handleThemeChange}
-                                    size="small"
-                                    variant="standard"
-                                    disableUnderline
-                                    renderValue={(key) => (
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 0.5 }}>
-                                            <PaletteIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                                            <ThemeSwatch swatch={themeLabels[key].swatch} mode={themeLabels[key].mode} />
-                                        </Box>
-                                    )}
-                                    inputProps={{ 'aria-label': 'Colour theme' }}
-                                    sx={{ ml: 1, '& .MuiSelect-select': { py: 0.5 } }}
-                                >
-                                    {themeOrder.map((key) => (
-                                        <MenuItem key={key} value={key}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <ThemeSwatch swatch={themeLabels[key].swatch} mode={themeLabels[key].mode} />
-                                                {themeLabels[key].label}
-                                            </Box>
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </Tooltip>
+                            {/* No tooltip: it stayed open over the first menu
+                                item once the menu was showing, and the options
+                                now carry their own descriptions anyway. */}
+                            <ModeMenu current={current} onChange={handleThemeChange} />
 
                             <Button
                                 href={profile.resume}
