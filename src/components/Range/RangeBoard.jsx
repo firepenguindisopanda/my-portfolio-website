@@ -160,6 +160,7 @@ const RangeBoard = () => {
         eyebrow="Range"
         title="Six domains, one standard"
         description="Every number on this board is measured from a shipped project, and the line under it says where to check."
+        count={`${domains.length} domains`}
       />
 
       <Box

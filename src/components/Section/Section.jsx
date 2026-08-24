@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import useLayout from '../../hooks/useLayout';
+import { RAIL_WIDTH } from '../../utilities/themeConfig';
 
 /**
  * The vertical rhythm between sections, owned in one place.
@@ -22,7 +23,7 @@ import useLayout from '../../hooks/useLayout';
  * modes diverge) and not every one of those is a multiple of eight.
  */
 const Section = React.forwardRef(({ children, component = 'div', sx, ...rest }, ref) => {
-  const { sectionSpacing } = useLayout();
+  const { sectionSpacing, gutter } = useLayout();
 
   return (
     <Box
@@ -30,6 +31,14 @@ const Section = React.forwardRef(({ children, component = 'div', sx, ...rest }, 
       component={component}
       sx={{
         py: { xs: `${sectionSpacing.xs}px`, md: `${sectionSpacing.md}px` },
+        // Notebook reserves a margin rail beside every section, which is what
+        // SectionHeading's eyebrow hangs out into and what phases 4-5 fill with
+        // dates and source citations. Reserved here rather than per component so
+        // the rail is the same width down the whole page.
+        //
+        // Only `rail` is wired: `channel` (Instrument) needs a code per section,
+        // which is data those components do not carry yet.
+        ...(gutter === 'rail' && { pl: { md: `${RAIL_WIDTH}px` } }),
         ...sx,
       }}
       {...rest}
