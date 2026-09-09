@@ -12,7 +12,7 @@ vi.mock('../components/Projects/Projects', () => ({ default: () => <div data-tes
 vi.mock('../components/WorkExperience/WorkExperience', () => ({ default: () => <div data-testid="work">Experience</div> }));
 vi.mock('../components/AcademicAchievements/AcademicAchievements', () => ({ default: () => <div data-testid="academic">Certificates</div> }));
 vi.mock('../components/contact/Contact', () => ({ default: () => <div data-testid="contact">Contact</div> }));
-vi.mock('../components/TechnicalSkills/ExtraCurricular', () => ({ default: () => <div data-testid="extra">Extra Curricular</div> }));
+vi.mock('../components/WorkedExample/WorkedExample', () => ({ default: () => <div data-testid="worked-example">Worked example</div> }));
 vi.mock('../components/BackToTop/BackToTop', () => ({ default: ({ children }) => <div data-testid="scroll-top">{children}</div> }));
 vi.mock('../assets/NicholasSmith_Resume.pdf', () => ({ default: 'mocked-resume.pdf' }));
 
@@ -31,7 +31,7 @@ describe('Home page', () => {
   it('renders every section', () => {
     renderHome();
 
-    ['hero', 'projects', 'work', 'about-me', 'technical', 'academic', 'extra', 'contact']
+    ['hero', 'projects', 'worked-example', 'work', 'about-me', 'technical', 'academic', 'contact']
       .forEach((testId) => expect(screen.getByTestId(testId)).toBeInTheDocument());
   });
 
@@ -48,12 +48,21 @@ describe('Home page', () => {
     expect(order.indexOf('projects')).toBeLessThan(order.indexOf('academic'));
     expect(order.indexOf('work')).toBeLessThan(order.indexOf('academic'));
     expect(order.indexOf('hero')).toBeLessThan(order.indexOf('projects'));
+    // The worked example is a drill-down into the work, so it follows it.
+    expect(order.indexOf('projects')).toBeLessThan(order.indexOf('worked-example'));
+  });
+
+  it('keeps mentorship and the full credential index off the home page', () => {
+    // Both moved to /background. Together they were 2,026px of supporting
+    // material sitting between the credentials summary and the contact form.
+    const { container } = renderHome();
+    expect(container.querySelector('#community')).toBeNull();
   });
 
   it('gives the app bar real anchor targets for every nav section', () => {
     const { container } = renderHome();
 
-    ['projects', 'experience', 'skills', 'credentials', 'contact'].forEach((id) => {
+    ['projects', 'worked-example', 'experience', 'skills', 'credentials', 'contact'].forEach((id) => {
       expect(container.querySelector(`#${id}`)).not.toBeNull();
     });
   });

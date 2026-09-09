@@ -8,9 +8,9 @@ import {
   EvidenceLedger,
   MaskedName,
   Portrait,
-  SkillChips,
   SocialRow,
   StatusChips,
+  SupportingCopy,
   profile,
 } from '../heroParts';
 
@@ -110,20 +110,6 @@ const Cover = ({ onSeeWork }) => {
               </Typography>
             </Box>
 
-            <Box className="hero-item">
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ maxWidth: `${theme.custom.layout.measure}ch`, mb: 3 }}
-              >
-                {profile.proof}
-              </Typography>
-            </Box>
-
-            <Box className="hero-item" sx={{ mb: 3 }}>
-              <SkillChips />
-            </Box>
-
             <Box className="hero-item" sx={{ mb: 3 }}>
               <CtaRow onSeeWork={onSeeWork} />
             </Box>
@@ -137,6 +123,12 @@ const Cover = ({ onSeeWork }) => {
 
         <Box sx={{ pl: { md: `${RAIL_WIDTH}px` } }}>
           <EvidenceLedger sx={{ mt: { xs: 4, md: 5 } }} />
+
+          <SupportingCopy
+            className="hero-item"
+            maxWidth={`${theme.custom.layout.measure}ch`}
+            sx={{ mt: { xs: 4, md: 4.5 } }}
+          />
         </Box>
       </Container>
     </Box>

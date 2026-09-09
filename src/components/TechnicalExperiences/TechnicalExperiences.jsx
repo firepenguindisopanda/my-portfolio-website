@@ -51,10 +51,45 @@ const skillCategories = [
   },
 ];
 
+/**
+ * A tablist is a single tab stop whose selection moves with the arrow keys.
+ *
+ * The markup already claimed `role="tablist"`/`role="tab"`/`role="tabpanel"`,
+ * which is a promise to a screen-reader user about how the control behaves -
+ * but nothing implemented it: every tab was its own tab stop, arrow keys did
+ * nothing, and no tab was associated with the panel it controls. Either the
+ * roles come off or the behaviour goes on, and the behaviour is the smaller
+ * change.
+ */
+const useTabListKeys = (count, activeIndex, setActiveIndex) => {
+  const refs = React.useRef([]);
+
+  const onKeyDown = (event) => {
+    const moves = {
+      ArrowDown: (i) => (i + 1) % count,
+      ArrowRight: (i) => (i + 1) % count,
+      ArrowUp: (i) => (i - 1 + count) % count,
+      ArrowLeft: (i) => (i - 1 + count) % count,
+      Home: () => 0,
+      End: () => count - 1,
+    };
+    const move = moves[event.key];
+    if (!move) return;
+
+    event.preventDefault();
+    const next = move(activeIndex);
+    setActiveIndex(next);
+    refs.current[next]?.focus();
+  };
+
+  return { refs, onKeyDown };
+};
+
 const TechnicalExperiences = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const theme = useTheme();
   const active = skillCategories[activeIndex];
+  const { refs, onKeyDown } = useTabListKeys(skillCategories.length, activeIndex, setActiveIndex);
 
   return (
     <Section>
@@ -84,17 +119,29 @@ const TechnicalExperiences = () => {
             bgcolor: 'background.paper',
           }}
         >
-          <Stack role="tablist" aria-label="Skill categories">
+          <Stack role="tablist" aria-label="Skill categories" onKeyDown={onKeyDown}>
             {skillCategories.map((category, index) => {
               const isActive = index === activeIndex;
               return (
                 <ButtonBase
                   key={category.id}
+                  ref={(node) => {
+                    refs.current[index] = node;
+                  }}
                   role="tab"
+                  id={`skills-tab-${category.id}`}
+                  aria-controls="skills-panel"
                   aria-selected={isActive}
+                  // One tab stop for the whole list: Tab reaches the selected
+                  // category, the arrow keys move between them.
+                  tabIndex={isActive ? 0 : -1}
                   onClick={() => setActiveIndex(index)}
                   sx={{
-                    display: 'block',
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    width: '100%',
                     textAlign: 'left',
                     px: 3,
                     py: 2.25,
@@ -105,15 +152,24 @@ const TechnicalExperiences = () => {
                     '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
                   }}
                 >
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography
+                      variant="h5"
+                      component="span"
+                      sx={{ display: 'block', color: isActive ? 'primary.main' : 'text.primary' }}
+                    >
+                      {category.title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {category.caption}
+                    </Typography>
+                  </Box>
                   <Typography
-                    variant="h5"
-                    component="span"
-                    sx={{ display: 'block', color: isActive ? 'primary.main' : 'text.primary' }}
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ fontFamily: theme.custom.codeFont, flexShrink: 0 }}
                   >
-                    {category.title}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {category.caption}
+                    {category.skills.length}
                   </Typography>
                 </ButtonBase>
               );
@@ -122,7 +178,12 @@ const TechnicalExperiences = () => {
         </Grid>
 
         <Grid item xs={12} md={8}>
-          <Box role="tabpanel" sx={{ p: { xs: 3, md: 4 } }}>
+          <Box
+            role="tabpanel"
+            id="skills-panel"
+            aria-labelledby={`skills-tab-${active.id}`}
+            sx={{ p: { xs: 3, md: 4 } }}
+          >
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
               {active.description}
             </Typography>

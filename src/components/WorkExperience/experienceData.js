@@ -17,6 +17,49 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
  */
 export const workExperiences = [
   {
+    id: 'teaching-assistant',
+    title: 'Full Time Teaching Assistant',
+    organization: 'UWI, Department of Computing and Information Technology',
+    // The appointment letter (2026 September 03) sets the term as
+    // 2026 September 01 to 2027 May 31. Stated as the term rather than as
+    // "present" because it has a defined end date, which is the same standard
+    // every other row here is written to.
+    period: 'September 2026 - May 2027',
+    type: 'Education',
+    icon: SchoolIcon,
+    // 'Cloud computing' rather than 'Two semesters': both of these are terms a
+    // recruiter or an ATS actually matches on, and the period is already stated
+    // above. The spread is the point - analytics at one end, cloud at the other.
+    achievements: ['Data analytics', 'Cloud computing', 'Five courses'],
+    items: [
+      /*
+       * Every title is the official course title, not a paraphrase. The
+       * appointment letter names codes only; the Semester I pair was resolved by
+       * code against the published UWI timetable, and the Semester II three came
+       * from the departmental course descriptions, which is where they had to
+       * come from - the Semester II timetable is not published yet.
+       *
+       * INFO 3604's real title is just "Project" (the capstone), so it is left
+       * as that rather than dressed up into something more descriptive.
+       */
+      {
+        type: 'task',
+        icon: SchoolIcon,
+        text: 'Semester I: Introduction to Data Analytics (COMP 3605) and Business Information Systems (INFO 3600).',
+      },
+      {
+        type: 'task',
+        icon: SchoolIcon,
+        text: 'Semester II: Information Systems Development (INFO 2600), Project (INFO 3604) and Cloud Computing (INFO 3606).',
+      },
+      {
+        type: 'task',
+        icon: CodeIcon,
+        text: 'Ran practical sessions and supported coursework across the department\'s computing and information technology programmes.',
+      },
+    ],
+  },
+  {
     id: 'tutor',
     title: 'Part Time Tutor',
     organization: 'UWI, Department of Computing and Information Technology',

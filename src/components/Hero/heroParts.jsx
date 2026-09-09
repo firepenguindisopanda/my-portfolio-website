@@ -180,6 +180,29 @@ export const SkillChips = () => {
   );
 };
 
+/**
+ * The paragraph and the keyword list, set below the evidence ledger.
+ *
+ * Both used to sit between the thesis and the calls to action, which put ~200px
+ * of supporting material in front of the one thing in the hero worth reading
+ * first. Measured on the reference arrangement, that left the ledger's own
+ * label at 683px on an 888px hero: visible in a 900px devtools viewport, gone
+ * behind the fold on any real laptop once browser chrome is subtracted.
+ *
+ * Demoted rather than deleted. The paragraph carries specifics the ledger rows
+ * do not, the chips are read by keyword scanners that never scroll, and both
+ * are on the same page and in the same crawl wherever they sit. What changes is
+ * only which of them a person meets first.
+ */
+export const SupportingCopy = ({ maxWidth, sx, ...rest }) => (
+  <Box sx={sx} {...rest}>
+    <Typography variant="body2" color="text.secondary" sx={{ maxWidth, mb: 2.5 }}>
+      {profile.proof}
+    </Typography>
+    <SkillChips />
+  </Box>
+);
+
 export const CtaRow = ({ onSeeWork, size = 'large' }) => {
   const posthog = usePostHog();
 

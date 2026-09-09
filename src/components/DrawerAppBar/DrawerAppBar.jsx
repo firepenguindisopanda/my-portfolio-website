@@ -25,7 +25,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useAppTheme } from '../../App';
 import ModeMenu from '../ModeMenu/ModeMenu';
-import { profile, sections, portfolioPages } from '../../data/profile';
+import { profile, sections, navSections, portfolioPages } from '../../data/profile';
 import useSectionSpy from '../../hooks/useSectionSpy';
 
 // Capped against the viewport so the drawer still leaves a dismiss target on a
@@ -45,6 +45,9 @@ function DrawerAppBar(props) {
 
     const isHome = location.pathname === '/';
     // Section links only mean something on the page that has those sections.
+    // Watches every section, not just the linked ones: with only the five nav
+    // ids observed, scrolling into Range or About left the previous link lit
+    // because nothing newer had ever become visible.
     const activeSection = useSectionSpy(isHome ? sections.map((s) => s.id) : []);
 
     const handleDrawerToggle = () => setMobileOpen((open) => !open);
@@ -104,7 +107,7 @@ function DrawerAppBar(props) {
             <List
                 subheader={<ListSubheader disableSticky sx={{ bgcolor: 'transparent' }}>This page</ListSubheader>}
             >
-                {sections.map((section) => (
+                {navSections.map((section) => (
                     <ListItem key={section.id} disablePadding>
                         <ListItemButton
                             onClick={() => goToSection(section.id)}
@@ -212,7 +215,7 @@ function DrawerAppBar(props) {
 
                     {!isCompact && (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            {sections.map((section) => {
+                            {navSections.map((section) => {
                                 const isActive = isHome && activeSection === section.id;
                                 return (
                                     <Button

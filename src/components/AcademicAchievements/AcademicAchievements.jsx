@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Typography,
@@ -14,6 +15,7 @@ import {
     useTheme,
 } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
@@ -136,6 +138,17 @@ const CredentialIndex = ({ items, 'aria-label': ariaLabel }) => (
 );
 
 /**
+ * How many certificate rows the home page shows before handing off to /background.
+ *
+ * Seventeen featured rows ran to ~880px on a page where credentials and
+ * community together were 21% of the scroll - more than projects and experience
+ * combined. Six is the top of the same list, and because FEATURED is ordered
+ * strongest-first it is also the half that covers both halves of the job:
+ * two ML specialisations and three data-analytics certificates.
+ */
+const HOME_LIMIT = 6;
+
+/**
  * Certificates and awards.
  *
  * The certificate wall used to be ~92 entries behind 12 pages of pagination,
@@ -146,17 +159,29 @@ const CredentialIndex = ({ items, 'aria-label': ariaLabel }) => (
  * Awards keep the block treatment. They are four things with a story each -
  * a placing, a field, a margin - not rows in an index, and the mode's `surface`
  * token is what decides how a block is enclosed.
+ *
+ * `full` is what /background passes. The home page shows the first six rows and
+ * a link; the background page shows the index in full, with the coursework
+ * behind the same disclosure it has always had. One component either way - the
+ * two views differ by how many rows they slice, not by having their own layout.
  */
-const AcademicAchievements = () => {
+const AcademicAchievements = ({ full = false }) => {
     const [tab, setTab] = useState(0);
     const [showAll, setShowAll] = useState(false);
+    const navigate = useNavigate();
+
+    const shown = full ? featuredCertificates : featuredCertificates.slice(0, HOME_LIMIT);
 
     return (
         <Section>
             <SectionHeading
                 eyebrow="Credentials"
                 title="Certificates & awards"
-                description="Specialisations, professional certificates and competition placings. Verification links go straight to the issuer."
+                description={
+                    full
+                        ? 'Every certificate on file, plus competition placings. Verification links go straight to the issuer.'
+                        : 'Specialisations, professional certificates and competition placings. Verification links go straight to the issuer.'
+                }
             />
 
             <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 3 }}>
@@ -166,9 +191,21 @@ const AcademicAchievements = () => {
 
             {tab === 0 && (
                 <>
-                    <CredentialIndex items={featuredCertificates} aria-label="Featured certificates" />
+                    <CredentialIndex items={shown} aria-label="Featured certificates" />
 
-                    {otherCertificates.length > 0 && (
+                    {!full && (
+                        <Box sx={{ mt: 3 }}>
+                            <Button
+                                variant="outlined"
+                                endIcon={<ArrowForwardIcon />}
+                                onClick={() => navigate('/background')}
+                            >
+                                {`All ${totalCertificateCount} credentials and community work`}
+                            </Button>
+                        </Box>
+                    )}
+
+                    {full && otherCertificates.length > 0 && (
                         <>
                             <Box sx={{ mt: 3 }}>
                                 <Button

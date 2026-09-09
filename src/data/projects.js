@@ -9,6 +9,7 @@ import uwiScraperShot from '../assets/screenshots/uwi-scraper.webp';
 import pythonOcrShot from '../assets/screenshots/python-ocr.webp';
 import biReportingShot from '../assets/screenshots/bi-automatic-reporting.webp';
 import fastapiMockerShot from '../assets/screenshots/fastapimocker.webp';
+import timetableBuilderShot from '../assets/screenshots/timetable-builder.webp';
 
 export const projects = [
   {
@@ -126,7 +127,11 @@ export const projects = [
     technologies: ['Python 3.13', 'FastAPI', 'SQLModel', 'SQLAlchemy', 'Alembic', 'Neon Postgres', 'Upstash Redis', 'asyncpg', 'pydantic-settings', 'JWT', 'pytest', 'uv'],
     thumbnail: null,
     featured: true,
-    topPick: true,
+    // No longer a top pick. It was the FastAPI-service showcase in the first
+    // row until timetable-builder shipped, which is the same shape of work at
+    // seven publications' worth of operational history, so it took the slot.
+    // The first screen holds six cards and the badge only means something if
+    // fewer than six carry it.
     githubUrl: null,
     liveUrl: 'https://fastapimocker.fastapicloud.dev/',
     markdown: '/markdowns/fastapimocker.md',
@@ -296,7 +301,7 @@ export const projects = [
     thumbnail: null,
     featured: false,
     githubUrl: 'https://github.com/firepenguindisopanda/react-portfolio-website',
-    liveUrl: 'https://nicksportfolio.tech/',
+    liveUrl: 'https://nicksmith.is-a.dev/',
     markdown: '/markdowns/portfolio-website.md',
     evidence: 'A Vitest suite runs in CI on every push, and the four theme personalities share one set of structural tokens so they cannot drift into four different websites.',
     techIcons: [ { Icon: ReactIcon, label: 'React' }, { Icon: MaterialUi, label: 'Material UI' }, { Icon: FirebaseIcon, label: 'Firebase' } ],
@@ -443,6 +448,46 @@ export const projects = [
       'HTMX-powered inline editing and Alpine.js batch editing for classification fields without page reloads',
       'Admin dashboard with aggregate metrics, hidden login URL, bcrypt auth, and Redis-backed sessions',
       'Scheduled crawl jobs via APScheduler with cron-based scheduling and background health-check runs',
+    ],
+  },
+  {
+    id: 'timetable-builder',
+    highlight: 'Every published UWI timetable PDF - about 1,600 of them - extracted into a Postgres warehouse and served as a searchable explorer, a public API and a drag-to-arrange timetable builder. A corpus validator gates every load, and each session carries a count of how many independent PDFs confirmed it.',
+    primaryTech: ['FastAPI', 'PostgreSQL', 'pdfplumber', 'Vanilla JS'],
+    // The builder with four courses auto-placed: lecture, lab and tutorial
+    // blocks colour-coded across the week, rooms named on each. It is the page
+    // students actually use, so it is the one the card shows.
+    screenshot: timetableBuilderShot,
+    title: 'Timetable Builder: UWI Timetable PDFs Into a Warehouse Students Plan From',
+    shortDescription: 'Extracts UWI St. Augustine\'s CELCAT timetable PDFs - one per course, room and lecturer - into a PostgreSQL warehouse, and serves a course, room and lecturer explorer, a public JSON API, and a timetable builder that fills a week in from course codes and lets a student drag any class to another sitting. Live through seven republished timetables.',
+    description: 'UWI publishes its timetable as roughly 1,600 CELCAT PDFs and nothing lets a student ask what their week looks like for a given set of courses. This extracts every PDF with pdfplumber geometry and keyword parsing into a Postgres warehouse where sessions are stored per publication and never overwritten, so any two publications can be diffed. Off that it serves a read-only explorer, a public API, and a builder: pick courses and the week fills itself in, drag a class to any of its alternative sittings, see clashes, undo and redo, and be told what moved when UWI republishes - with the option to update while keeping what you placed yourself. Every session records which PDFs described it; 3,438 of the current 3,684 (93%) are confirmed by two or more independently published timetables. Before any load, a corpus validator cross-references every extracted room and course code against the registry UWI publishes and exits non-zero if a required field drops below 99% or a sanity check fails. The telemetry is built around a real silent failure: a missing reversed-day entry filed one PDF in five\'s Wednesday classes under Tuesday, with every field populated and nothing raised - the only symptom was a corpus-wide day histogram. Extraction now returns named diagnostics for near-misses, and a weekday-skew gate sits in the validator. A vision LLM was benchmarked against the deterministic extractor on a ten-PDF sample and lost - twelve entries missed, eight invented, every block read as one hour - so it is kept only as an admin calibration tool. 444 Python and 308 JavaScript tests.',
+    category: 'Full Stack',
+    technologies: ['Python 3.12', 'FastAPI', 'PostgreSQL', 'psycopg 3', 'pdfplumber', 'PyMuPDF', 'Jinja2', 'JavaScript', 'pytest', 'MongoDB', 'NVIDIA NIM', 'uv', 'FastAPI Cloud'],
+    thumbnail: null,
+    featured: true,
+    // Top pick in place of fastapimocker - see the note on that entry. Keep the
+    // count at five: Projects.test.jsx fails if the badge is on every one of
+    // the six first-screen cards.
+    topPick: true,
+    githubUrl: 'https://github.com/firepenguindisopanda/timetable-builder',
+    liveUrl: 'https://celcat-timetable-extraction.fastapicloud.dev/',
+    markdown: '/markdowns/timetable-builder.md',
+    evidence: 'Every session records which PDFs described it - 93% of the current publication is confirmed by two or more independently published timetables - and a corpus validator cross-references every extracted room and course code against UWI\'s own registry before a load, exiting non-zero rather than commenting.',
+    techIcons: [
+      { Icon: Python, label: 'Python' },
+      { Icon: PostgresqlIcon, label: 'PostgreSQL' },
+    ],
+    tasks: [
+      'Deterministic PDF extraction with pdfplumber geometry and keyword parsing across roughly 1,600 course, room and lecturer timetables, returning a diagnostics block that names near-misses instead of swallowing them',
+      'PostgreSQL warehouse storing sessions per publication, never overwritten, with a current_sessions view that flips on its own when a genuine republish is loaded - publication identity is the SHA-256 of the registry XML',
+      'Corpus validator that cross-references extracted rooms and course codes against the published finder.xml registry, reports coverage, malformed times, merged blocks and phantom codes, and exits non-zero below a 99% coverage gate',
+      'Sync tooling that detects a republish and pulls it, writing the registry only after every link is walked without error - a partial pull would otherwise attach changed sessions to the previous publication silently; the guard has fired in production',
+      'Timetable builder: pick courses and the week auto-places one lecture, lab and tutorial per course, drag any class to another sitting, clash detection, undo and redo, and placements the student made persisting across reloads and republishes',
+      'Republish handling for saved timetables - detects that a saved week is behind, lists what moved, and refreshes courses while keeping pins; a changes feed diffs any publication against the one before it',
+      'Explorer for courses, rooms and lecturers with a week view, teaching-weeks strip and a provenance rail on every page saying when UWI published, when it was imported and when it was last checked',
+      'Public JSON API - sessions per course with a source count on each, a changes endpoint, and an ops health endpoint - alongside key-guarded admin routes that close, not open, when the key is unset',
+      'Observability built around a real silent misfile: structured logs with correlation ids, extraction findings, and a weekday-skew gate, after a missing reversed-day entry filed one PDF in five\'s Wednesday classes under Tuesday',
+      'Content-hashed asset versioning after a deploy served new HTML against a cached old script and rendered a blank calendar over a good saved timetable; 444 Python and 308 JavaScript tests, the JS suite run in a vm context in browser load order',
     ],
   },
   {

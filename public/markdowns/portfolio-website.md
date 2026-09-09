@@ -4,7 +4,7 @@
 
 Personal portfolio that showcases projects, technical skills, and a modern web design built with React and Material UI.
 
-**Live Site:** https://nicksportfolio.tech/
+**Live Site:** https://nicksmith.is-a.dev/
 **Repository:** https://github.com/firepenguindisopanda/react-portfolio-website
 
 ---
