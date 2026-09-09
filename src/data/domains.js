@@ -9,6 +9,7 @@ import { projects } from './projects';
  */
 
 const fullStackCount = projects.filter((p) => p.category === 'Full Stack').length;
+const dataScienceCount = projects.filter((p) => p.category === 'Data Science').length;
 
 export const domains = [
   {
@@ -48,10 +49,21 @@ export const domains = [
   {
     code: 'DATA',
     name: 'Data science',
-    stat: { value: 89, suffix: '%', label: 'modelled fraud losses cut' },
-    source: 'fraud detection - threshold derived from a cost function',
+    /*
+     * This cell used to carry the fraud result - "89% modelled fraud losses
+     * cut", sourced to the cost function. The worked example a few sections
+     * below now shows that same decision in full, and it reports 88.9% because
+     * that is what the metrics artifact says. Two numbers for one fact, rounded
+     * differently, on a page whose argument is that its numbers are checkable.
+     *
+     * So the board keeps the job it is good at - saying how much of each
+     * domain there is, and where to count it - and hands the result itself to
+     * the section that can actually show the workings.
+     */
+    stat: { value: dataScienceCount, label: 'data-science studies' },
+    source: 'the projects below, filtered to Data Science',
     claim:
-      'Analysis that reports confidence intervals, paired significance tests and cost curves rather than a single accuracy score.',
+      'Analysis that reports confidence intervals, paired significance tests and cost curves rather than a single accuracy score. The worked example below is one of them.',
     flagships: [
       { id: 'fraud-detection', name: 'fraud-detection' },
       { id: 'starbucks-offer-analysis', name: 'starbucks-analysis' },

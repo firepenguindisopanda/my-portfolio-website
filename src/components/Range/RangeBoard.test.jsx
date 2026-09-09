@@ -4,6 +4,7 @@ import * as router from 'react-router-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import RangeBoard from './RangeBoard';
+import { Stat } from './rangeParts';
 import { domains } from '../../data/domains';
 import { getThemePersonality, themeOrder, themePersonalities } from '../../utilities/themeConfig';
 
@@ -12,12 +13,10 @@ vi.mock('react-router-dom', async () => ({
   useNavigate: vi.fn(),
 }));
 
-const renderIn = (key) =>
+const renderIn = (key, ui = <RangeBoard />) =>
   render(
     <ThemeProvider theme={createTheme(getThemePersonality(key))}>
-      <MemoryRouter>
-        <RangeBoard />
-      </MemoryRouter>
+      <MemoryRouter>{ui}</MemoryRouter>
     </ThemeProvider>
   );
 
@@ -59,7 +58,7 @@ describe('Range board', () => {
       expect(values).toEqual(domains.map((d) => String(d.stat.value)));
     });
 
-    it.each(themeOrder)('%s keeps the suffix outside the animated span', (key) => {
+    it.each(themeOrder)('%s tweens a bare number, never a number with a unit', (key) => {
       // A suffix inside `.range-stat` would be swept into the numeric tween and
       // disappear, so "89%" would count up to "89".
       const { container, unmount } = renderIn(key);
@@ -67,8 +66,22 @@ describe('Range board', () => {
       [...container.querySelectorAll('.range-stat')].forEach((el) => {
         expect(el.textContent).toMatch(/^\d+$/);
       });
-      expect(screen.getByText(/89/)).toBeInTheDocument();
       unmount();
+    });
+
+    it('renders a suffix beside the tweened span rather than inside it', () => {
+      // No live domain carries a suffix any more: the DATA cell's "89%" was the
+      // only one, and it moved to the worked-example section, which shows that
+      // result in full rather than restating it. The guarantee still has to
+      // hold for whoever adds the next one, so it is exercised with a fixture
+      // instead of being left to rot until the day it matters.
+      const { container } = renderIn(
+        themeOrder[0],
+        <Stat domain={{ stat: { value: 89, suffix: '%' } }} />
+      );
+
+      expect(container.querySelector('.range-stat').textContent).toBe('89');
+      expect(container.textContent).toContain('89%');
     });
   });
 

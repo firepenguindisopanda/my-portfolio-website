@@ -35,6 +35,7 @@ const FullstackPortfolio = lazy(() => import('./pages/FullstackPortfolio'));
 const DesktopPortfolio = lazy(() => import('./pages/DesktopPortfolio'));
 const AndroidPortfolio = lazy(() => import('./pages/AndroidPortfolio'));
 const MLPortfolio = lazy(() => import('./pages/MLPortfolio'));
+const Background = lazy(() => import('./pages/Background'));
 const AboutPanda = lazy(() => import('./pages/AboutPanda'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
@@ -208,6 +209,7 @@ const ToggleThemeProvider = () => {
               <Route path="/desktop" element={<PageShell><DesktopPortfolio /></PageShell>} />
               <Route path="/android" element={<PageShell><AndroidPortfolio /></PageShell>} />
               <Route path="/ml" element={<PageShell><MLPortfolio /></PageShell>} />
+              <Route path="/background" element={<PageShell><Background /></PageShell>} />
               <Route path="/about-panda" element={<PageShell><AboutPanda /></PageShell>} />
               <Route path="*" element={<PageShell><NotFound /></PageShell>} />
             </Routes>

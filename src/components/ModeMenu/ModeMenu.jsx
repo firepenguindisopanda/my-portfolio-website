@@ -41,7 +41,11 @@ const ModeMenu = ({ current, onChange, variant = 'bar' }) => {
       size="small"
       fullWidth={!inBar}
       variant={inBar ? 'standard' : 'outlined'}
-      disableUnderline={inBar}
+      // Only the standard variant has an underline to disable. Passing the prop
+      // unconditionally meant the drawer's outlined Select received a prop MUI
+      // does not consume, so React forwarded it to the DOM and logged a warning
+      // on every page load.
+      {...(inBar ? { disableUnderline: true } : {})}
       renderValue={(key) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: inBar ? 0.5 : 0 }}>
           {inBar && <PaletteIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}

@@ -1,10 +1,10 @@
-# nicksportfolio.tech
+# nicksmith.is-a.dev
 
 Nicholas Smith's portfolio: a React single-page app that presents the same
 projects, experience and credentials in four editorial formats, switchable from
 the app bar.
 
-Live at https://nicksportfolio.tech
+Live at https://nicksmith.is-a.dev
 
 ## Stack
 

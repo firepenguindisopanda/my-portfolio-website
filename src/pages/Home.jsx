@@ -7,10 +7,10 @@ import Hero from '../components/Hero/Hero';
 import RangeBoard from '../components/Range/RangeBoard';
 import AboutMe from '../components/AboutMe/AboutMe';
 import Projects from '../components/Projects/Projects';
+import WorkedExample from '../components/WorkedExample/WorkedExample';
 import WorkExperience from '../components/WorkExperience/WorkExperience';
 import TechnicalExperiences from '../components/TechnicalExperiences/TechnicalExperiences';
 import AcademicAchievements from '../components/AcademicAchievements/AcademicAchievements';
-import ExtraCurricular from '../components/TechnicalSkills/ExtraCurricular';
 import Contact from '../components/contact/Contact';
 import useDocumentMeta from '../hooks/useDocumentMeta';
 import { routeMeta } from '../data/routes';
@@ -22,6 +22,16 @@ const SECTION_OFFSET = 72;
  * what have you built, and where have you worked - before anything else.
  * Projects and experience used to sit 3rd and 9th, behind ~7,000px of
  * certificates and values cards.
+ *
+ * The worked example sits directly after Projects rather than before it: it is
+ * a drill-down into one of them, and putting a second capabilities block (after
+ * Range) in front of the work itself would have pushed the thing everyone comes
+ * for further down the page.
+ *
+ * Mentorship and community moved to /background. It was 942px of supporting
+ * material sitting between Credentials and Contact, and nobody scrolls nine
+ * screens to reach a contact form past it. Nothing was cut - the page that now
+ * holds it can give it more room than it had here.
  */
 const Home = () => {
   useDocumentMeta(routeMeta('/'));
@@ -69,6 +79,10 @@ const Home = () => {
           <Projects />
         </Box>
 
+        <Box component="section" id="worked-example" sx={{ scrollMarginTop: SECTION_OFFSET }}>
+          <WorkedExample />
+        </Box>
+
         <Box component="section" id="experience" sx={{ scrollMarginTop: SECTION_OFFSET }}>
           <WorkExperience />
         </Box>
@@ -83,10 +97,6 @@ const Home = () => {
 
         <Box component="section" id="credentials" sx={{ scrollMarginTop: SECTION_OFFSET }}>
           <AcademicAchievements />
-        </Box>
-
-        <Box component="section" id="community" sx={{ scrollMarginTop: SECTION_OFFSET }}>
-          <ExtraCurricular />
         </Box>
 
         <Box component="section" id="contact" sx={{ scrollMarginTop: SECTION_OFFSET }}>

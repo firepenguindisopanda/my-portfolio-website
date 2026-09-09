@@ -7,8 +7,8 @@ import {
   EvidenceLedger,
   MaskedName,
   Portrait,
-  SkillChips,
   SocialRow,
+  SupportingCopy,
   profile,
 } from '../heroParts';
 
@@ -103,7 +103,7 @@ const Masthead = ({ onSeeWork }) => {
           <Field label="Location">{profile.location}</Field>
           <Field label="Available">{profile.available ? 'Yes, for roles and contract work' : 'Not currently'}</Field>
           <Field label="Working since">{profile.since}</Field>
-          <Field label="Focus">Full-stack, ML, desktop</Field>
+          <Field label="Focus">Full-stack, data, ML</Field>
         </Box>
 
         {/* The note on the filing. */}
@@ -121,13 +121,6 @@ const Masthead = ({ onSeeWork }) => {
           >
             {profile.thesis}
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: '78ch' }}>
-            {profile.proof}
-          </Typography>
-        </Box>
-
-        <Box className="hero-item" sx={{ mt: 2.5 }}>
-          <SkillChips />
         </Box>
 
         <Box
@@ -139,6 +132,8 @@ const Masthead = ({ onSeeWork }) => {
         </Box>
 
         <EvidenceLedger sx={{ mt: { xs: 4, md: 4.5 } }} />
+
+        <SupportingCopy className="hero-item" maxWidth="78ch" sx={{ mt: { xs: 3.5, md: 4 } }} />
       </Container>
     </Box>
   );

@@ -334,9 +334,24 @@ const buildLayout = ({
 });
 
 /** Tokens components read instead of re-declaring per-theme design maps. */
-const buildCustom = ({ divider, hoverBorder, hoverLift, radius, motion, layout, displayFont, focusRing }) => ({
+const buildCustom = ({ divider, hoverBorder, hoverLift, radius, motion, layout, displayFont, focusRing, chart }) => ({
   radius,
   focusRing,
+  // The one non-accent colour any figure on this site is allowed to use.
+  //
+  // A chart here compares a measured outcome against the null option, so it
+  // needs exactly two marks: the accent for the result being argued for, and
+  // one recessive tone for the baseline it beats. Four modes with four accents
+  // means the baseline cannot be a single hex - hence a token.
+  //
+  // Every value was chosen by running the pair through a CVD validator against
+  // that mode's own surface rather than by eye: each clears the >=15 OKLab
+  // normal-vision separation floor from its accent (the pass that
+  // `text.secondary` failed at 11.7 on Instrument, which is where this started)
+  // and holds 3:1 against the ground so the bar is visible on its own. It is
+  // deliberately achromatic: grey is the semantic here - it is the option
+  // nobody chose - so the usual chroma floor for peer categories does not apply.
+  chart,
   card: {
     border: `1px solid ${divider}`,
     borderColor: divider,
@@ -367,6 +382,7 @@ const TP = {
   divider: 'rgba(139,156,168,0.26)',
   hoverBorder: 'rgba(76,194,224,0.55)',
   focusRing: '#4CC2E0',
+  chart: { baseline: '#5C6B78' }, // validated against the #101922 panel
   overlay: '0 8px 24px rgba(0,0,0,0.55)',
   radius: { control: 4, container: 8 },
   motion: buildMotion(INSTRUMENT_MOTION),
@@ -428,6 +444,7 @@ const OM = {
   divider: '#DEDEDA',
   hoverBorder: 'rgba(107,45,92,0.55)',
   focusRing: '#6B2D5C',
+  chart: { baseline: '#8A8A93' }, // validated against the #F1F1EF wall
   overlay: '0 8px 24px rgba(22,22,26,0.12)',
   // Plates are square. A gallery does not round the corners of what it hangs.
   radius: { control: 0, container: 0 },
@@ -498,6 +515,7 @@ const FC = {
   divider: 'rgba(201,146,107,0.26)',
   hoverBorder: 'rgba(75,164,123,0.60)',
   focusRing: '#4BA47B',
+  chart: { baseline: '#6E665D' }, // validated against the #1C1915 page
   overlay: '0 8px 24px rgba(0,0,0,0.5)',
   radius: { control: 2, container: 4 },
   motion: buildMotion(NOTEBOOK_MOTION),
@@ -561,6 +579,7 @@ const CC = {
   divider: '#D8DCE3',
   hoverBorder: '#3B37B8',
   focusRing: '#3B37B8',
+  chart: { baseline: '#7E889A' }, // validated against the #F4F5F7 sheet
   overlay: '0 8px 24px rgba(20,27,38,0.10)',
   // Documents are square.
   radius: { control: 0, container: 0 },
@@ -640,7 +659,9 @@ export const themePersonalities = {
  * once the modes carry their own layouts it would be pointing at the wrong
  * thing entirely. Each name now says what format the visitor is about to get.
  *
- * `descriptor` is unused until phase 7 adds it to the mode menu.
+ * `descriptor` is what stops the control reading as a colour picker: ModeMenu
+ * sets it under each name in the dropdown, because "Instrument" and "Exhibit"
+ * tell a first-time visitor nothing about the fact that the layout changes too.
  */
 export const themeLabels = {
   'technical-precision': {

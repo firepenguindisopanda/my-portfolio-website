@@ -7,9 +7,9 @@ import {
   EvidenceLedger,
   MaskedName,
   Portrait,
-  SkillChips,
   SocialRow,
   StatusChips,
+  SupportingCopy,
   profile,
 } from '../heroParts';
 
@@ -57,7 +57,12 @@ const Panel = ({ onSeeWork }) => {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) 300px' },
+            // 216px, not 300. With the paragraph and the chips moved below the
+            // ledger the copy column is ~346px tall, and a 300px portrait is
+            // 400px tall - it would have become the taller of the two and held
+            // the grid open at exactly the height the demotion just reclaimed.
+            // At 216 it is 288px and the copy column still sets the height.
+            gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) 216px' },
             gap: { xs: 4, md: 6 },
             alignItems: 'start',
           }}
@@ -86,16 +91,6 @@ const Panel = ({ onSeeWork }) => {
               </Typography>
             </Box>
 
-            <Box className="hero-item">
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5, maxWidth: 620 }}>
-                {profile.proof}
-              </Typography>
-            </Box>
-
-            <Box className="hero-item" sx={{ mb: 3.5 }}>
-              <SkillChips />
-            </Box>
-
             <Box className="hero-item" sx={{ mb: 3 }}>
               <CtaRow onSeeWork={onSeeWork} />
             </Box>
@@ -108,10 +103,16 @@ const Panel = ({ onSeeWork }) => {
             </Box>
           </Box>
 
-          <Portrait ticks sx={{ maxWidth: { xs: 240, md: 300 }, mx: { xs: 'auto', md: 0 } }} />
+          {/* 144 on a phone, where the columns stack and the portrait sits
+              between the calls to action and the evidence rows. At 200 it was
+              267px tall and pushed the first ledger row past the fold on a
+              typical handset once browser chrome is subtracted. */}
+          <Portrait ticks sx={{ maxWidth: { xs: 144, md: 216 }, mx: { xs: 'auto', md: 0 } }} />
         </Box>
 
         <EvidenceLedger sx={{ mt: { xs: 4, md: 5 } }} />
+
+        <SupportingCopy className="hero-item" maxWidth={620} sx={{ mt: { xs: 4, md: 5 } }} />
       </Container>
     </Box>
   );

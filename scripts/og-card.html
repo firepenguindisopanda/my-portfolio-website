@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>OG card source - Nicholas Smith</title>
+<!--
+  The source for public/og-image.png, the 1200x630 card that LinkedIn, X, Slack
+  and Facebook render when the site is shared.
+
+  It exists as HTML because the card had drifted: it still said "Software
+  Engineer" and "Mobile" long after the site said otherwise, and it was navy and
+  mint from a palette the site had already replaced - so the preview did not
+  look like the page it linked to. A PNG cannot be edited; this can.
+
+  Colours and faces are Instrument's, from src/utilities/themeConfig.js, because
+  Instrument is the default mode and therefore what someone sees one click after
+  the preview.
+
+  To regenerate:
+    1. open this file in a browser at exactly 1200x630
+    2. screenshot the viewport, save as public/og-image.png
+    3. magick og.png -strip -define png:compression-level=9 public/og-image.png
+  Keep index.html's og:image:alt in step with the chips below.
+-->
+<style>
+@font-face { font-family: 'SG'; font-weight: 700;
+  src: url(../node_modules/@fontsource/space-grotesk/files/space-grotesk-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: 'JB'; font-weight: 600;
+  src: url(../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-600-normal.woff2) format('woff2'); }
+@font-face { font-family: 'IBM'; font-weight: 400;
+  src: url(../node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2) format('woff2'); }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1200px; height: 630px; }
+body { background: #080D12; font-family: 'IBM', sans-serif; -webkit-font-smoothing: antialiased; }
+
+.card { width: 1200px; height: 630px; position: relative; overflow: hidden; }
+.rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #4CC2E0; }
+.grid { display: grid; grid-template-columns: 1fr 340px; gap: 64px;
+        padding: 96px 72px 72px; height: 100%; align-items: start; }
+
+.eyebrow { font-family: 'JB'; font-weight: 600; font-size: 20px; letter-spacing: .16em;
+           color: #4CC2E0; text-transform: uppercase; margin-bottom: 28px; }
+h1 { font-family: 'SG'; font-weight: 700; font-size: 92px; line-height: 1.02;
+     letter-spacing: -.03em; color: #E6EDF3; margin-bottom: 30px; }
+.disc { font-size: 29px; line-height: 1.45; color: #E6EDF3; margin-bottom: 8px; }
+.loc { font-size: 24px; color: #8B9CA8; margin-bottom: 34px; }
+.chips { display: flex; gap: 12px; margin-bottom: 36px; }
+.chip { font-family: 'JB'; font-weight: 600; font-size: 19px; color: #4CC2E0;
+        border: 1px solid rgba(76,194,224,.42); border-radius: 4px; padding: 9px 15px; }
+.url { font-family: 'JB'; font-weight: 600; font-size: 21px; color: #8B9CA8; }
+
+/* The same calibration ticks the Instrument hero frames the portrait with. */
+.frame { position: relative; }
+.portrait { width: 340px; aspect-ratio: 3/4; border: 1px solid rgba(139,156,168,.26);
+            border-radius: 8px; overflow: hidden; margin-top: 6px; }
+.portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tick { position: absolute; width: 22px; height: 22px; border-color: #4CC2E0; }
+.tl { top: -9px; left: -9px; border-top: 3px solid; border-left: 3px solid; }
+.tr { top: -9px; right: -9px; border-top: 3px solid; border-right: 3px solid; }
+.bl { bottom: -9px; left: -9px; border-bottom: 3px solid; border-left: 3px solid; }
+.br { bottom: -9px; right: -9px; border-bottom: 3px solid; border-right: 3px solid; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="rule"></div>
+  <div class="grid">
+    <div>
+      <div class="eyebrow">Software engineer &middot; Data analyst</div>
+      <h1>Nicholas<br>Smith</h1>
+      <div class="disc">Full-stack web &middot; Data analysis &middot; Machine learning</div>
+      <div class="loc">Port of Spain, Trinidad &amp; Tobago</div>
+      <div class="chips">
+        <div class="chip">React</div>
+        <div class="chip">Python</div>
+        <div class="chip">SQL</div>
+        <div class="chip">AI/ML</div>
+      </div>
+      <div class="url">nicksmith.is-a.dev</div>
+    </div>
+    <div class="frame">
+      <div class="portrait"><img src="../src/assets/Nicholas_Smith_profile_pic.webp" alt=""></div>
+      <div class="tick tl"></div><div class="tick tr"></div>
+      <div class="tick bl"></div><div class="tick br"></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
