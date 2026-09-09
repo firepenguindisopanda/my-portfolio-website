@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
-import { motion, useReducedMotion } from 'framer-motion';
+import Reveal from '../../Reveal/Reveal';
 import { RAIL_WIDTH } from '../../../utilities/themeConfig';
 import { ProjectActions, ProjectMedia, useOpenProject } from '../projectParts';
 
@@ -15,24 +15,9 @@ import { ProjectActions, ProjectMedia, useOpenProject } from '../projectParts';
  */
 const Entry = ({ project, index, onOpen, isLast }) => {
   const theme = useTheme();
-  const prefersReducedMotion = useReducedMotion();
-  const reveal = theme.custom.motion;
-
-  const motionProps = prefersReducedMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: reveal.distance },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: '-40px' },
-        transition: {
-          duration: reveal.duration,
-          delay: Math.min(index, 5) * reveal.stagger,
-          ease: reveal.ease,
-        },
-      };
 
   return (
-    <motion.div {...motionProps}>
+    <Reveal delay={Math.min(index, 5) * theme.custom.motion.stagger}>
       <Box
         sx={{
           display: 'grid',
@@ -145,7 +130,7 @@ const Entry = ({ project, index, onOpen, isLast }) => {
           </Box>
         )}
       </Box>
-    </motion.div>
+    </Reveal>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useTheme, alpha } from '@mui/material/styles';
 import { usePostHog } from '@posthog/react';
 import {
@@ -185,14 +185,18 @@ function DrawerAppBar(props) {
                         </IconButton>
                     )}
 
-                    {/* Deliberately not an <h1>: the hero owns the page heading. */}
+                    {/* Deliberately not an <h1>: the hero owns the page heading.
+                        A real link rather than a span with onClick, so it is in
+                        the tab order and works with Enter and middle-click. */}
                     <Typography
                         variant="h5"
-                        component="span"
-                        onClick={() => navigate('/')}
+                        component={RouterLink}
+                        to="/"
+                        aria-label={`${profile.name} - home`}
                         sx={{
                             fontWeight: 700,
-                            cursor: 'pointer',
+                            color: 'inherit',
+                            textDecoration: 'none',
                             whiteSpace: 'nowrap',
                             mr: 'auto',
                             fontSize: { xs: '1.05rem', md: '1.25rem' },
@@ -246,15 +250,20 @@ function DrawerAppBar(props) {
                                 color="inherit"
                                 endIcon={<ExpandMoreIcon />}
                                 onClick={(e) => setPortfolioAnchor(e.currentTarget)}
-                                aria-haspopup="true"
+                                id="deep-dives-button"
+                                aria-haspopup="menu"
+                                aria-controls={portfolioAnchor ? 'deep-dives-menu' : undefined}
+                                aria-expanded={portfolioAnchor ? 'true' : undefined}
                                 sx={{ fontWeight: 500, color: 'text.secondary', '&:hover': { color: 'text.primary' } }}
                             >
                                 Deep dives
                             </Button>
                             <Menu
+                                id="deep-dives-menu"
                                 anchorEl={portfolioAnchor}
                                 open={Boolean(portfolioAnchor)}
                                 onClose={() => setPortfolioAnchor(null)}
+                                MenuListProps={{ 'aria-labelledby': 'deep-dives-button' }}
                             >
                                 {portfolioPages.map((item) => (
                                     <MenuItem

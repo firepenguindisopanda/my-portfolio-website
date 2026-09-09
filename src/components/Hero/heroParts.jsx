@@ -125,7 +125,7 @@ export const SocialRow = ({ size = 18 }) => (
           '&:hover': { color: 'primary.main', borderColor: 'primary.main' },
         }}
       >
-        <Icon size={size} />
+        <Icon size={size} aria-hidden="true" focusable="false" />
       </IconButton>
     ))}
   </Stack>

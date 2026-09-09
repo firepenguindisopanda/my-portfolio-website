@@ -11,7 +11,7 @@ import {
   useTheme,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { motion, useReducedMotion } from 'framer-motion';
+import Reveal from '../Reveal/Reveal';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import LaunchIcon from '@mui/icons-material/Launch';
@@ -137,7 +137,6 @@ const ProjectRow = ({ project, index, surface }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const posthog = usePostHog();
-  const prefersReducedMotion = useReducedMotion();
 
   const openCaseStudy = () => {
     if (!project.markdown) return;
@@ -150,19 +149,10 @@ const ProjectRow = ({ project, index, surface }) => {
     navigate(`/projects/${project.id}`);
   };
 
-  const motionProps = prefersReducedMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: 12 },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: '-60px' },
-        transition: { duration: 0.4, delay: Math.min(index, 4) * 0.05, ease: [0.4, 0, 0.2, 1] },
-      };
-
   const techLabels = (project.primaryTech || project.technologies || []).slice(0, 5);
 
   return (
-    <motion.div {...motionProps}>
+    <Reveal delay={Math.min(index, 4) * theme.custom.motion.stagger}>
       <Card
         component="article"
         sx={{
@@ -267,7 +257,7 @@ const ProjectRow = ({ project, index, surface }) => {
           </Box>
         </Box>
       </Card>
-    </motion.div>
+    </Reveal>
   );
 };
 

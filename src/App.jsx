@@ -26,7 +26,6 @@ import DrawerAppBar from './components/DrawerAppBar/DrawerAppBar';
 import ScrollProgress from './components/ScrollProgress/ScrollProgress';
 import SiteFooter from './components/SiteFooter/SiteFooter';
 import ConsentBanner from './components/ConsentBanner/ConsentBanner';
-import { MotionConfig } from 'framer-motion';
 import { usePostHog } from '@posthog/react';
 
 // Lazy load pages for code splitting - reduces initial bundle size
@@ -41,7 +40,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 
 const LoadingFallback = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-    <CircularProgress />
+    <CircularProgress aria-label="Loading page" />
   </Box>
 );
 
@@ -189,18 +188,11 @@ const ToggleThemeProvider = () => {
     <ThemeContext.Provider value={contextValue}>
       <ThemeProvider theme={theme}>
         {/*
-          * One reduced-motion policy for every framer-motion animation on the
-          * site, rather than a guard each component has to remember. The four
-          * modes carry four motion characters and the slowest travels 16px over
-          * 0.7s, so anyone who asked their system for less motion has to get it
-          * everywhere - including in components nobody has touched in months.
-          *
-          * `user` disables transform and layout animations and leaves opacity
-          * alone, which is the right trade: what people ask to be rid of is
-          * movement. It does NOT cover height or size animations, so an
-          * expanding panel still needs its own check - see experienceParts.
+          * Reduced motion has no global switch here: GSAP is the only
+          * animation library, and every component that animates checks
+          * usePrefersReducedMotion (or gsapEnabled) before it starts a tween.
+          * performance.test.js fails any file that tweens without the guard.
           */}
-        <MotionConfig reducedMotion="user">
         <CssBaseline />
         <ConsentBanner />
         <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -221,7 +213,6 @@ const ToggleThemeProvider = () => {
             </Routes>
           </Suspense>
         </Router>
-        </MotionConfig>
       </ThemeProvider>
     </ThemeContext.Provider>
   );

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
-import { motion, useReducedMotion } from 'framer-motion';
+import Reveal from '../../Reveal/Reveal';
 import { ProjectActions, ProjectMedia, creditLine, useOpenProject } from '../projectParts';
 
 /**
@@ -17,24 +17,9 @@ import { ProjectActions, ProjectMedia, creditLine, useOpenProject } from '../pro
  */
 const Plate = ({ project, index, onOpen }) => {
   const theme = useTheme();
-  const prefersReducedMotion = useReducedMotion();
-  const reveal = theme.custom.motion;
-
-  const motionProps = prefersReducedMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: reveal.distance },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: '-60px' },
-        transition: {
-          duration: reveal.duration,
-          delay: Math.min(index, 5) * reveal.stagger,
-          ease: reveal.ease,
-        },
-      };
 
   return (
-    <motion.div {...motionProps}>
+    <Reveal delay={Math.min(index, 5) * theme.custom.motion.stagger}>
       <Box
         component="button"
         type="button"
@@ -100,7 +85,7 @@ const Plate = ({ project, index, onOpen }) => {
       <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1, mt: 2 }}>
         <ProjectActions project={project} onOpen={onOpen} />
       </Stack>
-    </motion.div>
+    </Reveal>
   );
 };
 

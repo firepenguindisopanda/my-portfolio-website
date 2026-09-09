@@ -107,14 +107,14 @@ const Contact = () => {
         <Grid item xs={12} md={5}>
           <Stack spacing={2}>
             <ChannelCard
-              icon={<MdOutlineEmail />}
+              icon={<MdOutlineEmail aria-hidden="true" focusable="false" />}
               label="Email"
               value={profile.email}
               href={`mailto:${profile.email}`}
               onClick={() => posthog?.capture('contact_channel_clicked', { channel: 'email' })}
             />
             <ChannelCard
-              icon={<BsWhatsapp />}
+              icon={<BsWhatsapp aria-hidden="true" focusable="false" />}
               label="WhatsApp"
               value={profile.whatsapp.display}
               href={profile.whatsapp.href}

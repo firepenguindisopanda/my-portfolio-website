@@ -1,70 +1,99 @@
-# Getting Started with Create React App
+# nicksportfolio.tech
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Nicholas Smith's portfolio: a React single-page app that presents the same
+projects, experience and credentials in four editorial formats, switchable from
+the app bar.
 
-## Available Scripts
+Live at https://nicksportfolio.tech
 
-In the project directory, you can run:
+## Stack
 
-### `npm start`
+- React 18, React Router 6, Vite 8
+- MUI 5 for components; one theme definition per presentation mode in
+  `src/utilities/themeConfig.js`
+- GSAP (hero timeline, section rules, scroll progress) and framer-motion
+  (section reveals, route transitions), both guarded by `prefers-reduced-motion`
+- react-markdown for the case studies in `public/markdowns`, recharts for the
+  interactive analysis on the data-science write-ups
+- PostHog for analytics, behind a consent banner and cookieless by default
+- Vitest and Testing Library; ESLint 9 flat config
+- Firebase Hosting
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Presentation modes
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The four "themes" are four layouts of the same content, not four palettes.
+Each mode owns its typefaces, density, radii, motion character and section
+arrangement:
 
-### `npm test`
+| Mode | Format | Display / body |
+|---|---|---|
+| Instrument (default) | Instrument panel on a dark ground, modular grid | Space Grotesk / IBM Plex Sans |
+| Ledger | Audit sheet, ruled rows, no cards | IBM Plex Sans Condensed / Public Sans |
+| Notebook | Engineering notebook, one column and a margin rail | JetBrains Mono / Lora |
+| Exhibit | Gallery plates with wall labels | Bodoni Moda / Inter |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The rule that keeps this maintainable: no component branches on the theme id.
+Layout is a token (`theme.custom.layout`), each section switches once on it,
+and the renderers are siblings fed by shared data hooks. Radii come from a
+four-value scale, surfaces are separated by hairlines rather than shadows, and
+there are no gradients. `src/__tests__/performance.test.js` enforces most of
+this against the source.
 
-### `npm run build`
+## Running it
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Requires Node 22.12 or newer.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```sh
+npm ci
+cp .env.example .env   # optional: PostHog key for local analytics
+npm start              # http://localhost:5173
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```sh
+npm test               # vitest, one run
+npm run test:watch
+npm run lint
+npm run build          # writes build/, then runs scripts/generate-seo.mjs
+npm run preview        # serves build/
+npm run analyze        # bundle breakdown by source map
+```
 
-### `npm run eject`
+## Build and SEO
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+The site is client-rendered behind a catch-all rewrite, so the post-build
+script writes a real `index.html` per route with that route's title,
+description, Open Graph tags and JSON-LD baked in, plus a `sitemap.xml`. Link
+previews on LinkedIn, Slack and the rest do not run JavaScript, and this is
+what gives each case study its own card. Route metadata lives in
+`src/data/routes.js`; case-study routes derive from `src/data/projects.js`.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Vite inlines `VITE_`-prefixed variables at build time, so the PostHog key has
+to be present wherever `npm run build` runs. CI reads it from a repository
+secret and fails the build if the key is missing from the output.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Deploying
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```sh
+npm run build
+npx firebase deploy
+```
 
-## Learn More
+`firebase.json` serves `build/` with clean URLs and rewrites unknown paths to
+`index.html`, where the router renders the 404 page.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Layout of the source
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
+src/
+  data/           profile, projects, routes, certificates, domains, plot catalogue
+  utilities/      themeConfig (the four modes), gsapSetup
+  hooks/          useLayout, useSectionSpy, useDocumentMeta, useScrollRestore
+  components/     one folder per section; multi-renderer sections keep a
+                  renderers/ folder and a shared *Parts.jsx
+  pages/          Home, ProjectDetail, the deep-dive category pages, NotFound
+public/
+  markdowns/      case-study write-ups
+  portfolio_data/ metrics and plots for the interactive analyses
+scripts/
+  generate-seo.mjs
+```

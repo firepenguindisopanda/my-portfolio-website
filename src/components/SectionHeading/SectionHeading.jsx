@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Box, Typography, Stack, useTheme } from '@mui/material';
-import { useReducedMotion } from 'framer-motion';
+import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import useLayout from '../../hooks/useLayout';
 import { RAIL_WIDTH } from '../../utilities/themeConfig';
 import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
@@ -46,7 +46,7 @@ const RULES = {
  */
 const SectionHeading = ({ eyebrow, title, description, action, id, count }) => {
   const rootRef = useRef(null);
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const { motion } = useTheme().custom;
   const { heading } = useLayout();
 
@@ -62,8 +62,12 @@ const SectionHeading = ({ eyebrow, title, description, action, id, count }) => {
 
       const trigger = { trigger: rootRef.current, start: 'top 88%', once: true };
 
+      // `opacity`, not `autoAlpha`: autoAlpha also sets visibility:hidden,
+      // which drops the h2 out of the accessibility tree until the reader
+      // scrolls to it. A screen-reader user stepping through headings never
+      // reached "Projects" or "Experience" - they were hidden below the fold.
       gsap.from('.heading-copy', {
-        autoAlpha: 0,
+        opacity: 0,
         y: motion.distance,
         duration: motion.duration,
         ease: motion.gsapEase,

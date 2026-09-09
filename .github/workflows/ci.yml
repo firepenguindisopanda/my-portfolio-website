@@ -16,7 +16,7 @@ jobs:
         node-version: ['22.17.1']
 
     steps:
-      - name: Checout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
@@ -26,7 +26,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Linting
         run: npm run lint
@@ -49,7 +49,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - name: Install deps
-        run: npm install
+        run: npm ci
       - name: Build
         # Vite inlines VITE_ variables at build time. .env is gitignored, so
         # without these the artifact ships with analytics silently disabled.

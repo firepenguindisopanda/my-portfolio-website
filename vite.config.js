@@ -17,8 +17,6 @@ export default defineConfig({
       'react-markdown',
       'remark-gfm',
       'react-syntax-highlighter',
-      'swiper/react',
-      'swiper',
     ],
   },
   test: {

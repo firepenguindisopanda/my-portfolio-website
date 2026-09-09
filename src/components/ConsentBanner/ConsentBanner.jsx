@@ -63,7 +63,9 @@ const ConsentBanner = () => {
           borderRadius: { xs: 0, sm: 2 },
         }}
       >
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.75 }}>
+        {/* `component="p"`: subtitle2 renders as <h6> by default, which put a
+            heading in the outline ahead of the page's h1. */}
+        <Typography variant="subtitle2" component="p" sx={{ fontWeight: 700, mb: 0.75 }}>
           Cookies
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
