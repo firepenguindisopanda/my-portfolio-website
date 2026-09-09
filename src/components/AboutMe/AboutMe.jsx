@@ -88,39 +88,56 @@ const AboutMe = () => {
         <Grid item xs={12} md={5}>
           <Reveal delay={revealMotion.stagger}>
             <Stack spacing={2}>
-              <InfoCard icon={<LuHelpingHand size={17} aria-hidden="true" focusable="false" />} title="Mentoring">
+              <InfoCard
+                icon={<LuHelpingHand size={17} aria-hidden="true" focusable="false" />}
+                title="I teach what I use"
+              >
                 <Typography variant="body2" color="text.secondary">
                   I run mentorship sessions through UWI DCIT and the WiDS Datathon, covering version
                   control, design patterns and CI/CD with students working on their first real projects.
                 </Typography>
               </InfoCard>
 
-              <InfoCard icon={<GiArtificialIntelligence size={17} aria-hidden="true" focusable="false" />} title="AI">
+              <InfoCard
+                icon={<GiArtificialIntelligence size={17} aria-hidden="true" focusable="false" />}
+                title="I argue with my own results"
+              >
                 <Typography variant="body2" color="text.secondary">
-                  Awarded and completed a Udacity Nano-Degree Scholarship in AI Programming with Python.
+                  The ML write-ups here compare methods rather than report one number - permutation
+                  importance against Gini, precision-recall against the ROC curve that flatters it.
+                  Where two methods disagree, the disagreement is the finding.
                 </Typography>
               </InfoCard>
 
-              <InfoCard icon={<SiCodeforces size={15} aria-hidden="true" focusable="false" />} title="Problem solving">
-                <Stack direction="row" spacing={1}>
-                  {competitiveProfiles.map(({ Icon, label, href }) => (
-                    <IconButton
-                      key={label}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={label}
-                      size="small"
-                      sx={{
-                        color: 'text.secondary',
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        '&:hover': { color: 'primary.main', borderColor: 'primary.main' },
-                      }}
-                    >
-                      <Icon size={16} aria-hidden="true" focusable="false" />
-                    </IconButton>
-                  ))}
+              <InfoCard
+                icon={<SiCodeforces size={15} aria-hidden="true" focusable="false" />}
+                title="I still practise the fundamentals"
+              >
+                <Stack spacing={1.5}>
+                  <Typography variant="body2" color="text.secondary">
+                    Data structures and algorithms, kept sharp on Codewars, LeetCode and Codeforces.
+                    The profiles are public if you want to see the work rather than the claim.
+                  </Typography>
+                  <Stack direction="row" spacing={1}>
+                    {competitiveProfiles.map(({ Icon, label, href }) => (
+                      <IconButton
+                        key={label}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={label}
+                        size="small"
+                        sx={{
+                          color: 'text.secondary',
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          '&:hover': { color: 'primary.main', borderColor: 'primary.main' },
+                        }}
+                      >
+                        <Icon size={16} aria-hidden="true" focusable="false" />
+                      </IconButton>
+                    ))}
+                  </Stack>
                 </Stack>
               </InfoCard>
             </Stack>

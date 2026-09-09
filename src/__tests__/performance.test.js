@@ -83,7 +83,10 @@ describe('rendering cost', () => {
     // would have gone quietly vacuous rather than failing. Every below-the-fold
     // component that renders an image has to opt into lazy loading, wherever in
     // that component's directory the image ends up living.
-    ['components/Projects', 'components/AcademicAchievements'].forEach((dir) => {
+    // AcademicAchievements came off this list when the certificate wall became
+    // an index: it renders no images at all now, so asserting it renders lazy
+    // ones would assert the wall back into existence.
+    ['components/Projects'].forEach((dir) => {
       const files = sourceText.filter(
         ({ file, text }) => file.startsWith(dir) && /component="img"|<img\b/.test(text)
       );
@@ -197,10 +200,15 @@ describe('third-party embeds', () => {
     });
   });
 
-  it('gives the Credly iframe explicit dimensions', () => {
-    const badge = read('components/EmbededBadges/CredlyBadge.jsx');
-    expect(badge).toMatch(/width=\{width\}/);
-    expect(badge).toMatch(/height=\{height\}/);
-    expect(badge).toMatch(/loading="lazy"/);
+  // The Credly badge wall is gone: seven of its eight iframes embedded a
+  // credential the certificate index already lists, so the section was the
+  // same content twice and eight third-party frames to say it. The script
+  // guard above stays - it is what stopped the embed being reintroduced the
+  // wrong way the first time.
+  it('embeds no third-party iframes on the home page', () => {
+    sourceText.forEach(({ file, text }) => {
+      const embedsCredly = /credly\.com\/embedded_badge/.test(text);
+      expect({ file, embedsCredly }).toEqual({ file, embedsCredly: false });
+    });
   });
 });

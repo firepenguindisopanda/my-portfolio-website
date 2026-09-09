@@ -15,8 +15,12 @@ import { RAIL_WIDTH } from '../../utilities/themeConfig';
  * Deliberately renders a plain <Box>, not a <section>: pages/Home.jsx already
  * wraps each section in a semantic <section> carrying the id that the nav,
  * useSectionSpy and hash links resolve against. Owning spacing only keeps the
- * two from competing over one element, and keeps the doubled rhythm that
- * #skills and #credentials render today - each holds two of these.
+ * two from competing over one element.
+ *
+ * #skills and #credentials used to hold two of these each - the skills panel
+ * plus a Tech Stack marquee, the certificate wall plus a Credly badge wall -
+ * and so rendered the rhythm twice. Both second halves were the first half
+ * again in another form, and both are gone, so every id now holds one.
  *
  * Spacing is emitted in px rather than MUI's 8px-multiple shorthand, because
  * the token is a real measurement per mode (48/72 today, 56 to 128 once the

@@ -97,6 +97,19 @@ const FEATURED = [
     label: 'Convolutional Neural Networks',
     issuer: 'DeepLearning.AI',
   },
+  /**
+   * The one credential that had no entry here and appeared only in the Credly
+   * wall. That wall showed eight badges, seven of which were the `verifyUrl`
+   * of a certificate already listed above - the same credential twice, under
+   * two headings, one of them eight third-party iframes. The wall went; this
+   * row is what it was carrying that this list was not.
+   */
+  {
+    file: 'it_manager_certnexus',
+    label: 'IT Manager',
+    issuer: 'CertNexus',
+    verifyUrl: 'https://www.credly.com/badges/6ecaf500-de88-4a52-86e4-e9c6bff401aa',
+  },
 ];
 
 const byFileName = Object.entries(certModules).reduce((acc, [path, url]) => {
@@ -104,8 +117,13 @@ const byFileName = Object.entries(certModules).reduce((acc, [path, url]) => {
   return acc;
 }, {});
 
+/**
+ * A featured row needs proof, not a picture: either an issuer verification link
+ * or a certificate image. The filter used to require the image, which silently
+ * dropped any credential whose proof is the stronger of the two.
+ */
 export const featuredCertificates = FEATURED
-  .filter((c) => byFileName[c.file])
+  .filter((c) => byFileName[c.file] || c.verifyUrl)
   .map((c) => ({ ...c, id: c.file, image: byFileName[c.file] }));
 
 const featuredFiles = new Set(FEATURED.map((c) => c.file));
