@@ -57,7 +57,7 @@ const ModeMenu = ({ current, onChange, variant = 'bar' }) => {
           </Box>
         </Box>
       )}
-      inputProps={{ 'aria-label': 'Presentation mode' }}
+      inputProps={{ 'aria-label': 'Presentation mode', name: 'presentation-mode' }}
       MenuProps={{ slotProps: { paper: { sx: { maxWidth: 320 } } } }}
       sx={inBar ? { ml: 1, '& .MuiSelect-select': { py: 0.5 } } : undefined}
     >

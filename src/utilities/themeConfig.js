@@ -77,19 +77,18 @@ const buildShadows = (overlay) => [
 /**
  * The repeated section reveal, per mode.
  *
- * Two ease keys because the page runs two animation libraries: `ease` is the
- * cubic array framer-motion wants, `gsapEase` the named curve GSAP wants. They
- * describe the same curve and should be changed together.
+ * `gsapEase` is a named GSAP curve. There used to be a second `ease` key
+ * holding the same curve as a cubic array for framer-motion; that library is
+ * gone, and with it the need to keep two spellings of one curve in step.
  *
  * This is the reveal that fires once per section on scroll. The Hero's
  * orchestrated timeline is a one-off composition and deliberately does not read
  * these - it sets its own beats.
  */
-const buildMotion = ({ duration, distance, stagger, ease, gsapEase }) => ({
+const buildMotion = ({ duration, distance, stagger, gsapEase }) => ({
   duration,
   distance,
   stagger,
-  ease,
   gsapEase,
 });
 
@@ -98,7 +97,6 @@ const INSTRUMENT_MOTION = {
   duration: 0.28,
   distance: 8,
   stagger: 0.05,
-  ease: [0.2, 0, 0, 1],
   gsapEase: 'power3.out',
 };
 
@@ -110,7 +108,6 @@ const LEDGER_MOTION = {
   duration: 0.18,
   distance: 0,
   stagger: 0,
-  ease: [0.4, 0, 0.2, 1],
   gsapEase: 'power1.out',
 };
 
@@ -119,7 +116,6 @@ const NOTEBOOK_MOTION = {
   duration: 0.6,
   distance: 2,
   stagger: 0.1,
-  ease: [0.25, 0, 0.2, 1],
   gsapEase: 'power1.out',
 };
 
@@ -128,7 +124,6 @@ const EXHIBIT_MOTION = {
   duration: 0.7,
   distance: 16,
   stagger: 0.12,
-  ease: [0.16, 0, 0.2, 1],
   gsapEase: 'power2.out',
 };
 

@@ -49,7 +49,7 @@ const SiteFooter = () => (
                   '&:hover': { color: 'primary.main', borderColor: 'primary.main' },
                 }}
               >
-                <Icon size={16} />
+                <Icon size={16} aria-hidden="true" focusable="false" />
               </IconButton>
             ))}
           </Stack>
@@ -116,7 +116,9 @@ const SiteFooter = () => (
           component={RouterLink}
           to="/about-panda"
           underline="none"
-          sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.disabled', '&:hover': { color: 'text.secondary' } }}
+          // text.secondary, not text.disabled: the disabled tone is 3.4:1 on
+          // the Instrument ground, under the 4.5:1 this 12px caption needs.
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary', '&:hover': { color: 'text.primary' } }}
         >
           <Box component="img" src={PANDA} alt="" width={22} height={22} sx={{ opacity: 0.8 }} />
           <Typography variant="caption" sx={{ fontStyle: 'italic' }}>

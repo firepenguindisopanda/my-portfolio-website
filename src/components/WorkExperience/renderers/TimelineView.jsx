@@ -8,12 +8,8 @@ import {
   TimelineContent,
   TimelineDot,
 } from '@mui/lab';
-import { motion, useReducedMotion } from 'framer-motion';
+import Reveal from '../../Reveal/Reveal';
 import { DetailsToggle, ExperienceChips, ExperienceDetails } from '../experienceParts';
-
-// A motion.div wrapping a plain Card, not motion(Card): the factory form is
-// deprecated in framer-motion 11 and logs on every render, and `motion.create`
-// is the v12 replacement this project is not on yet.
 
 /**
  * Instrument - a dated timeline of cards.
@@ -24,20 +20,9 @@ import { DetailsToggle, ExperienceChips, ExperienceDetails } from '../experience
  */
 const ExperienceCard = ({ experience, expanded, onToggle }) => {
   const theme = useTheme();
-  const prefersReducedMotion = useReducedMotion();
-  const reveal = theme.custom.motion;
-
-  const motionProps = prefersReducedMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: reveal.distance },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: '-40px' },
-        transition: { duration: reveal.duration, ease: reveal.ease },
-      };
 
   return (
-    <motion.div {...motionProps} style={{ width: '100%' }}>
+    <Reveal sx={{ width: '100%' }}>
       <Card sx={{ width: '100%', overflow: 'hidden' }}>
       <CardContent sx={{ px: 2, py: 1.5 }}>
         <Typography variant="h3" component="h3" sx={{ fontSize: '1.05rem' }}>
@@ -62,7 +47,7 @@ const ExperienceCard = ({ experience, expanded, onToggle }) => {
         <ExperienceDetails experience={experience} expanded={expanded} />
       </Box>
       </Card>
-    </motion.div>
+    </Reveal>
   );
 };
 

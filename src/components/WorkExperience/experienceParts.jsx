@@ -1,7 +1,7 @@
 import React from 'react';
-import { Box, Button, Chip, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Button, Chip, Collapse, Stack, Typography, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
@@ -45,26 +45,23 @@ export const DetailsToggle = ({ experience, expanded, onToggle, sx }) => (
 /**
  * The task list behind an entry.
  *
- * Height-animated on open, and guarded here rather than left to the global
- * MotionConfig in App.jsx: `reducedMotion: 'user'` disables transform and
- * layout animations, but a height animation is neither, so it would keep
- * playing for someone who asked for no motion. The panel opens instantly.
+ * MUI's Collapse rather than a framer height tween: it rides the transition
+ * library MUI already ships, and a height animation is the one kind no
+ * reduced-motion policy catches on its own, so the timeout is zeroed here.
+ * `unmountOnExit` keeps the closed panel out of the tab order and the
+ * accessibility tree, which is what `aria-expanded` on the toggle promises.
  */
 export const ExperienceDetails = ({ experience, expanded, sx }) => {
   const theme = useTheme();
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <AnimatePresence initial={false}>
-      {expanded && (
-        <motion.div
-          id={`experience-detail-${experience.id}`}
-          initial={prefersReducedMotion ? false : { height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={prefersReducedMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-          transition={{ duration: prefersReducedMotion ? 0 : theme.custom.motion.duration }}
-          style={{ overflow: 'hidden' }}
-        >
+    <Collapse
+      id={`experience-detail-${experience.id}`}
+      in={expanded}
+      timeout={prefersReducedMotion ? 0 : theme.custom.motion.duration * 1000}
+      unmountOnExit
+    >
           <Stack spacing={1.5} sx={{ pt: 1.5, ...sx }}>
             {experience.items.map((item, i) => (
               <Box key={i} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
@@ -90,8 +87,6 @@ export const ExperienceDetails = ({ experience, expanded, sx }) => {
               </Box>
             ))}
           </Stack>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    </Collapse>
   );
 };

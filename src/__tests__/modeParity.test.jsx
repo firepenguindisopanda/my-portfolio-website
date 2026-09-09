@@ -47,7 +47,10 @@ describe('mode parity', () => {
     return cache.get(key);
   };
 
-  it('anchors every section the nav links to, in every mode', () => {
+  // The first outline() call renders the whole home page four times over and
+  // pays every import's warm-up; under full-suite load it passed 5s once GSAP
+  // contexts replaced the framer mock.
+  it('anchors every section the nav links to, in every mode', { timeout: 20000 }, () => {
     themeOrder.forEach((key) => {
       const ids = outline(key).sectionIds;
       sections.forEach((section) => {

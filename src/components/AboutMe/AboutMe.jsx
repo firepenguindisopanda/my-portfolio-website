@@ -1,13 +1,13 @@
 import React from 'react';
 import { Box, Grid, Typography, Divider, IconButton, Stack, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { motion, useReducedMotion } from 'framer-motion';
 import { SiCodewars, SiLeetcode, SiCodeforces } from 'react-icons/si';
 import { LuHelpingHand } from 'react-icons/lu';
 import { GiArtificialIntelligence } from 'react-icons/gi';
 import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
 import Surface from '../Surface/Surface';
+import Reveal from '../Reveal/Reveal';
 import { profile } from '../../data/profile';
 
 /**
@@ -66,17 +66,7 @@ const InfoCard = ({ icon, title, children }) => {
  * what's left is the part that actually says something: the bio.
  */
 const AboutMe = () => {
-  const prefersReducedMotion = useReducedMotion();
   const { motion: revealMotion } = useTheme().custom;
-
-  const reveal = prefersReducedMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: revealMotion.distance },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: '-40px' },
-        transition: { duration: revealMotion.duration, ease: revealMotion.ease },
-      };
 
   return (
     <Section>
@@ -84,7 +74,7 @@ const AboutMe = () => {
 
       <Grid container spacing={4}>
         <Grid item xs={12} md={7}>
-          <motion.div {...reveal}>
+          <Reveal>
             <Stack spacing={2}>
               {bio.map((paragraph) => (
                 <Typography key={paragraph.slice(0, 32)} variant="body1" color="text.secondary">
@@ -92,30 +82,26 @@ const AboutMe = () => {
                 </Typography>
               ))}
             </Stack>
-          </motion.div>
+          </Reveal>
         </Grid>
 
         <Grid item xs={12} md={5}>
-          <motion.div
-            {...(prefersReducedMotion
-              ? {}
-              : { ...reveal, transition: { ...reveal.transition, delay: revealMotion.stagger } })}
-          >
+          <Reveal delay={revealMotion.stagger}>
             <Stack spacing={2}>
-              <InfoCard icon={<LuHelpingHand size={17} />} title="Mentoring">
+              <InfoCard icon={<LuHelpingHand size={17} aria-hidden="true" focusable="false" />} title="Mentoring">
                 <Typography variant="body2" color="text.secondary">
                   I run mentorship sessions through UWI DCIT and the WiDS Datathon, covering version
                   control, design patterns and CI/CD with students working on their first real projects.
                 </Typography>
               </InfoCard>
 
-              <InfoCard icon={<GiArtificialIntelligence size={17} />} title="AI">
+              <InfoCard icon={<GiArtificialIntelligence size={17} aria-hidden="true" focusable="false" />} title="AI">
                 <Typography variant="body2" color="text.secondary">
                   Awarded and completed a Udacity Nano-Degree Scholarship in AI Programming with Python.
                 </Typography>
               </InfoCard>
 
-              <InfoCard icon={<SiCodeforces size={15} />} title="Problem solving">
+              <InfoCard icon={<SiCodeforces size={15} aria-hidden="true" focusable="false" />} title="Problem solving">
                 <Stack direction="row" spacing={1}>
                   {competitiveProfiles.map(({ Icon, label, href }) => (
                     <IconButton
@@ -132,13 +118,13 @@ const AboutMe = () => {
                         '&:hover': { color: 'primary.main', borderColor: 'primary.main' },
                       }}
                     >
-                      <Icon size={16} />
+                      <Icon size={16} aria-hidden="true" focusable="false" />
                     </IconButton>
                   ))}
                 </Stack>
               </InfoCard>
             </Stack>
-          </motion.div>
+          </Reveal>
         </Grid>
       </Grid>
     </Section>

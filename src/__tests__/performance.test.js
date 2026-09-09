@@ -133,24 +133,30 @@ describe('design system constraints', () => {
     expect(RADIUS_SCALE).toEqual([0, 2, 4, 8]);
   });
 
-  it('declares one reduced-motion policy for framer-motion', () => {
-    // Four modes carry four motion characters and the slowest travels 16px over
-    // 0.7s. A global policy covers every framer animation on the site including
-    // components nobody has touched in months, which per-component guards
-    // demonstrably did not - four files were animating unguarded before this.
-    expect(read('App.jsx')).toMatch(/<MotionConfig\s+reducedMotion="user">/);
+  it('ships one animation library', () => {
+    // framer-motion and GSAP each cost ~110kB of the eager bundle, for a site
+    // whose reveals, timelines and scroll effects all fit one of them. GSAP
+    // stayed: the hero timelines, count-ups and scroll scrub are native to it.
+    const offenders = sourceText.filter(({ text }) => /from 'framer-motion'/.test(text));
+    expect(offenders.map((o) => o.file)).toEqual([]);
+    expect(JSON.parse(fs.readFileSync(path.join(SRC, '..', 'package.json'), 'utf8')).dependencies).not.toHaveProperty(
+      'framer-motion'
+    );
   });
 
-  it('guards the animations that policy cannot reach', () => {
-    // `reducedMotion: 'user'` skips transform and layout animations and leaves
-    // everything else playing, and GSAP is not framer's to govern at all. So
-    // two kinds still need their own check: any GSAP timeline, and any height
-    // animation - a panel expanding from 0 is neither transform nor layout.
-    const needsOwnGuard = /gsap\.(timeline|from|fromTo)|height: 0/;
-    const guards = /prefersReducedMotion|useReducedMotion|gsapEnabled/;
+  it('guards every tween against prefers-reduced-motion', () => {
+    // There is no global switch: each file that starts a GSAP tween checks the
+    // visitor's preference (or gsapEnabled, which implies the check) first.
+    const needsOwnGuard = /gsap\.(timeline|from|fromTo|to)\(/;
+    const guards = /prefersReducedMotion|gsapEnabled/;
+
+    // The reading-progress hairline is scrubbed to scroll position: it only
+    // moves when the reader does, which is not motion in the sense the
+    // preference asks to be rid of, so it is the one tween that runs unguarded.
+    const scrubOnly = new Set(['components/ScrollProgress/ScrollProgress.jsx']);
 
     const unguarded = sourceText
-      .filter(({ text }) => needsOwnGuard.test(text) && !guards.test(text))
+      .filter(({ file, text }) => !scrubOnly.has(file) && needsOwnGuard.test(text) && !guards.test(text))
       .map((o) => o.file);
 
     expect(unguarded).toEqual([]);

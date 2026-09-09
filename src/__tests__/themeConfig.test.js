@@ -65,7 +65,7 @@ describe('presentation modes', () => {
     );
     expect(layout.sectionSpacing).toEqual({ xs: expect.any(Number), md: expect.any(Number) });
     expect(Object.keys(motion).sort()).toEqual(
-      ['distance', 'duration', 'ease', 'gsapEase', 'stagger'].sort()
+      ['distance', 'duration', 'gsapEase', 'stagger'].sort()
     );
     expect(radius).toEqual({ control: expect.any(Number), container: expect.any(Number) });
     expect(displayFont).toEqual(expect.any(String));

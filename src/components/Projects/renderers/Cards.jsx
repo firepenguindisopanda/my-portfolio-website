@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Card, CardActions, CardContent, Chip, Grid, Stack, Typography, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { motion, useReducedMotion } from 'framer-motion';
+import Reveal from '../../Reveal/Reveal';
 import { ProjectActions, ProjectMedia, TechChips, useOpenProject } from '../projectParts';
 
 /**
@@ -13,26 +13,11 @@ import { ProjectActions, ProjectMedia, TechChips, useOpenProject } from '../proj
  */
 const ProjectCard = ({ project, index, onOpen }) => {
   const theme = useTheme();
-  const prefersReducedMotion = useReducedMotion();
-  const reveal = theme.custom.motion;
-
-  const motionProps = prefersReducedMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: reveal.distance },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: '-40px' },
-        transition: {
-          duration: reveal.duration,
-          // Capped at six steps: past that the last card in a long grid arrives
-          // late enough to read as broken rather than staggered.
-          delay: Math.min(index, 5) * reveal.stagger,
-          ease: reveal.ease,
-        },
-      };
 
   return (
-    <motion.div style={{ height: '100%' }} {...motionProps}>
+    // Capped at six steps: past that the last card in a long grid arrives late
+    // enough to read as broken rather than staggered.
+    <Reveal delay={Math.min(index, 5) * theme.custom.motion.stagger} sx={{ height: '100%' }}>
       <Card
         sx={{
           height: '100%',
@@ -81,7 +66,7 @@ const ProjectCard = ({ project, index, onOpen }) => {
           <ProjectActions project={project} onOpen={onOpen} />
         </CardActions>
       </Card>
-    </motion.div>
+    </Reveal>
   );
 };
 

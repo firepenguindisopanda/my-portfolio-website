@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Box, Container, Typography, useTheme } from '@mui/material';
-import { useReducedMotion } from 'framer-motion';
+import usePrefersReducedMotion from '../../../hooks/usePrefersReducedMotion';
 import { gsap, gsapEnabled, useGSAP } from '../../../utilities/gsapSetup';
 import {
   CtaRow,
@@ -23,7 +23,7 @@ import {
  */
 const Panel = ({ onSeeWork }) => {
   const theme = useTheme();
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const rootRef = useRef(null);
 
   useGSAP(

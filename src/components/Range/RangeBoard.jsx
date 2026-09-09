@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useTheme } from '@mui/material';
-import { useReducedMotion } from 'framer-motion';
+import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
 import useLayout from '../../hooks/useLayout';
@@ -29,7 +29,7 @@ const RENDERERS = {
 };
 
 const RangeBoard = () => {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const boardRef = useRef(null);
   const { range: renderer } = useLayout();
   const { motion } = useTheme().custom;
@@ -46,8 +46,11 @@ const RangeBoard = () => {
       // `.range-item` rather than a panel class: every renderer tags its own
       // repeating unit with it, so the entrance works the same whether that
       // unit is a grid cell, a table row, an entry or a column in the strip.
+      // `opacity` rather than `autoAlpha`, so the h3 in each item stays in
+      // the accessibility tree while it waits below the fold - see the same
+      // note in SectionHeading.
       gsap.from('.range-item', {
-        autoAlpha: 0,
+        opacity: 0,
         y: motion.distance,
         duration: motion.duration,
         ease: motion.gsapEase,
