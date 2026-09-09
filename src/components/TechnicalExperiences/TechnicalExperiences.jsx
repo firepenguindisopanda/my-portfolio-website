@@ -3,6 +3,7 @@ import { Box, Typography, Chip, Stack, Grid, ButtonBase, useTheme } from '@mui/m
 import { alpha } from '@mui/material/styles';
 import Section from '../Section/Section';
 import SectionHeading from '../SectionHeading/SectionHeading';
+import techIcons from '../../data/techIcons';
 
 /**
  * Skills, trimmed from 54 to 26.
@@ -126,18 +127,35 @@ const TechnicalExperiences = () => {
               {active.description}
             </Typography>
             <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-              {active.skills.map((skill) => (
-                <Chip
-                  key={skill}
-                  label={skill}
-                  sx={{
-                    fontFamily: theme.custom.codeFont,
-                    fontSize: '0.75rem',
-                    bgcolor: alpha(theme.palette.primary.main, 0.08),
-                    color: 'text.primary',
-                  }}
-                />
-              ))}
+              {active.skills.map((skill) => {
+                const Mark = techIcons[skill];
+                return (
+                  <Chip
+                    key={skill}
+                    icon={
+                      Mark ? (
+                        <Mark
+                          size={14}
+                          aria-hidden="true"
+                          focusable="false"
+                          // The mark is the entry's identity, not a second
+                          // colour: `currentColor` keeps forty vendor palettes
+                          // out of one panel.
+                          style={{ color: 'inherit' }}
+                        />
+                      ) : undefined
+                    }
+                    label={skill}
+                    sx={{
+                      fontFamily: theme.custom.codeFont,
+                      fontSize: '0.75rem',
+                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      color: 'text.primary',
+                      '& .MuiChip-icon': { color: 'primary.main', ml: 1, mr: -0.25 },
+                    }}
+                  />
+                );
+              })}
             </Stack>
           </Box>
         </Grid>

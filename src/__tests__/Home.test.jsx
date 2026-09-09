@@ -13,8 +13,6 @@ vi.mock('../components/WorkExperience/WorkExperience', () => ({ default: () => <
 vi.mock('../components/AcademicAchievements/AcademicAchievements', () => ({ default: () => <div data-testid="academic">Certificates</div> }));
 vi.mock('../components/contact/Contact', () => ({ default: () => <div data-testid="contact">Contact</div> }));
 vi.mock('../components/TechnicalSkills/ExtraCurricular', () => ({ default: () => <div data-testid="extra">Extra Curricular</div> }));
-vi.mock('../components/iconcarousel/IconCarousel', () => ({ default: () => <div data-testid="carousel">Icon Carousel</div> }));
-vi.mock('../components/OnlineLearningBadges/OnlineLearningBadges', () => ({ default: () => <div data-testid="badges">Badges</div> }));
 vi.mock('../components/BackToTop/BackToTop', () => ({ default: ({ children }) => <div data-testid="scroll-top">{children}</div> }));
 vi.mock('../assets/NicholasSmith_Resume.pdf', () => ({ default: 'mocked-resume.pdf' }));
 
@@ -33,7 +31,7 @@ describe('Home page', () => {
   it('renders every section', () => {
     renderHome();
 
-    ['hero', 'projects', 'work', 'about-me', 'technical', 'carousel', 'academic', 'badges', 'extra', 'contact']
+    ['hero', 'projects', 'work', 'about-me', 'technical', 'academic', 'extra', 'contact']
       .forEach((testId) => expect(screen.getByTestId(testId)).toBeInTheDocument());
   });
 

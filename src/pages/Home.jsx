@@ -9,9 +9,7 @@ import AboutMe from '../components/AboutMe/AboutMe';
 import Projects from '../components/Projects/Projects';
 import WorkExperience from '../components/WorkExperience/WorkExperience';
 import TechnicalExperiences from '../components/TechnicalExperiences/TechnicalExperiences';
-import IconCarousel from '../components/iconcarousel/IconCarousel';
 import AcademicAchievements from '../components/AcademicAchievements/AcademicAchievements';
-import OnlineLearningBadges from '../components/OnlineLearningBadges/OnlineLearningBadges';
 import ExtraCurricular from '../components/TechnicalSkills/ExtraCurricular';
 import Contact from '../components/contact/Contact';
 import useDocumentMeta from '../hooks/useDocumentMeta';
@@ -81,12 +79,10 @@ const Home = () => {
 
         <Box component="section" id="skills" sx={{ scrollMarginTop: SECTION_OFFSET }}>
           <TechnicalExperiences />
-          <IconCarousel />
         </Box>
 
         <Box component="section" id="credentials" sx={{ scrollMarginTop: SECTION_OFFSET }}>
           <AcademicAchievements />
-          <OnlineLearningBadges />
         </Box>
 
         <Box component="section" id="community" sx={{ scrollMarginTop: SECTION_OFFSET }}>
