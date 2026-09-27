@@ -93,8 +93,8 @@ const PredictionVsActualChart = ({ dataPath }) => {
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {data.model || 'Model'} predictions on {data.dataset || 'dataset'}{' '}
-          ({data.sample_size} stratified samples). Fraudulent transactions
-          (actual=1) shown in red, legitimate (actual=0) in blue.
+          ({data.sample_size} stratified samples). {data.positive_label || 'Fraudulent transactions'}{' '}
+          (actual=1) shown in red, {data.negative_label || 'legitimate'} (actual=0) in blue.
         </Typography>
 
         {cm && (

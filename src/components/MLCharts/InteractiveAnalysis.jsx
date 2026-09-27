@@ -20,7 +20,7 @@ const COPY = {
   'starbucks-offer-analysis': {
     title: 'Interactive analysis and business insights',
     intro:
-      'Customer segments, model performance, causal inference results and feature importance from the improved analysis pipeline (May 2026).',
+      'Customer segments, the send-time model scored on customers it never saw, causal inference results and which features the model relies on.',
     plotsTitle: 'Exploratory data analysis',
   },
 };

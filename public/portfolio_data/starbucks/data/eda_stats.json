@@ -37,19 +37,18 @@
     "female_pct": 36.1
   },
   "methodology": {
-    "models_compared": "Logistic Regression, Random Forest, Gradient Boosting, XGBoost",
-    "clustering": "K-Means (k=4) with stability analysis (ARI=0.85)",
+    "models_compared": "Logistic Regression, Histogram Gradient Boosting, XGBoost (send-time model)",
+    "clustering": "K-Means (k=4) with stability analysis (mean ARI 0.76)",
     "causal_inference": "ATE with bootstrap CIs, PSM, Welch's t-test, Cohen's d",
     "clusters_found": 4,
     "recommendation_lift_pct": 7.9,
-    "cross_validation": "5-fold Stratified CV",
+    "cross_validation": "5-fold CV grouped by customer, held-out customers, forward-in-time check",
     "statistical_rigor": "Hypothesis tests, effect sizes, Bootstrap CIs",
-    "threshold_optimization": "Optimal F1 threshold = 0.42"
+    "leakage_check": "Leakage ladder: first model 0.994 AUC, send-time model 0.865 on unseen customers"
   },
   "algorithms": [
     "Logistic Regression",
-    "Random Forest",
-    "Gradient Boosting",
+    "Histogram Gradient Boosting",
     "XGBoost"
   ]
 }
