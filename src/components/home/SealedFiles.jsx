@@ -89,8 +89,7 @@ const SealedFiles = () => (
           Sealed files
         </h2>
         <p className="lede">
-          Most of my paid work belongs to the clients who paid for it. Their names and their code stay with them; the
-          problem, and what I built, are on file.
+          Client names and code stay with the clients. The problem, and what I built, are on file.
         </p>
       </div>
       <ol className="sf-grid">
