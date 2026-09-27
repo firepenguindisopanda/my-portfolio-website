@@ -1,27 +1,13 @@
-import { useSyncExternalStore } from 'react';
-
-const QUERY = '(prefers-reduced-motion: reduce)';
-
-const getMedia = () => (typeof window !== 'undefined' && typeof window.matchMedia === 'function' ? window.matchMedia(QUERY) : null);
-
-const subscribe = (callback) => {
-  const media = getMedia();
-  if (!media?.addEventListener) return () => {};
-  media.addEventListener('change', callback);
-  return () => media.removeEventListener('change', callback);
-};
-
-const getSnapshot = () => Boolean(getMedia()?.matches);
-const getServerSnapshot = () => false;
+import { useMotion } from '../motion/Motion';
 
 /**
- * Whether the visitor has asked their system for less motion.
+ * Whether this page should hold still.
  *
- * This used to come from framer-motion's `useReducedMotion`. GSAP has no
- * equivalent, and once framer left the bundle the site needed one source of
- * truth for the question every animated component asks first. Live, not read
- * once: flipping the OS setting mid-visit takes effect on the next render.
+ * True when the visitor's system asks for reduced motion and they have not
+ * switched motion on in the header - or when they switched it off. Every
+ * component that starts a GSAP tween checks this first; performance.test.js
+ * fails any file that tweens without the guard.
  */
-const usePrefersReducedMotion = () => useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+const usePrefersReducedMotion = () => !useMotion().motionOn;
 
 export default usePrefersReducedMotion;

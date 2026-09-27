@@ -1,9 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, useTheme } from '@mui/material';
-import { alpha } from '@mui/material/styles';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { usePostHog } from '@posthog/react';
 import { projects } from '../../data/projects';
 
@@ -14,73 +10,18 @@ import { projects } from '../../data/projects';
  */
 const caseStudies = projects.filter((p) => p.markdown);
 
-const NavPanel = ({ direction, project, onOpen }) => {
-  const theme = useTheme();
+const NavCell = ({ direction, project, onOpen }) => {
   const isNext = direction === 'next';
-  const Icon = isNext ? ArrowForwardIcon : ArrowBackIcon;
-
   return (
-    <Box
-      component="button"
-      type="button"
-      onClick={() => onOpen(direction, project)}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: isNext ? 'flex-end' : 'flex-start',
-        textAlign: isNext ? 'right' : 'left',
-        gap: 0.75,
-        width: '100%',
-        p: { xs: 2.5, md: 3 },
-        bgcolor: 'background.default',
-        border: 'none',
-        cursor: 'pointer',
-        font: 'inherit',
-        color: 'inherit',
-        transition: 'background-color 0.2s ease',
-        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
-        '&:hover .case-nav-title': { color: 'primary.main' },
-      }}
-    >
-      <Box
-        sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 0.75,
-          flexDirection: isNext ? 'row' : 'row-reverse',
-        }}
-      >
-        <Typography variant="overline" color="text.secondary">
-          {isNext ? 'Next case study' : 'Previous case study'}
-        </Typography>
-        <Icon sx={{ fontSize: 14, color: 'text.secondary' }} />
-      </Box>
-
-      <Typography
-        className="case-nav-title"
-        variant="h3"
-        component="span"
-        sx={{
-          fontSize: '1.0625rem',
-          color: 'text.primary',
-          transition: 'color 0.2s ease',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-        }}
-      >
-        {project.title}
-      </Typography>
-
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ fontFamily: theme.custom.codeFont }}
-      >
-        {project.category}
-      </Typography>
-    </Box>
+    <button type="button" className={`cn-cell ${direction}`} onClick={() => onOpen(direction, project)}>
+      <span className="cn-dir">
+        {!isNext && <span aria-hidden="true">&larr; </span>}
+        {isNext ? 'Next case study' : 'Previous case study'}
+        {isNext && <span aria-hidden="true"> &rarr;</span>}
+      </span>
+      <span className="cn-title">{project.title}</span>
+      <span className="cn-cat">{project.category}</span>
+    </button>
   );
 };
 
@@ -105,23 +46,10 @@ const CaseStudyFooter = ({ currentId }) => {
   };
 
   return (
-    <Box
-      component="nav"
-      aria-label="More case studies"
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-        gap: '1px',
-        bgcolor: 'divider',
-        border: '1px solid',
-        borderColor: 'divider',
-        borderRadius: (theme) => `${theme.custom.radius.container}px`,
-        overflow: 'hidden',
-      }}
-    >
-      <NavPanel direction="previous" project={previous} onOpen={open} />
-      <NavPanel direction="next" project={next} onOpen={open} />
-    </Box>
+    <nav className="case-nav" aria-label="More case studies">
+      <NavCell direction="previous" project={previous} onOpen={open} />
+      <NavCell direction="next" project={next} onOpen={open} />
+    </nav>
   );
 };
 

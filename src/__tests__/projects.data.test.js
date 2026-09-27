@@ -122,6 +122,21 @@ describe('Case study routing', () => {
   });
 });
 
+describe('Desktop tools', () => {
+  it('lists Link Tracker under Desktop Tools with a case study and no private data paths', () => {
+    const tracker = projects.find((p) => p.id === 'link-tracker');
+    expect(tracker).toBeDefined();
+    expect(tracker.category).toBe('Desktop Tools');
+    expect(tracker.featured).toBe(true);
+    expect(tracker.markdown).toBe('/markdowns/link-tracker.md');
+
+    // The source repo keeps real tab dumps and a triage export beside the
+    // code. Nothing published here may point at them.
+    const study = fs.readFileSync(path.join(process.cwd(), 'public', tracker.markdown), 'utf8');
+    expect(study).not.toMatch(/open-tabs-|triage-\d{4}|C:\\Users\\/);
+  });
+});
+
 describe('Route metadata', () => {
   it('registers a unique title and description for every static route', () => {
     const paths = staticRoutes.map((r) => r.path);

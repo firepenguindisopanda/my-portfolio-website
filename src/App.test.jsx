@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import App from './App';
-import { profile } from './data/profile';
+import { profile, sections } from './data/profile';
 
 /**
  * This test renders the whole App, so Suspense has to resolve nine lazily
@@ -15,9 +15,12 @@ vi.setConfig({ testTimeout: 40000 });
 
 const SUSPENSE_BUDGET = 25000;
 
+const loading = () => screen.queryByText(/opening the file/i);
+
 test('renders loading state initially', async () => {
   render(<App />);
-  expect(screen.getByRole('progressbar')).toBeInTheDocument();
+  // A status message rather than a spinner: it is read out, and it says what is happening.
+  expect(screen.getByRole('status')).toHaveTextContent(/opening the file/i);
 });
 
 test('lands on the full home page rather than a standalone card', async () => {
@@ -25,7 +28,7 @@ test('lands on the full home page rather than a standalone card', async () => {
 
   await waitFor(
     () => {
-      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+      expect(loading()).not.toBeInTheDocument();
     },
     { timeout: SUSPENSE_BUDGET }
   );
@@ -35,11 +38,11 @@ test('lands on the full home page rather than a standalone card', async () => {
   const heading = await screen.findByRole('heading', { level: 1, name: profile.name }, { timeout: SUSPENSE_BUDGET });
   expect(heading).toBeInTheDocument();
 
-  expect(await screen.findByRole('button', { name: /see my work/i })).toBeInTheDocument();
+  expect(await screen.findByRole('link', { name: /see my work/i })).toHaveAttribute('href', '#story');
 
-  // Sections the app bar links to must exist on this same page.
+  // Sections the header links to must exist on this same page.
   await waitFor(() => {
-    ['projects', 'experience', 'skills', 'contact'].forEach((id) => {
+    sections.forEach(({ id }) => {
       expect(document.getElementById(id)).not.toBeNull();
     });
   });

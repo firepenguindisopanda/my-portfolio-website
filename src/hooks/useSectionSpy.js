@@ -12,7 +12,9 @@ import { useEffect, useState } from 'react';
  * @returns {string} the id of the section nearest the top of the viewport
  */
 const useSectionSpy = (sectionIds) => {
-  const [activeId, setActiveId] = useState(sectionIds[0] ?? '');
+  // Nothing is current until a section reaches reading position: on the home
+  // page the reader starts on the cover, which is none of the listed sections.
+  const [activeId, setActiveId] = useState('');
   // sectionIds is usually a fresh array each render; a stable key avoids
   // tearing the observer down and rebuilding it on every parent render.
   const key = sectionIds.join('|');
@@ -38,7 +40,12 @@ const useSectionSpy = (sectionIds) => {
           }
         });
 
-        if (visible.size === 0) return;
+        if (visible.size === 0) {
+          // Between two sections the last one stays current, but above the
+          // first one - back on the cover - none is.
+          if (elements[0].getBoundingClientRect().top > window.innerHeight * 0.45) setActiveId('');
+          return;
+        }
         // Follow document order so that when several sections are on screen the
         // topmost one wins, which is what a reader perceives as "current".
         const current = ids.find((id) => visible.has(id));

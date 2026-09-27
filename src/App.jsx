@@ -1,221 +1,107 @@
-import React, { useState, useEffect, Suspense, lazy, useCallback } from 'react'
-import { flushSync } from 'react-dom'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import './App.css'
+import React, { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import './App.css';
+import './styles/casefile.css';
+import './styles/pages.css';
 
-// The eager set is exactly Instrument's pair plus the utility face: Space
-// Grotesk (its display), IBM Plex Sans (its body) and JetBrains Mono, which
-// carries labels and evidence lines in every mode and so can never be deferred.
-// Instrument is the default, so this is the fonts one visitor needs and no more
-// - the other three modes pull their own pair on demand in useThemeFonts below.
-import '@fontsource/space-grotesk/500.css';
-import '@fontsource/space-grotesk/600.css';
-import '@fontsource/space-grotesk/700.css';
+// Casefile's three faces, bundled rather than fetched from Google: Instrument
+// Serif for display, IBM Plex Sans to read, IBM Plex Mono for every label and
+// number. Only the weights the design uses.
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource/instrument-serif/400-italic.css';
 import '@fontsource/ibm-plex-sans/400.css';
 import '@fontsource/ibm-plex-sans/500.css';
 import '@fontsource/ibm-plex-sans/600.css';
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/600.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@fontsource/ibm-plex-mono/600.css';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Box, CircularProgress, Toolbar } from '@mui/material';
-import { getThemePersonality } from './utilities/themeConfig';
-import PageTransition from './components/PageTransition/PageTransition';
-import DrawerAppBar from './components/DrawerAppBar/DrawerAppBar';
-import ScrollProgress from './components/ScrollProgress/ScrollProgress';
-import SiteFooter from './components/SiteFooter/SiteFooter';
-import ConsentBanner from './components/ConsentBanner/ConsentBanner';
 import { usePostHog } from '@posthog/react';
+import { casefileTheme } from './utilities/themeConfig';
+import { MotionProvider, useMotion } from './motion/Motion';
+import PageTransition from './components/PageTransition/PageTransition';
+import SiteHeader from './components/site/SiteHeader';
+import SiteFooter from './components/site/SiteFooter';
+import ConsentBanner from './components/ConsentBanner/ConsentBanner';
 
-// Lazy load pages for code splitting - reduces initial bundle size
+// Every route is code-split; the home page is the only one most visitors load.
 const Home = lazy(() => import('./pages/Home'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const FullstackPortfolio = lazy(() => import('./pages/FullstackPortfolio'));
 const DesktopPortfolio = lazy(() => import('./pages/DesktopPortfolio'));
 const AndroidPortfolio = lazy(() => import('./pages/AndroidPortfolio'));
 const MLPortfolio = lazy(() => import('./pages/MLPortfolio'));
+const Background = lazy(() => import('./pages/Background'));
 const AboutPanda = lazy(() => import('./pages/AboutPanda'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
+const theme = createTheme(casefileTheme);
+
 const LoadingFallback = () => (
-  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-    <CircularProgress aria-label="Loading page" />
-  </Box>
+  <div role="status" aria-live="polite" style={{ minHeight: '60vh', display: 'grid', placeItems: 'center' }}>
+    <span className="mono" style={{ fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--graphite)' }}>
+      Opening the file…
+    </span>
+  </div>
 );
 
-// Context to share theme switching
-const ThemeContext = React.createContext({
-  current: 'technical-precision',
-  setTheme: (_name, _origin) => { },
-});
-
-export const useAppTheme = () => React.useContext(ThemeContext);
-
 /**
- * Loads the font families a theme needs, once, the first time it is selected.
- * Keeps the initial payload to one family instead of the six that were
- * previously imported up front.
+ * Tags every PostHog event with the design the visitor saw and whether motion
+ * was on, so the redesign can be compared with what came before it and the
+ * scroll stories with the still version.
  */
-const THEME_FONTS = {
-  // Exhibit: Bodoni Moda for h1/h2, Inter for everything else.
-  'ocean-mist': () => Promise.all([
-    import('@fontsource/bodoni-moda/700.css'),
-    import('@fontsource/inter/400.css'),
-    import('@fontsource/inter/500.css'),
-  ]),
-  // Notebook: Lora only - its display face is JetBrains Mono, already eager.
-  'forest-canopy': () => Promise.all([
-    import('@fontsource/lora/400.css'),
-    import('@fontsource/lora/600.css'),
-  ]),
-  // Ledger: no longer shares Instrument's body face, so it has its own pair.
-  'corporate-clean': () => Promise.all([
-    import('@fontsource/ibm-plex-sans-condensed/600.css'),
-    import('@fontsource/public-sans/400.css'),
-    import('@fontsource/public-sans/600.css'),
-  ]),
-};
-
-// Per weight, not per family: `import('@fontsource/inter')` pulled every weight
-// the family ships, which for a mode that uses two of them is most of a
-// megabyte spent on faces nothing renders.
-const loadedFonts = new Set(['technical-precision']);
-
-const useThemeFonts = (themeKey) => {
-  useEffect(() => {
-    if (loadedFonts.has(themeKey)) return;
-    const load = THEME_FONTS[themeKey];
-    if (!load) return;
-    loadedFonts.add(themeKey);
-    load().catch(() => loadedFonts.delete(themeKey));
-  }, [themeKey]);
-};
-
-/**
- * Registers the active theme as a super property, so every event PostHog sends
- * carries the personality the visitor was actually looking at. Without it there
- * is no way to tell whether the people who reach the case studies came through
- * one theme more than another - only that the switcher got used.
- */
-const useThemeSuperProperty = (themeKey) => {
+const useDesignSuperProperties = () => {
   const posthog = usePostHog();
-
+  const { motionOn } = useMotion();
   useEffect(() => {
-    posthog?.register({ portfolio_theme: themeKey });
-  }, [themeKey, posthog]);
+    posthog?.register({ portfolio_design: 'casefile', motion_on: motionOn });
+  }, [posthog, motionOn]);
 };
 
-/** Chrome shared by every route: one app bar, the page, then the footer. */
-const PageShell = ({ children }) => (
-  <>
-    <ScrollProgress />
-    <DrawerAppBar />
-    <Toolbar />
-    <PageTransition>{children}</PageTransition>
-    <SiteFooter />
-  </>
+/** Chrome shared by every route: skip link, header, the page, footer. */
+const PageShell = ({ children }) => {
+  useDesignSuperProperties();
+  return (
+    <>
+      <div id="top" />
+      <a className="skip" href="#main">Skip to content</a>
+      <SiteHeader />
+      <PageTransition>{children}</PageTransition>
+      <SiteFooter />
+    </>
+  );
+};
+
+const page = (el) => <PageShell>{el}</PageShell>;
+
+const App = () => (
+  <MotionProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <ConsentBanner />
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        {/* Pageviews are captured by PostHog itself via capture_pageview:
+            'history_change' in index.jsx. */}
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route path="/" element={page(<Home />)} />
+            {/* The About narrative lives on /background now. */}
+            <Route path="/about" element={<Navigate to="/background" replace />} />
+            <Route path="/projects/:projectId" element={page(<ProjectDetail />)} />
+            <Route path="/fullstack" element={page(<FullstackPortfolio />)} />
+            <Route path="/desktop" element={page(<DesktopPortfolio />)} />
+            <Route path="/android" element={page(<AndroidPortfolio />)} />
+            <Route path="/ml" element={page(<MLPortfolio />)} />
+            <Route path="/background" element={page(<Background />)} />
+            <Route path="/about-panda" element={page(<AboutPanda />)} />
+            <Route path="*" element={page(<NotFound />)} />
+          </Routes>
+        </Suspense>
+      </Router>
+    </ThemeProvider>
+  </MotionProvider>
 );
 
-const ToggleThemeProvider = () => {
-  const [themeKey, setThemeKey] = useState(() => {
-    return localStorage.getItem('portfolio-theme') || 'technical-precision';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('portfolio-theme', themeKey);
-  }, [themeKey]);
-
-  useThemeFonts(themeKey);
-  useThemeSuperProperty(themeKey);
-
-  /**
-   * Theme changes sweep in as an expanding circle from the control that asked
-   * for them, via the View Transitions API. The browser snapshots the old
-   * theme, the new one renders underneath, and the clip circle grown over the
-   * snapshot is what the visitor sees - no gradient, no fade, one wipe.
-   *
-   * Falls back to an instant switch when the API is missing (jsdom, older
-   * Firefox/Safari) or the visitor prefers reduced motion.
-   */
-  const setTheme = useCallback((name, origin) => {
-    const reduceMotion =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (!document.startViewTransition || reduceMotion) {
-      setThemeKey(name);
-      return;
-    }
-
-    const x = origin?.x ?? window.innerWidth - 48;
-    const y = origin?.y ?? 32;
-    // Radius to the farthest viewport corner, so the circle always covers it.
-    const radius = Math.hypot(
-      Math.max(x, window.innerWidth - x),
-      Math.max(y, window.innerHeight - y)
-    );
-
-    const transition = document.startViewTransition(() => {
-      flushSync(() => setThemeKey(name));
-    });
-
-    transition.ready
-      .then(() => {
-        document.documentElement.animate(
-          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-          {
-            duration: 600,
-            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-            pseudoElement: '::view-transition-new(root)',
-          }
-        );
-      })
-      .catch(() => {
-        // Snapshot can fail mid-navigation; the theme has still switched.
-      });
-  }, []);
-
-  const personality = React.useMemo(() => getThemePersonality(themeKey), [themeKey]);
-  const theme = React.useMemo(() => createTheme(personality), [personality]);
-
-  const contextValue = React.useMemo(
-    () => ({ current: themeKey, setTheme }),
-    [themeKey, setTheme]
-  );
-
-  return (
-    <ThemeContext.Provider value={contextValue}>
-      <ThemeProvider theme={theme}>
-        {/*
-          * Reduced motion has no global switch here: GSAP is the only
-          * animation library, and every component that animates checks
-          * usePrefersReducedMotion (or gsapEnabled) before it starts a tween.
-          * performance.test.js fails any file that tweens without the guard.
-          */}
-        <CssBaseline />
-        <ConsentBanner />
-        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          {/* Pageviews are captured by PostHog itself via capture_pageview:
-              'history_change' in index.jsx - it hooks the history API, so
-              react-router navigations are picked up without a tracker here. */}
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
-              <Route path="/" element={<PageShell><Home /></PageShell>} />
-              <Route path="/about" element={<Navigate to="/" replace />} />
-              <Route path="/projects/:projectId" element={<PageShell><ProjectDetail /></PageShell>} />
-              <Route path="/fullstack" element={<PageShell><FullstackPortfolio /></PageShell>} />
-              <Route path="/desktop" element={<PageShell><DesktopPortfolio /></PageShell>} />
-              <Route path="/android" element={<PageShell><AndroidPortfolio /></PageShell>} />
-              <Route path="/ml" element={<PageShell><MLPortfolio /></PageShell>} />
-              <Route path="/about-panda" element={<PageShell><AboutPanda /></PageShell>} />
-              <Route path="*" element={<PageShell><NotFound /></PageShell>} />
-            </Routes>
-          </Suspense>
-        </Router>
-      </ThemeProvider>
-    </ThemeContext.Provider>
-  );
-};
-
-export default ToggleThemeProvider;
+export default App;

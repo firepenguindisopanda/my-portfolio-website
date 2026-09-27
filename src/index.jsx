@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import ToggleThemeProvider from './App';
+import App from './App';
 
 import posthog from 'posthog-js';
 import { PostHogErrorBoundary, PostHogProvider } from '@posthog/react';
@@ -71,7 +71,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <PostHogProvider client={posthog}>
     <PostHogErrorBoundary>
-      <ToggleThemeProvider />
+      <App />
     </PostHogErrorBoundary>
   </PostHogProvider>
 );

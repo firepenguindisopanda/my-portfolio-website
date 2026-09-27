@@ -4,7 +4,7 @@ import ProjectDetail from './ProjectDetail';
 import * as router from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { MemoryRouter } from 'react-router-dom';
-import { getThemePersonality } from '../utilities/themeConfig';
+import { casefileTheme } from '../utilities/themeConfig';
 
 vi.mock('react-router-dom', async () => ({
   ...(await vi.importActual('react-router-dom')),
@@ -18,7 +18,7 @@ describe('ProjectDetail navigation and scroll state', () => {
     vi.clearAllMocks();
   });
 
-  test('Back to all projects navigates home and scrolls to the projects section', async () => {
+  test('Back to all projects navigates home and scrolls to the project index', async () => {
     const mockNavigate = vi.fn();
     router.useNavigate.mockImplementation(() => mockNavigate);
     router.useLocation.mockImplementation(() => ({ pathname: '/projects/ai-pitchdeck-generator', state: {} }));
@@ -27,7 +27,7 @@ describe('ProjectDetail navigation and scroll state', () => {
     global.fetch = vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve('# Hello\nThis is a test markdown') }));
 
     render(
-      <ThemeProvider theme={createTheme(getThemePersonality('technical-precision'))}>
+      <ThemeProvider theme={createTheme(casefileTheme)}>
         <MemoryRouter>
           <ProjectDetail />
         </MemoryRouter>
@@ -40,9 +40,9 @@ describe('ProjectDetail navigation and scroll state', () => {
 
     const backButton = screen.getByRole('button', { name: /Back to all projects/i });
     fireEvent.click(backButton);
-    // The label promises the projects section, so the click must always land
-    // there rather than wherever history came from.
-    expect(mockNavigate).toHaveBeenCalledWith('/', { state: { scrollTo: 'projects' } });
+    // The label promises every project, so the click must always land on the
+    // index rather than wherever history came from.
+    expect(mockNavigate).toHaveBeenCalledWith('/', { state: { scrollTo: 'index' } });
   });
 
   test('the case-study footer offers a previous and a next write-up', async () => {
@@ -54,7 +54,7 @@ describe('ProjectDetail navigation and scroll state', () => {
     global.fetch = vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve('# Hello\nThis is a test markdown') }));
 
     render(
-      <ThemeProvider theme={createTheme(getThemePersonality('technical-precision'))}>
+      <ThemeProvider theme={createTheme(casefileTheme)}>
         <MemoryRouter>
           <ProjectDetail />
         </MemoryRouter>

@@ -1,263 +1,113 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Button,
-  Card,
-  Chip,
-  Container,
-  Stack,
-  Typography,
-  useTheme,
-} from '@mui/material';
-import { alpha } from '@mui/material/styles';
-import Reveal from '../Reveal/Reveal';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import LaunchIcon from '@mui/icons-material/Launch';
-import GitHubIcon from '@mui/icons-material/GitHub';
+import { Link } from 'react-router-dom';
 import { usePostHog } from '@posthog/react';
 import { projects as allProjects } from '../../data/projects';
 import EvidenceLine from '../Evidence/EvidenceLine';
+import { PROJECT_VISUALS } from '../ProjectVisuals';
+import { splitTitle } from '../home/links';
 
 /**
- * One layout for every deep-dive route.
+ * One layout for every deep-dive route (/fullstack, /ml, /desktop, /android):
+ * a drawer of the case file, holding every project in that category as a row
+ * of the home page's index, with its evidence line in the open.
  *
- * /fullstack and /desktop previously rendered a VS Code pastiche whose detail
- * pane was a thinner copy of the /projects/:id case study, while /ml used a
- * third layout again - three category pages in three design languages, and one
- * of them duplicating the page it linked to. This component is the single
- * treatment they now share, and it never shows detail: every row hands off to
- * the case study, which is the only place depth lives.
- *
- * Rows are deliberately not numbered and not alternated left/right. Neither
- * order nor side carries information here, and a zigzag costs scanning speed
- * for decoration.
+ * It never shows detail: every row hands off to the case study, which is the
+ * only place depth lives. Rows are not numbered - order carries no meaning
+ * here - and a project without a screenshot shows its stack set in type, never
+ * an invented picture.
  */
 
-/** Projects with a live URL are labelled as such - it is the strongest signal a row can carry. */
-const StatusChip = ({ project }) => {
-  if (!project.liveUrl) return null;
-  return (
-    <Chip
-      label="Live"
-      size="small"
-      color="success"
-      variant="outlined"
-      sx={{ height: 20, fontSize: '0.65rem', letterSpacing: '0.04em' }}
-    />
-  );
-};
+const EXT = { target: '_blank', rel: 'noopener noreferrer' };
+const NewTab = () => <span className="sr-only"> (opens in a new tab)</span>;
 
-const MediaPanel = ({ project }) => {
-  const theme = useTheme();
+/** The row's picture: the real capture, else a drawn figure, else the stack set in type. */
+export const ProjectMedia = ({ project, title }) => {
   const image = project.screenshot || project.thumbnail;
-
+  // A drawn visual only where there is no real capture.
+  const Visual = !image && project.visual && PROJECT_VISUALS[project.visual];
   if (image) {
     return (
-      <Box
-        component="img"
-        src={image}
-        alt={`${project.title} screenshot`}
-        loading="lazy"
-        sx={{
-          width: '100%',
-          height: 'auto',
-          aspectRatio: '16 / 10',
-          objectFit: 'cover',
-          objectPosition: '50% 20%',
-          display: 'block',
-          borderRadius: `${theme.custom.radius.control}px`,
-          border: '1px solid',
-          borderColor: 'divider',
-        }}
-      />
+      <div className="ix-thumb">
+        <img src={image} alt={`Screenshot of ${title}`} loading="lazy" decoding="async" width="640" height="400" />
+      </div>
     );
   }
-
-  const icons = project.techIcons || [];
-
-  // No capture yet. Tech marks if the project has them, and otherwise the stack
-  // set in mono - anything rather than an empty tinted rectangle, which reads
-  // as a broken image rather than as a project without a screenshot.
+  if (Visual) {
+    return (
+      <div className="ix-thumb">
+        <Visual ratio="16 / 10" />
+      </div>
+    );
+  }
   return (
-    <Box
-      sx={{
-        width: '100%',
-        aspectRatio: '16 / 10',
-        display: 'flex',
-        flexDirection: icons.length ? 'row' : 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: icons.length ? 2 : 0.75,
-        px: 2,
-        bgcolor: alpha(theme.palette.primary.main, 0.06),
-        borderRadius: `${theme.custom.radius.control}px`,
-        border: '1px solid',
-        borderColor: 'divider',
-      }}
-    >
-      {icons.length > 0
-        ? icons.slice(0, 3).map(({ Icon, src, label }) => (
-            <Box
-              key={label || Icon?.name}
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                bgcolor: 'background.paper',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            >
-              {Icon ? <Icon style={{ width: 20, height: 20 }} /> : <img src={src} alt="" width="20" height="20" />}
-            </Box>
-          ))
-        : (project.primaryTech || project.technologies || []).slice(0, 4).map((tech) => (
-            <Typography
-              key={tech}
-              sx={{
-                fontFamily: theme.custom.codeFont,
-                fontSize: '0.8125rem',
-                fontWeight: 500,
-                color: alpha(theme.palette.primary.main, 0.75),
-              }}
-            >
-              {tech}
-            </Typography>
-          ))}
-    </Box>
+    <div className="ix-thumb ix-data" aria-hidden="true">
+      <span className="cap">{project.id}</span>
+      <span className="dd-stack">{(project.primaryTech || project.technologies || []).slice(0, 3).join(' / ')}</span>
+    </div>
   );
 };
 
-const ProjectRow = ({ project, index, surface }) => {
-  const theme = useTheme();
-  const navigate = useNavigate();
+const Row = ({ project, surface }) => {
   const posthog = usePostHog();
-
-  const openCaseStudy = () => {
-    if (!project.markdown) return;
+  const [title, sub] = splitTitle(project.title);
+  const viewed = () =>
     posthog?.capture('project_viewed', {
       project_id: project.id,
       project_title: project.title,
       category: project.category,
       surface,
     });
-    navigate(`/projects/${project.id}`);
-  };
-
-  const techLabels = (project.primaryTech || project.technologies || []).slice(0, 5);
 
   return (
-    <Reveal delay={Math.min(index, 4) * theme.custom.motion.stagger}>
-      <Card
-        component="article"
-        sx={{
-          p: { xs: 2.5, md: 3.5 },
-          mb: { xs: 3, md: 4 },
-          cursor: project.markdown ? 'pointer' : 'default',
-        }}
-        onClick={openCaseStudy}
-      >
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 280px) minmax(0, 1fr)' },
-            gap: { xs: 2.5, md: 4 },
-            alignItems: 'start',
-          }}
-        >
-          <MediaPanel project={project} />
-
-          <Box sx={{ minWidth: 0 }}>
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-              <Typography variant="overline" color="text.secondary">
-                {project.category}
-              </Typography>
-              <StatusChip project={project} />
-            </Stack>
-
-            <Typography variant="h3" component="h2" sx={{ mb: 1.25 }}>
-              {project.title}
-            </Typography>
-
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {project.highlight || project.shortDescription}
-            </Typography>
-
-            <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75, mb: project.evidence ? 2.5 : 2 }}>
-              {techLabels.map((tech) => (
-                <Chip
-                  key={tech}
-                  label={tech}
-                  size="small"
-                  sx={{
-                    fontFamily: theme.custom.codeFont,
-                    fontSize: '0.6875rem',
-                    bgcolor: alpha(theme.palette.primary.main, 0.08),
-                    color: 'primary.main',
-                  }}
-                />
-              ))}
-            </Stack>
-
-            {project.evidence && (
-              <Box sx={{ mb: 2.5 }}>
-                <EvidenceLine text={project.evidence} compact />
-              </Box>
-            )}
-
-            <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-              {project.markdown && (
-                <Button
-                  size="small"
-                  variant="contained"
-                  endIcon={<ArrowForwardIcon />}
-                  onClick={openCaseStudy}
-                >
-                  Case study
-                </Button>
-              )}
-              {project.liveUrl && (
-                <Button
-                  size="small"
-                  variant="outlined"
-                  startIcon={<LaunchIcon />}
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    posthog?.capture('project_demo_clicked', { project_id: project.id, surface });
-                  }}
-                >
-                  Live
-                </Button>
-              )}
-              {project.githubUrl && (
-                <Button
-                  size="small"
-                  startIcon={<GitHubIcon />}
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{ color: 'text.secondary' }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    posthog?.capture('project_github_clicked', { project_id: project.id, surface });
-                  }}
-                >
-                  Code
-                </Button>
-              )}
-            </Stack>
-          </Box>
-        </Box>
-      </Card>
-    </Reveal>
+    <li className="ix-row dd-row">
+      <ProjectMedia project={project} title={title} />
+      <div className="ix-main">
+        <h2 className="ix-title">
+          {project.markdown ? (
+            <Link to={`/projects/${project.id}`} onClick={viewed}>
+              {title}
+            </Link>
+          ) : (
+            title
+          )}
+          {sub && <span className="sub">{sub}</span>}
+        </h2>
+        <p className="ix-hl">{project.highlight || project.shortDescription}</p>
+        {project.evidence && <EvidenceLine text={project.evidence} compact />}
+      </div>
+      <div className="ix-meta">
+        <p className="ix-cat">
+          {project.category}
+          {project.liveUrl && <span className="dd-live">Live</span>}
+        </p>
+        <ul className="tech" aria-label="Tech">
+          {(project.primaryTech || project.technologies || []).slice(0, 5).map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+      </div>
+      <p className="ix-links">
+        {project.markdown && (
+          <Link to={`/projects/${project.id}`} onClick={viewed}>
+            Case study<span className="sr-only">: {title}</span>
+          </Link>
+        )}
+        {project.liveUrl && (
+          <a href={project.liveUrl} {...EXT} onClick={() => posthog?.capture('project_demo_clicked', { project_id: project.id, surface })}>
+            Live
+            <NewTab />
+            <span aria-hidden="true">&nbsp;&#8599;</span>
+          </a>
+        )}
+        {project.githubUrl && (
+          <a href={project.githubUrl} {...EXT} onClick={() => posthog?.capture('project_github_clicked', { project_id: project.id, surface })}>
+            Code
+            <NewTab />
+            <span aria-hidden="true">&nbsp;&#8599;</span>
+          </a>
+        )}
+      </p>
+    </li>
   );
 };
 
@@ -270,75 +120,47 @@ const ProjectRow = ({ project, index, surface }) => {
  * @param {string}   emptyMessage shown when no project matches yet
  */
 const CategoryPage = ({ eyebrow, title, description, categories, surface, emptyMessage }) => {
-  const navigate = useNavigate();
-
-  const projects = useMemo(
-    () => allProjects.filter((p) => categories.includes(p.category)),
-    [categories],
-  );
+  const projects = useMemo(() => allProjects.filter((p) => categories.includes(p.category)), [categories]);
 
   return (
-    <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 }, py: { xs: 5, md: 8 } }}>
-      <Button
-        startIcon={<ArrowBackIcon />}
-        onClick={() => navigate('/')}
-        size="small"
-        sx={{ mb: 4, ml: -1, color: 'text.secondary' }}
-      >
-        All work
-      </Button>
-
-      <Box sx={{ mb: { xs: 5, md: 7 }, maxWidth: 720 }}>
-        <Typography variant="overline" color="primary.main" sx={{ display: 'block', mb: 1 }}>
-          {eyebrow}
-        </Typography>
-        <Typography variant="h1" component="h1" sx={{ mb: 2, fontSize: { xs: '2.25rem', md: '2.75rem' } }}>
-          {title}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          {description}
-        </Typography>
-
-        <Box
-          sx={{
-            mt: 3,
-            pt: 2,
-            borderTop: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <Typography variant="overline" color="text.secondary">
+    <div className="cf pg dd">
+      <header className="pg-head">
+        <div className="wrap">
+          <div className="crumbs">
+            <Link className="back" to="/#index">
+              <span aria-hidden="true">&larr;</span> All work
+            </Link>
+            <span className="crumb-path" aria-hidden="true">
+              deep-dives / {surface}
+            </span>
+          </div>
+          <p className="sec-tab">{eyebrow}</p>
+          <h1 className="pg-title">{title}</h1>
+          <p className="lede">{description}</p>
+          <p className="pg-count">
             {projects.length} {projects.length === 1 ? 'project' : 'projects'}
-          </Typography>
-        </Box>
-      </Box>
+          </p>
+        </div>
+      </header>
 
-      {projects.length === 0 ? (
-        <Box
-          sx={{
-            border: '1px dashed',
-            borderColor: 'divider',
-            borderRadius: 2,
-            p: { xs: 4, md: 6 },
-            textAlign: 'center',
-          }}
-        >
-          <Typography variant="h3" component="p" sx={{ mb: 1.5 }}>
-            Nothing here yet
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 460, mx: 'auto' }}>
-            {emptyMessage}
-          </Typography>
-          <Button variant="outlined" onClick={() => navigate('/')} endIcon={<ArrowForwardIcon />}>
-            See the shipped work
-          </Button>
-        </Box>
-      ) : (
-        projects.map((project, index) => (
-          <ProjectRow key={project.id} project={project} index={index} surface={surface} />
-        ))
-      )}
-    </Container>
+      <div className="wrap dd-body">
+        {projects.length === 0 ? (
+          <div className="dd-empty">
+            <p className="dd-empty-title">Nothing filed here yet</p>
+            <p>{emptyMessage}</p>
+            <Link className="btn btn-primary" to="/#index">
+              See the shipped work <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </div>
+        ) : (
+          <ul className="ix-list">
+            {projects.map((project) => (
+              <Row key={project.id} project={project} surface={surface} />
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 };
 

@@ -1,43 +1,54 @@
-# nicksportfolio.tech
+# nicksmith.is-a.dev
 
-Nicholas Smith's portfolio: a React single-page app that presents the same
-projects, experience and credentials in four editorial formats, switchable from
-the app bar.
+Nicholas Smith's portfolio: a React single-page app designed as a case file.
+The work is told as four scroll-driven case stories, three projects can be
+tried on the page, and everything else is a filterable index with a case study
+behind every row.
 
-Live at https://nicksportfolio.tech
+Live at https://nicksmith.is-a.dev
 
 ## Stack
 
 - React 18, React Router 6, Vite 8
-- MUI 5 for components; one theme definition per presentation mode in
-  `src/utilities/themeConfig.js`
-- GSAP (hero timeline, section rules, scroll progress) and framer-motion
-  (section reveals, route transitions), both guarded by `prefers-reduced-motion`
+- Plain CSS for every page (`src/styles/`), with MUI 5 kept for the ML
+  analysis blocks and drawn figures; `src/utilities/themeConfig.js` mirrors the
+  CSS tokens so both paint alike
+- GSAP with ScrollTrigger and Flip (pinned case stories, the index filter, the
+  hover preview), behind a Motion switch that defaults to `prefers-reduced-motion`
 - react-markdown for the case studies in `public/markdowns`, recharts for the
   interactive analysis on the data-science write-ups
 - PostHog for analytics, behind a consent banner and cookieless by default
 - Vitest and Testing Library; ESLint 9 flat config
 - Firebase Hosting
 
-## Presentation modes
+## Design: Casefile
 
-The four "themes" are four layouts of the same content, not four palettes.
-Each mode owns its typefaces, density, radii, motion character and section
-arrangement:
+One design, an archive of case files: cool paper and ink, a highlighter for
+what was verified and a stamp red for what was flagged, and a night stage where
+the case stories play out. Instrument Serif carries the big moments, IBM Plex
+Sans the reading, IBM Plex Mono every label and number.
 
-| Mode | Format | Display / body |
-|---|---|---|
-| Instrument (default) | Instrument panel on a dark ground, modular grid | Space Grotesk / IBM Plex Sans |
-| Ledger | Audit sheet, ruled rows, no cards | IBM Plex Sans Condensed / Public Sans |
-| Notebook | Engineering notebook, one column and a margin rail | JetBrains Mono / Lora |
-| Exhibit | Gallery plates with wall labels | Bodoni Moda / Inter |
+The home page, in order:
 
-The rule that keeps this maintainable: no component branches on the theme id.
-Layout is a token (`theme.custom.layout`), each section switches once on it,
-and the renderers are siblings fed by shared data hooks. Radii come from a
-four-value scale, surfaces are separated by hairlines rather than shadows, and
-there are no gradients. `src/__tests__/performance.test.js` enforces most of
-this against the source.
+- **Cover** - name, thesis and a file card, with three evidence rows that each
+  open a case study.
+- **Four cases** - on a desktop each chapter pins while its figure plays
+  against the scroll; on phones each figure plays once as it arrives, and with
+  motion off every figure is drawn in its finished state.
+- **Try it** - the Chimp Test, Link Tracker's Q/R/D/X triage and the timetable
+  drag, on example data. All three work by keyboard and touch.
+- **Index** - every featured project, filterable, with a floating screenshot
+  preview on the compact rows.
+- **Experience, Skills, Recognition, Contact** - the contact form sends through
+  EmailJS.
+
+Motion follows the visitor's system setting until they use the header's Motion
+switch, which is remembered. CSS transitions are keyed on `html.motion-on`, and
+the reduced-motion override on `html.motion-off`, never on a global rule -
+a global `transition-duration` corrupts GSAP's `from()` tweens.
+`src/__tests__/performance.test.js` enforces this and the other design rules
+(gradients and shadows only in `src/styles/`, lazy images below the fold,
+three font families) against the source.
 
 ## Running it
 
@@ -85,12 +96,18 @@ npx firebase deploy
 
 ```
 src/
-  data/           profile, projects, routes, certificates, domains, plot catalogue
-  utilities/      themeConfig (the four modes), gsapSetup
-  hooks/          useLayout, useSectionSpy, useDocumentMeta, useScrollRestore
-  components/     one folder per section; multi-renderer sections keep a
-                  renderers/ folder and a shared *Parts.jsx
-  pages/          Home, ProjectDetail, the deep-dive category pages, NotFound
+  styles/         casefile.css (tokens, header, home), pages.css, tryit.css
+  data/           profile, projects, experience, skills, certificates,
+                  background, routes, worked example, plot catalogue
+  motion/         MotionProvider and the Motion switch's state
+  utilities/      themeConfig (the MUI mirror of the tokens), gsapSetup
+  hooks/          useSectionSpy, useDocumentMeta, useScrollRestore
+  components/
+    home/         the home page's sections; story/ and tryit/ hold the case
+                  stories and the demos
+    site/         header and footer
+    ...           case-study pieces, the deep-dive layout, ML charts
+  pages/          Home, ProjectDetail, the deep-dive pages, Background, NotFound
 public/
   markdowns/      case-study write-ups
   portfolio_data/ metrics and plots for the interactive analyses

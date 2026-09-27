@@ -88,7 +88,7 @@ const ModelMetricsCard = ({ dataPath }) => {
               label="Precision"
               value={best.precision.toFixed(3)}
               subtext={`Recall: ${best.recall.toFixed(3)}`}
-              color={theme.palette.secondary.main}
+              color={theme.palette.info.main}
             />
           </Grid>
           <Grid item xs={12} sm={3}>
@@ -181,7 +181,7 @@ const ModelMetricsCard = ({ dataPath }) => {
               label="MAE"
               value={data.lightgbm.mae.toFixed(3)}
               subtext={`Baseline: ${data.baseline_nmme_mean.mae.toFixed(3)}`}
-              color={theme.palette.secondary.main}
+              color={theme.palette.info.main}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -239,7 +239,7 @@ const ModelMetricsCard = ({ dataPath }) => {
             label="Precision"
             value={best.precision.toFixed(3)}
             subtext={`Baseline: ${baseline.precision.toFixed(3)}`}
-            color={theme.palette.secondary.main}
+            color={theme.palette.info.main}
           />
         </Grid>
         <Grid item xs={12} sm={3}>
