@@ -45,7 +45,7 @@ const ClusterSummaryCard = ({ dataPath }) => {
         Customer Segments & Business KPIs
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        4 segments identified via K-Means clustering with stability analysis (ARI=0.85). Segments are validated against business metrics: revenue, CLV proxy, and offer ROI.
+        4 segments identified via K-Means clustering with stability analysis (mean ARI 0.76, moderately stable). Segments are validated against business metrics: revenue, CLV proxy, and offer ROI.
       </Typography>
 
       <Grid container spacing={2} sx={{ mb: 4 }}>

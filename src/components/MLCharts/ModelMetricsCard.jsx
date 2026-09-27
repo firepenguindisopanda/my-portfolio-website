@@ -212,8 +212,10 @@ const ModelMetricsCard = ({ dataPath }) => {
     );
   }
 
-  const best = data.xgboost;
+  // `best` is the current shape; `xgboost` is the shape the first version wrote.
+  const best = data.best || data.xgboost;
   const baseline = data.baseline;
+  const baselineName = data.baseline_model || 'baseline';
   const hasCV = data.cross_validation !== undefined;
   const hasThreshold = data.threshold_optimization !== undefined;
   return (
@@ -222,7 +224,7 @@ const ModelMetricsCard = ({ dataPath }) => {
         Model Performance
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        {data.best_model} vs baseline on {data.training_samples.toLocaleString()} training samples ({data.test_samples.toLocaleString()} test). Imbalance ratio: {data.imbalance_ratio} ({data.positive_pct}% positive).
+        {data.best_model} vs {baselineName.toLowerCase()} on {data.training_samples.toLocaleString()} training samples ({data.test_samples.toLocaleString()} test). Imbalance ratio: {data.imbalance_ratio} ({data.positive_pct}% positive).
         {hasCV ? ` 5-fold CV AUC-ROC: ${data.cross_validation.cv_auc_mean.toFixed(3)} ± ${data.cross_validation.cv_auc_std.toFixed(3)}.` : ''}
       </Typography>
       <Grid container spacing={3} sx={{ mb: 3 }}>
@@ -290,6 +292,14 @@ const ModelMetricsCard = ({ dataPath }) => {
         {hasThreshold && (
           <Chip
             label={`Brier: ${data.threshold_optimization.brier_score.toFixed(3)}`}
+            color="info"
+            variant="outlined"
+            sx={{ fontWeight: 600, fontSize: '0.85rem' }}
+          />
+        )}
+        {!hasThreshold && data.brier_score !== undefined && (
+          <Chip
+            label={`Brier: ${data.brier_score.toFixed(3)}`}
             color="info"
             variant="outlined"
             sx={{ fontWeight: 600, fontSize: '0.85rem' }}

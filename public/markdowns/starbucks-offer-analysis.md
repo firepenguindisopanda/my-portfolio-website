@@ -28,7 +28,7 @@ The simulated Starbucks Rewards app data contains **306,534 events** from **17,0
 - Schema validation passed for all three datasets via custom JSONL parser
 - All 17,000 customers appear in the transcript (no orphans)
 - All 10 offers appear in the transcript (no orphans)
-- **Feature Engineering:** 55 customer features + 75 interaction features (174,583 interaction rows), including RFM metrics, time-decay features, channel interactions, CLV proxy, and offer timing
+- **Feature Engineering:** 55 customer features for segmentation (RFM, time decay, channel use, a CLV proxy), and a separate send-level table of 50,806 offers for the predictive model
 
 ---
 
@@ -147,11 +147,7 @@ Created **55 customer features** (+ 75 interaction features) from demographic an
 
 **Offer Features (11 features):** One-hot encoded offer types, channel flags (email, mobile, social, web), interaction terms (difficulty × reward, reward per day, difficulty per day)
 
-For predictive modeling, **174,583 interaction rows** were created (17,000 customers × 10 offers).
-
-**Target Distribution:**
-- Negative (did not complete): 80.8%
-- Positive (completed): 19.2%, a 4.2:1 imbalance
+These month-long features are the right way to describe a customer for segmentation. They are the wrong input for predicting whether one particular offer will be completed, because they count what happened after that offer was sent. The predictive model below uses its own send-level features for that reason.
 
 ---
 
@@ -170,7 +166,7 @@ K-Means clustering was applied to 32 standardized features (demographic + behavi
 | **4** | 380,418 | 0.147 | 2,436.1 | 1.94 | Within 1 SE |
 | 5 | 355,198 | 0.165 | 2,258.4 | 2.01 | - |
 
-**Why k=4 despite k=3 having higher silhouette:** The k=4 solution reveals a **business-critical distinction** between Discount Seekers and BOGO Advocates that k=3 collapses into one group. The recommendation system built on k=4 (+7.9% lift) validates this choice empirically, and the stability analysis (mean ARI = **0.85**, highly stable) confirms the clusters are robust.
+**Why k=4 despite k=3 having higher silhouette:** The k=4 solution reveals a **business-critical distinction** between Discount Seekers and BOGO Advocates that k=3 collapses into one group. The recommendation system built on k=4 (+7.9% lift) validates this choice empirically, and the stability analysis (mean ARI **0.76** across resamples, standard deviation 0.19, lowest 0.60) shows the clusters are moderately stable.
 
 The k=3 silhouette (0.170) is also only 0.023 higher than k=4; both indicate weak separation typical of behavioral data. The clusters serve as **directional guides**, not hard rules.
 
@@ -219,100 +215,79 @@ Segments were validated against business metrics to confirm practical relevance:
 
 ### Candid Assessment of Clustering Quality
 
-The silhouette score of 0.147 (k=4) indicates **weak separation**: clusters overlap. This is expected for behavioral data where customer segments have fuzzy boundaries. The stability analysis (ARI=0.85, "highly stable") provides confidence that the identified segments are real structures, not artifacts of randomness. The clusters serve as **directional guides** for targeting, and the recommendation system includes secondary offer types for this reason.
+The silhouette score of 0.147 (k=4) indicates **weak separation**: clusters overlap. This is expected for behavioral data where customer segments have fuzzy boundaries. The stability analysis (mean ARI 0.76, lowest 0.60) says most of the structure recurs across resamples, but not all of it, so the segment boundaries should be treated as soft. The clusters serve as **directional guides** for targeting, and the recommendation system includes secondary offer types for this reason.
 
 ---
 
 ## Predictive Modeling
 
-### Methodology
+### The question
 
-- **Task:** Binary classification (will customer complete a specific offer?)
-- **Target:** AUC-ROC > 0.70 (achieved: **0.994** yes), Precision > 0.60 (achieved: **0.847** yes)
-- **Models:** Logistic Regression (baseline), Random Forest, Gradient Boosting, XGBoost
-- **Validation:** 80/20 stratified train-test split + **5-fold Stratified Cross-Validation**
-- **Class weighting:** `scale_pos_weight` for XGBoost addressing 4.2:1 imbalance
-- **Calibration:** Brier score assessment
-- **Threshold optimization:** Sweep 0.10-0.90 to maximize F1
+When a BOGO or discount offer is sent, will this customer complete it within the offer's validity window? That is the decision a targeting system faces, so every feature has to be something known at the moment of sending.
 
-### Model Comparison
+### What the first version got wrong
 
-| Model | AUC-ROC | Precision | Recall | F1-Score |
-|-------|---------|-----------|--------|----------|
-| Logistic Regression (Baseline) | 0.979 | 0.884 | 0.839 | 0.861 |
-| Random Forest | 0.992 | 0.904 | 0.888 | 0.896 |
-| Gradient Boosting | 0.992 | 0.914 | 0.877 | 0.895 |
-| **XGBoost (Best)** | **0.994** | **0.847** | **0.965** | **0.902** |
+The first version of this model scored an AUC of **0.994**, and its own 5-fold cross-validation said 0.908. That gap was the clue. Four things were inflating it:
 
-![Model Comparison](/portfolio_data/starbucks/plots/model_comparison.webp)
+1. **Rows that never happened.** It crossed every customer with all ten offers, 170,000 rows, most of them offers the customer never received, including informational offers that cannot be completed at all. Predicting 0 for those is trivial.
+2. **No window.** The target was "ever completed this offer", not "completed within the offer's validity window".
+3. **Features from the future.** Its strongest feature was whether the offer was viewed by email, which only happens after the send, and it used completion counts over the whole month, the offer being predicted included.
+4. **A random split.** Rows were split at random, so each customer's other offers sat in both the training and the test set.
 
-XGBoost achieves **AUC-ROC of 0.994**, dramatically exceeding the 0.70 target, with precision of 0.847 and recall of 0.965 (catching 96.5% of actual completions).
+### The honest setup
 
-### 5-Fold Cross-Validation
+- **One row per offer actually sent:** 61,042 BOGO and discount sends. A completion is credited to the latest send of that offer whose window contains it, so an offer received twice counts as two sends.
+- **Censored sends dropped:** 10,236 sends whose validity window runs past the last hour of data (714) are excluded, because whether they would have completed is unknown. That leaves **50,806 sends to 16,804 customers**, 54.4% completed.
+- **Features known at send time:** the offer's terms (difficulty, reward, duration, type, channels), demographics, and the customer's history strictly before the send: earlier offers received, completed and viewed, transactions, spend, and hours since the last purchase.
+- **Customers kept apart:** 5-fold cross-validation grouped by customer, a held-out set of 3,361 customers (10,210 sends) never seen in training, and a time check that trains on the first three send waves and scores the later three.
+- **Tested:** unit tests check the window, the crediting of repeat sends and the censoring, and one test deletes every event after each send and confirms that none of its features change. Deliberately breaking either rule makes those tests fail.
 
-| Metric | Mean | Std Dev | Min | Max |
-|--------|------|---------|-----|-----|
-| AUC-ROC | 0.908 | 0.003 | 0.904 | 0.912 |
-| Precision | 0.627 | 0.008 | 0.614 | 0.638 |
-| Recall | 0.531 | 0.011 | 0.516 | 0.547 |
-| F1-Score | 0.575 | 0.006 | 0.566 | 0.584 |
+### Taking the leaks out, one at a time
 
-> Low standard deviations confirm **stable performance with no significant overfitting**.
+Same model (histogram gradient boosting), same sends, 5-fold cross-validation at each step:
 
-### Best Model Performance
+| Step | AUC |
+|---|---|
+| Original pipeline: every customer x every offer, random split | 0.994 |
+| One row per real send, still with month-long completion counts and the viewed flag | 0.934 |
+| Viewed flag removed | 0.931 |
+| Month-long counts replaced by history before the send | 0.866 |
+| Customers kept apart across folds (the honest setup) | **0.865** |
 
-![Best Model Performance](/portfolio_data/starbucks/plots/best_model_performance.webp)
+![Taking the leaks out](/portfolio_data/starbucks/plots/offer_response_ladder.webp)
 
-**Confusion Matrix:**
-| | Predicted Negative | Predicted Positive |
-|---|---|---|
-| **Actual Negative** | TN: 111,234 | FP: 5,770 |
-| **Actual Positive** | FN: 15,571 | TP: 18,008 |
+Most of the inflation came from two places: the rows that never happened (0.994 to 0.934) and the month-long completion counts (0.931 to 0.866). Once the features are honest, keeping customers apart costs almost nothing, which is a good sign that the model is not memorising people.
 
-### Threshold Optimization
+### Results on customers the model never saw
 
-Default threshold (0.50) may not maximize business value. F1-score optimization yields:
+| Model | CV AUC (grouped) | Held-out AUC | 95% CI | Brier |
+|---|---|---|---|---|
+| Offer terms only (logistic regression) | | 0.605 | | 0.239 |
+| Offer terms and demographics, no history | | 0.825 | | 0.170 |
+| Logistic regression, all features | 0.819 (sd 0.006) | 0.822 | 0.813 to 0.831 | 0.170 |
+| XGBoost | 0.864 (sd 0.005) | 0.865 | 0.857 to 0.873 | 0.148 |
+| **Histogram gradient boosting** | **0.865 (sd 0.005)** | **0.865** | **0.857 to 0.873** | **0.148** |
 
-| Threshold | F1 | Precision | Recall | Use Case |
-|-----------|-----|-----------|--------|----------|
-| 0.50 (default) | 0.581 | 0.633 | 0.536 | Balanced |
-| **0.42 (optimal)** | **0.612** | **0.567** | **0.665** | Higher recall: catch more completions |
-| 0.60 (conservative) | 0.540 | 0.741 | 0.429 | Minimize false positives |
+The interval resamples customers, not rows. At a 0.5 threshold the best model has precision 0.797, recall 0.822 and F1 0.809. Trained only on the first three send waves (hours 0 to 336), it scores **0.878** on the later three, so it holds up forward in time.
 
-> **Business Recommendation:** Use threshold **0.42** for targeting campaigns (maximizes F1 by capturing 66.5% of potential completions). Use 0.60 for high-precision scenarios (e.g., premium offers where false positives are costly).
+![Calibration on held-out customers](/portfolio_data/starbucks/plots/offer_response_calibration.webp)
 
-### Brier Score (Probability Calibration)
+The probabilities can be taken at face value: across ten bins of held-out sends, the share that completed tracks the predicted probability closely (for example 0.52 completed where 0.52 was predicted). That matters more than AUC here, because a targeting rule spends money in proportion to those probabilities.
 
-| Model | Brier Score | Interpretation |
-|-------|-------------|---------------|
-| Logistic Regression | 0.148 | Poorer calibration |
-| Random Forest | 0.138 | Moderate calibration |
-| Gradient Boosting | 0.134 | Good calibration |
-| **XGBoost** | **0.133** | **Best calibration** |
+### What the model relies on
 
-> XGBoost's Brier score of 0.133 indicates **well-calibrated probability estimates**: the predicted probabilities match actual outcomes.
+Permutation importance on the held-out customers (AUC lost when the feature is shuffled):
 
-### Feature Importance
+| Feature | AUC lost |
+|---|---|
+| Average spend per purchase before the send | 0.089 |
+| Membership tenure | 0.069 |
+| Income | 0.028 |
+| Reward | 0.026 |
+| Age | 0.018 |
+| Number of channels the offer goes out on | 0.014 |
 
-![Feature Importance](/portfolio_data/starbucks/plots/feature_importance.webp)
-
-**Top Predictive Features (Updated After Pipeline Bug Fix):**
-
-| Feature | Importance | Interpretation |
-|---------|------------|----------------|
-| **viewed_via_email** | 0.445 | Email viewing is the strongest predictor; customers who view offers via email are far more likely to complete |
-| offers_completed | 0.149 | Historical completion behavior |
-| view_to_completion_rate | 0.068 | Customers who view and then act |
-| reward | 0.042 | Higher reward offers more likely to complete |
-| offer_type_bogo | 0.035 | BOGO offers inherently more likely to complete |
-
-> **Note:** The initial analysis had a critical bug (`tune_xgboost_hyperparameters()` had dead code after its return statement) that prevented proper model training. The corrected pipeline (May 2026) fixes this, yielding dramatically improved performance: **AUC-ROC jumped from 0.909 to 0.994** and the #1 feature shifted from `offers_completed` to `viewed_via_email`.
-
-### SHAP Analysis
-
-![SHAP Summary](/portfolio_data/starbucks/plots/shap_summary_bar.webp)
-
-SHAP analysis confirms that **viewed_via_email**, **offers_completed**, and **view_to_completion_rate** are the top contributors. The model is interpretable: email engagement and past behavior drive predictions.
+In this simulated data an offer completes when the customer spends past its difficulty within the window, whether or not they looked at it, so past spending and the means to spend lead. Offer terms alone reach only 0.605; knowing the customer is what the model is for.
 
 ---
 
@@ -443,9 +418,10 @@ The rule-based system achieves a **+7.9% lift** in offer completion rates over r
 
 | Risk | Impact | Mitigation |
 |------|--------|-----------|
+| **Leakage in the first model** | Its 0.994 AUC was not achievable at send time | Rebuilt at send time, with tests that fail if a feature sees the future (0.865 on unseen customers) |
 | **Simulated Data** | Results may not generalize to real Starbucks behavior | Validate with production A/B tests before scaling |
 | **Selection Bias in ATE** | Offer assignment may not be random | PSM partially adjusts but cannot eliminate unobserved confounding |
-| **Low Silhouette Score** | k=4 = 0.147 (moderate separation) | Business interpretability justified k=4; stability analysis (ARI=0.85) confirms reliability |
+| **Low Silhouette Score** | k=4 = 0.147 (weak separation) | Business interpretability justified k=4; stability (mean ARI 0.76) is moderate, so boundaries are soft |
 | **Negligible Effect Sizes** | All Cohen's d < 0.02 for ATE | Business impact should focus on completion rates (up to 89%), not transaction lift |
 | **30-Day Window** | Single test period; no seasonality or lifecycle effects | Annual extrapolations are rough estimates from pro-rated data |
 
@@ -454,13 +430,13 @@ The rule-based system achieves a **+7.9% lift** in offer completion rates over r
 ## Key Insights
 
 1. **4 distinct customer segments** (Unengaged Unknowns, Discount Seekers, BOGO Advocates, Passive Browsers) with clear offer preferences and validated business metrics
-2. **XGBoost achieves near-perfect predictive performance**: AUC-ROC of 0.994 (up from 0.909 after critical bug fix), 5-fold CV stable at 0.908±0.003, well-calibrated (Brier=0.133)
-3. **Email engagement is the strongest signal**: `viewed_via_email` (importance 0.445) dominates all other features; customers who open email offers complete at much higher rates
+2. **An honest model beats an impressive one**: the first version's 0.994 AUC came from rows that never happened and features from after the send; rebuilt at send time it scores **0.865** on customers it never saw (0.878 forward in time), with well-calibrated probabilities
+3. **Past spending predicts completion, offer terms alone barely do**: average spend before the send, tenure and income lead the importance ranking; offer terms on their own reach only 0.605
 4. **Customer segments drive 85.6% of revenue**: 53.3% of customers (Discount Seekers + BOGO Advocates) generate the vast majority of revenue
 5. **Simple rule-based recommendations provide +7.9% lift** over random targeting, validated with A/B test simulation (power=0.80, feasible at n=3,277/group)
 6. **Causal analysis reveals differential impacts**: BOGO offers drive +$0.24/transaction, discounts reduce by -$0.25; all effect sizes are statistically significant but negligible (Cohen's d < 0.02)
 7. **Statistical rigor improves credibility**: hypothesis tests, bootstrap CIs, effect sizes, propensity score matching, and heterogeneous treatment effects paint a complete picture
-8. **Clustering quality is modest but robust**: silhouette 0.147 but stability ARI=0.85 confirms clusters are real structures, not noise
+8. **Clustering quality is modest**: silhouette 0.147 and mean stability ARI 0.76, so segments are useful directions rather than hard boundaries
 9. **Missing demographics (12.8%)** form their own segment with low engagement, a common real-world challenge solvable with data collection incentives
 10. **The recommendation gap** (+7.9% vs +10% target) is driven by large low-engagement segments; future work on re-engagement strategies could close this gap
 
@@ -468,13 +444,12 @@ The rule-based system achieves a **+7.9% lift** in offer completion rates over r
 
 ## Technical Details
 
-- **Framework:** Python 3.13+, pandas 3.0.2, scikit-learn 1.8.0, XGBoost 3.2.0, SHAP 0.51.0
+- **Framework:** Python 3.13+, pandas 3.0.2, scikit-learn 1.8.0, XGBoost 3.2.0
 - **Statistical Testing:** SciPy (Mann-Whitney U, Chi-squared, Kruskal-Wallis, Welch's t-test), Cohen's d, Cramer's V, bootstrap (B=1,000)
 - **Preprocessing:** StandardScaler, median imputation, one-hot encoding, missing flags
 - **Feature Engineering:** 55 customer features (demographic, behavioral, RFM, time-decay, CLV proxy) + 75 interaction features
 - **Clustering:** K-Means (k=4), validated with silhouette, Calinski-Harabasz, Davies-Bouldin, gap statistic, stability analysis (ARI)
-- **Models:** Logistic Regression, Random Forest (100 trees), Gradient Boosting (100 estimators), XGBoost (100 estimators, scale_pos_weight=3.81)
-- **Evaluation:** 80/20 stratified split, 5-fold CV, AUC-ROC, Precision, Recall, F1, Brier score, threshold optimization
+- **Predictive model:** one row per offer sent, features strictly before the send, censored windows dropped; logistic regression, histogram gradient boosting, XGBoost
+- **Evaluation:** 5-fold CV grouped by customer, a held-out 20% of customers with a customer-level bootstrap interval, a forward-in-time check, calibration curve, Brier score, permutation importance, and a leakage ladder
 - **Causal Inference:** ATE with bootstrap CIs (B=1,000), PSM via logistic regression, Welch's t-test, Cohen's d, heterogeneous treatment effects, A/B test simulation (Monte Carlo, 1,000 runs)
-- **Model Interpretability:** SHAP values (waterfall, summary, dependence, force plots)
 - **Reproducibility:** All stochastic processes seeded with `random_state=42`
