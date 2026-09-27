@@ -24,44 +24,6 @@ export const clientFiles = [
     stack: ['Angular 19', 'Ionic 8', 'Playwright', 'GitHub Actions', 'Cloudflare Pages', 'Flask', 'MySQL'],
   },
   {
-    id: 'food-manufacturing',
-    sector: 'Food manufacturing',
-    title: 'Production, stock and orders on a backend that could not change',
-    period: '2026',
-    via: 'Through a software consultancy',
-    points: [
-      'Rebuilt the Angular app over a legacy API that had to stay exactly as it was, held to it by an API contract harness.',
-      'Replicated the production backend in Docker from a database dump, with fake email and reports, so every write path could be tested without touching real data.',
-      'An audit that became 102 fixes, and a backend security review that reported injection, mass assignment and missing authorisation checks.',
-    ],
-    stack: ['Angular 19', 'Playwright', 'Docker', 'Flask', 'MySQL'],
-  },
-  {
-    id: 'licensing',
-    sector: 'Music licensing, run for five organisations',
-    title: 'A licensing platform, three framework versions forward',
-    period: '2026',
-    via: 'Through a software consultancy',
-    points: [
-      'Upgraded it from Angular 16 to 18, Ionic 7 to 8 and Capacitor 6, onto the esbuild builder.',
-      'Replaced its data table library and migrated thousands of legacy form fields.',
-    ],
-    stack: ['Angular 18', 'Ionic 8', 'Capacitor 6', 'esbuild'],
-  },
-  {
-    id: 'crm',
-    sector: 'Sales and customer enquiries',
-    title: 'A CRM moved from a hosted backend to its own API',
-    period: '2026',
-    via: 'Through a software consultancy',
-    points: [
-      'Wrote the requirements, proved the idea on Supabase with row-level security and realtime updates, then moved it to a self-hosted Flask and MySQL API.',
-      'Migrations with Alembic, least-privilege database roles, 49 tests and 12 architecture decision records.',
-      'Lead scoring, enquiry triage and an email outbox.',
-    ],
-    stack: ['Flask', 'MySQL', 'Alembic', 'Supabase'],
-  },
-  {
     id: 'programme-finder',
     sector: 'Higher education: a regional university',
     title: 'Which degrees can I study? Answered for every applicant',
@@ -72,19 +34,6 @@ export const clientFiles = [
       'Built the careers data behind each programme, with scripts that generate and normalise job data, and extended the qualification engine\'s parser and tests.',
     ],
     stack: ['Angular', 'Angular Material', 'Node.js', 'Neo4j', 'Firebase', 'GitHub Actions', 'Sentry', 'Python'],
-  },
-  {
-    id: 'advising',
-    sector: 'Higher education: academic advising',
-    title: 'Degree progress, read straight from a transcript',
-    period: '2026',
-    via: 'Top contributor in a team of three',
-    points: [
-      'Students upload a transcript PDF; it is parsed, checked against ground truth data, and evaluated against their degree\'s rules.',
-      'An advising assistant over the course catalogue and handbook, with intent routing, query rewriting, an answer judge and streamed replies.',
-      'A harness that runs two degree engines on the same transcripts and shows where they disagree.',
-    ],
-    stack: ['FastAPI', 'React 19', 'TypeScript', 'Pinecone', 'vLLM'],
   },
   {
     id: 'literacy',
@@ -99,19 +48,14 @@ export const clientFiles = [
     ],
     stack: ['React', 'Spring Boot', 'Docker', 'Nginx', 'AWS'],
   },
-  {
-    id: 'workload',
-    sector: 'Higher education: a university department',
-    title: 'Fair marking loads for teaching assistants',
-    period: '2026',
-    points: [
-      'Modelled the allocation three ways, as an integer program, a mixed integer quadratic program and a min-max model, and compared them on the department\'s real data.',
-      'Fairness metrics, parameter sweeps and a Pareto frontier to show the trade-offs, with infeasible inputs caught and explained.',
-      'The analysis code is covered by its own pytest suite.',
-    ],
-    stack: ['Python', 'PuLP', 'CVXPY', 'SCIP', 'pytest'],
-  },
 ];
+
+/**
+ * Client work from 2026 is not public yet, so it has no file: only the kinds
+ * of experience it added, with no sector, client or detail.
+ */
+export const stillSealed =
+  'Newer client work from 2026 stays closed until the clients make it public. It adds experience in rebuilding apps over legacy APIs that cannot change, upgrades across several major framework versions, CRM backends, retrieval over documents, and optimisation models for fair allocation.';
 
 /** Work too small for a file of its own, stated the same way. */
 export const smallerFiles = [
