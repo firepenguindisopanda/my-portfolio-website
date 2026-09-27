@@ -1,0 +1,222 @@
+# R.O.A.D. Barbados: Archive Handwriting Recognition
+
+> Colonial Barbados kept its deeds, wills and estate inventories by hand. This
+> entry reads them one line at a time: 44 recognisers vote on every line, and no
+> gain counted until it cleared a noise floor measured for this leaderboard.
+
+**Zindi competition, July to October 2026.** Best public leaderboard score
+**0.909772**. The private leaderboard, which decides the competition, is
+announced when it closes on 4 October 2026.
+
+## The problem
+
+The data is 5,472 cropped line images (4,098 labelled for training, 1,374 to
+transcribe) from scanned records in the Barbados archive, digitised through the
+Reclaiming Our Atlantic Destiny (R.O.A.D.) Programme and GovTech Barbados. The
+years written inside the labels run mostly from the 1630s to the 1710s: secretary
+hand, faded ink, damaged paper, and crops where the lines above and below bleed
+into the one being read.
+
+| | |
+|---|---|
+| Training lines | 4,098 |
+| Test lines | 1,374 (about 30% public leaderboard, 70% private) |
+| Distinct characters | 81 |
+| Average line | 62.3 characters, 11.3 words |
+| Median image | 1115 x 65 pixels |
+
+Many of these records document enslaved people as property. No images appear on
+this page: the competition's terms say nothing about republishing them, and a
+line from such a record shown without its context is the wrong way to show it.
+
+## The metric
+
+The competition describes the score as an equal blend of a weighted word error
+rate and a weighted character error rate. I recovered its exact form and checked
+it against more than 20 leaderboard results:
+
+```text
+score = 1 - 0.5 * (WER_w / 12 + CER_w / 55)
+```
+
+`WER_w` and `CER_w` are absolute edit distances per line, averaged over lines, so
+longer lines weigh more and the score can go below zero. One wrong word costs as
+much as 4.58 wrong characters, and word errors carry about three quarters of the
+penalty. That one fact shaped the project: a line that is right except for a
+single letter is charged a full word error, so character precision on nearly
+right words is where the points are.
+
+## Results
+
+Every step below is a public leaderboard score. MBR is minimum Bayes risk
+consensus: for each line, pick the candidate transcription that is closest, by
+edit distance, to all the others.
+
+| Step | Public score | What changed |
+|---|---|---|
+| Kraken, zero shot | -0.356 | a print model, with segmentation it did not expect |
+| TrOCR base, fine-tuned, beam 4 | 0.841275 | the first real baseline |
+| MBR of 6 systems | 0.845518 | includes an underfit model (finding 1) |
+| MBR of 22 systems | 0.855475 | a beam width sweep, then a control run at five widths |
+| TrOCR large, single | 0.857716 | the larger recogniser |
+| MBR of 27 systems | 0.860704 | large model added at five beam widths |
+| Family-weighted MBR of 29 | 0.868227 | weighting predicted +0.0050 and delivered +0.0052 |
+| Qwen2.5-VL-7B joins the pool (32) | 0.892027 | the largest single jump |
+| A longer 7B run (33) | 0.900924 | |
+| A self-trained 7B run (34) | 0.903041 | trained on its own confident test transcriptions |
+| Test-time augmentation decodes (43) | 0.909261 | padded, warped and noisy copies of each line |
+| A fourth 7B run (44) | **0.909772** | the best entry |
+
+The best single system from each family:
+
+| Family | Public score |
+|---|---|
+| Kraken (zero shot) | -0.356 |
+| Qwen2-VL-2B, QLoRA | 0.804865 |
+| TrOCR base | 0.841275 |
+| TrOCR large | 0.857716 |
+| Qwen2.5-VL-7B, QLoRA | 0.908416 |
+
+The two final submissions are the 44-system ensemble and the strongest single 7B
+model. The second pick was made on expected value over the private 70%: a near
+duplicate of the first would add almost nothing if the first is wrong.
+
+## What this found
+
+### 1. A weaker model can make the ensemble stronger
+
+Twice, adding a system that was worse on its own raised the ensemble:
+
+| Added | That system alone | Ensemble |
+|---|---|---|
+| a beam 1 decode, the worst in the pool | val 0.8337 | 0.841779 to 0.842524 |
+| an over-regularised model at two beam widths | public 0.816470 | 0.842524 to 0.845518 |
+
+The second model lost by 0.026 on its own and gained 0.0030 in the pool. It was
+trained with a different optimiser, augmentation and batch size, so it failed on
+different lines. After that, no run was thrown away for scoring badly alone, and
+pruning was later measured rather than assumed: selecting a smaller subset out of
+sample lost 2.8 to 3.4 thousandths.
+
+### 2. Validation overstated a preprocessing gain elevenfold
+
+Error analysis showed failures concentrated in tall crops:
+
+| | Share of lines | CER | Share of character errors |
+|---|---|---|---|
+| Aspect under 16 (tall crops) | 46% | 0.1108 | 54% |
+| Aspect 16 and over (wide crops) | 54% | 0.0665 | 46% |
+
+TrOCR resizes every crop to a square, so a tall crop spends its resolution on
+the neighbouring lines. Trimming tall crops to a minimum aspect of 16 gained
++0.0042 on validation and +0.00038 on the leaderboard. The trim stayed, and so did
+the lesson: validation is trustworthy for comparing decodes of one checkpoint, and
+unreliable across checkpoints. On the roughly 412 public rows an ensemble delta
+carries a standard error of about 1.5 thousandths, and a single model's gap
+between validation and leaderboard runs 10 to 14, so any public change under 3
+thousandths was treated as unresolved.
+
+### 3. A third of the remaining error is case and punctuation, and most of it cannot be won
+
+Lowercasing both sides would add 14.5 thousandths, and stripping punctuation
+another 18.6. That looks like the biggest lever left, and it mostly is not. Among
+near-duplicate lines in the training labels, transcribers disagree on case
+**8.5%** of the time (give or take 1.4 points), and the images behind those disagreements show
+identical letterforms: secretary hand capitals and minuscules are often
+indistinguishable. A case prior built from the training majority cost 11.3
+thousandths on validation (17 tokens fixed, 115 broken).
+
+### 4. The misread words are mostly names
+
+Of 890 word substitutions on validation, 261 (29%) have a reference word that never
+appears in training. Classified strictly:
+
+| Unseen word | Share |
+|---|---|
+| Capitalised, name-like | 40.6% |
+| Within two edits of a training word, no spelling-variant relation | 34.9% |
+| Archaic spelling of a word seen in training | 18.8% |
+| Genuinely novel | 3.8% |
+| Numeral | 1.9% |
+
+A first, loose test counted anything within two edits of a training word as a
+spelling variant, and called 86.6% of these words reachable. A control caught it:
+that test also matches 37.5% of random letter scrambles of training words, so it
+was measuring how dense the vocabulary is. The strict test requires a real variant
+relation (i and y, u and v, doubled letters, a silent e). The model also regresses
+towards the corpus: where two forms of a word are possible it writes the more
+frequent training form 234 times against 139 (p = 1e-6). Outside name lists would
+help, and the rules allow only the competition's data.
+
+### 5. Ideas that were measured and closed
+
+Each of these had a pass bar written down before it ran.
+
+| Idea | Result |
+|---|---|
+| ROVER confusion network fusion | validation 0.8972 against 0.8996 for the incumbent |
+| A second model correcting the ensemble's line, given the image | -2.87 thousandths, confidence interval entirely below zero |
+| Case correction by a training-majority prior | -11.3 thousandths |
+| Snapping unseen words to the nearest training word | -13.43 thousandths |
+| Reranking candidates by the model's own likelihood | -0.33 thousandths, fails the bar |
+| Reinforcement learning (GRPO) with the metric as the reward | +3.8 on validation, flat on the leaderboard |
+| Self-training beyond run 5 | run 6 reproduced its teacher on all 1,374 test lines, so it could add no new vote |
+
+## Method
+
+- **Split.** 3,482 training and 616 validation lines, grouped so near-duplicate
+  lines never straddle the split, and stratified by scan resolution and line
+  length. Validation labels were never cleaned. Doubtful training rows were read
+  against their images: most were labelled correctly after all, and the
+  exclusion list went from 21 rows to 6.
+- **Recognisers.** TrOCR base and large (handwritten checkpoints) fine-tuned
+  end to end, then Qwen2-VL-2B and Qwen2.5-VL-7B fine-tuned with QLoRA (4-bit
+  base, rank 16 adapters). Every model in the final ensemble is under an open
+  licence that allows commercial use, as the rules require.
+- **Combiner.** Family-weighted MBR, with the family weights tuned by nested
+  cross-validation on the validation predictions. Where the tuning surface was
+  flat, the weights came from the centre of the plateau rather than its peak.
+- **Decoding.** Beam widths 1 to 8 for TrOCR, and test-time augmentation for the
+  7B model: each line decoded again after padding, a small grid warp, and added
+  noise, each decode joining the pool as its own voter.
+
+## Engineering
+
+- **Compute.** Two T4 GPUs on Kaggle, about 30 GPU hours a week in 12 hour
+  sessions, plus a 6 GB laptop GPU for the first TrOCR runs (20 epochs in 2 hours
+  46 minutes). On the T4, fp16 measured 4.48 times faster than the emulated bf16
+  used at first.
+- **Kernel generators.** Each training notebook is generated from one that
+  already ran, with every edit asserted to match exactly once and a version stamp
+  written in. Notebooks find their input datasets by content, never by name.
+- **Local training.** A GPU check before starting, a fallback ladder when memory
+  runs out, GPU use logged through the run, and the final score recomputed in a
+  fresh process.
+- **Reproducibility.** Both final submissions rebuild byte for byte on a CPU in
+  about 10 seconds from 91 inputs, each checked by SHA-256. A deliberately
+  tampered input was caught and named.
+
+## Limitations
+
+- The public leaderboard is about 412 lines. Every conclusion above that rests on
+  it is stated with that noise floor in mind, and the private 70% decides.
+- The first TrOCR base weights were not kept. Their predictions were, so the
+  ensemble still rebuilds exactly, but those members, which carry 23.9% of the
+  vote weight, cannot be decoded again.
+- Case in these labels is partly a transcriber's choice, which puts a ceiling on
+  any recogniser scored against them.
+
+## What I would do next
+
+- Names are the largest reachable class of error, and they need data this
+  competition does not allow. With an archive's own index of names, a decode
+  constrained to it is the first thing I would try.
+- The metric charges a full word for a one letter slip, and 43.5% of word errors
+  are within two characters. A recogniser trained with a loss closer to the metric
+  is where the next gain lies; the short GRPO run moved validation by +3.8
+  thousandths in 0.17 of an epoch.
+
+## Stack
+
+Python, PyTorch, Hugging Face Transformers, PEFT with bitsandbytes (QLoRA), TrOCR,
+Qwen2-VL, Qwen2.5-VL, Kraken, rapidfuzz, Kaggle.

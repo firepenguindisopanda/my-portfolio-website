@@ -49,7 +49,7 @@ export const staticRoutes = [
     path: '/ml',
     title: 'Machine Learning & Data Science',
     description:
-      'Data science and machine learning work: forecasting, fraud detection, customer segmentation and speech recognition, with the analysis behind each result.',
+      'Data science and machine learning work: forecasting, fraud detection, customer segmentation, speech recognition and handwriting recognition, with the analysis behind each result.',
     changefreq: 'monthly',
     priority: '0.8',
   },
