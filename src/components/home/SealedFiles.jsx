@@ -1,5 +1,5 @@
 import React from 'react';
-import { clientFiles, smallerFiles } from '../../data/clientWork';
+import { clientFiles, smallerFiles, stillSealed } from '../../data/clientWork';
 
 /**
  * Client work, under seal. Most of the paid work belongs to the clients who
@@ -48,11 +48,43 @@ const SealedFile = ({ file, index }) => (
   </li>
 );
 
+/** The 2026 work: not public yet, so even the sector is under the bar. */
+const StillSealed = ({ index }) => (
+  <li className="sf-file sf-closed">
+    <article aria-labelledby="sf-still-sealed">
+      <p className="sf-tab" aria-hidden="true">
+        {fileNo(index)}
+      </p>
+      <div className="sf-sheet">
+        <p className="sf-client">
+          <span className="sf-k">Client</span>
+          <span className="sf-redact" aria-hidden="true" />
+          <span className="sr-only">name withheld</span>
+        </p>
+        <p className="sf-sector">
+          <span className="sf-redact" aria-hidden="true" />
+          <span className="sr-only">sector withheld</span>
+        </p>
+        <h3 className="sf-title" id="sf-still-sealed">
+          Still sealed
+        </h3>
+        <p className="sf-meta">
+          <span>2026</span>
+        </p>
+        <p className="sf-note">{stillSealed}</p>
+        <p className="sf-stamp" aria-hidden="true">
+          Sealed
+        </p>
+      </div>
+    </article>
+  </li>
+);
+
 const SealedFiles = () => (
   <section className="section sealed" id="clients" aria-labelledby="sealed-title">
     <div className="wrap">
       <div className="sec-head">
-        <p className="sec-tab">Client work, {clientFiles.length} files</p>
+        <p className="sec-tab">Client work, {clientFiles.length + 1} files</p>
         <h2 className="sec-title" id="sealed-title">
           Sealed files
         </h2>
@@ -65,6 +97,7 @@ const SealedFiles = () => (
         {clientFiles.map((file, i) => (
           <SealedFile key={file.id} file={file} index={i} />
         ))}
+        <StillSealed index={clientFiles.length} />
       </ol>
       {smallerFiles.length > 0 && (
         <div className="sf-more">

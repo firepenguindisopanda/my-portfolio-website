@@ -59,6 +59,11 @@ describe('confidentiality', () => {
     expect(hits).toEqual([]);
   });
 
+  it('files no client work from 2026, which is not public yet', async () => {
+    const { clientFiles } = await import('../data/clientWork');
+    expect(clientFiles.filter((f) => /2026/.test(f.period)).map((f) => f.id)).toEqual([]);
+  });
+
   it('is not vacuous: it reads the files where client work is written', () => {
     const files = walk(path.join(ROOT, 'src')).map((f) => path.relative(ROOT, f).split(path.sep).join('/'));
     expect(files).toContain('src/data/clientWork.js');

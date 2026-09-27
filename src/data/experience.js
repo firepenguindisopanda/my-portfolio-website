@@ -68,11 +68,8 @@ export const workExperiences = [
       },
       {
         type: 'task',
-        text: 'Rebuilt a food manufacturer\'s production, stock and ordering app over a legacy API that could not change, testing every write path against a Docker replica of production.',
-      },
-      {
-        type: 'task',
-        text: 'Moved a licensing platform three framework versions forward, and a CRM from a hosted backend to its own API.',
+        // The 2026 client work is not public yet: stated as experience, with no sector.
+        text: 'Rebuilt and upgraded other client apps over legacy APIs that could not change, testing write paths against Docker replicas of production.',
       },
       {
         type: 'task',
