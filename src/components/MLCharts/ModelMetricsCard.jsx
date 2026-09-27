@@ -8,6 +8,8 @@ const MetricCard = ({ icon, label, value, subtext, color }) => {
     <Paper
       sx={{
         p: 3,
+        height: '100%',
+        boxSizing: 'border-box',
         textAlign: 'center',
         background: alpha(color, 0.08),
         border: `1px solid ${alpha(color, 0.2)}`,
@@ -69,7 +71,7 @@ const ModelMetricsCard = ({ dataPath }) => {
               icon={<AssessmentIcon fontSize="large" />}
               label="Average Precision"
               value={best.average_precision.toFixed(3)}
-              subtext={ci ? `95% CI ${ci[0].toFixed(3)}-${ci[1].toFixed(3)}` : `Chance: ${data.ap_baseline}`}
+              subtext={ci ? <>95% CI <Box component="span" sx={{ whiteSpace: 'nowrap' }}>{ci[0].toFixed(3)}-{ci[1].toFixed(3)}</Box></> : `Chance: ${data.ap_baseline}`}
               color={theme.palette.primary.main}
             />
           </Grid>

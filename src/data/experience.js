@@ -155,7 +155,7 @@ export const workExperiences = [
     type: 'Development',
     achievements: ['Angular Migration', 'Search Feature', 'CI/CD'],
     items: [
-      { type: 'task', text: 'Updated existing Angular Applications to the latest version, fixing errors that occured.' },
+      { type: 'task', text: 'Updated existing Angular Applications to the latest version, fixing errors that occurred.' },
       { type: 'task', text: 'Updated existing search feature to autocomplete search.' },
       { type: 'task', text: 'Identified and fixed bugs with the existing application. The fix contributed to the overall user experience of the application.' },
       { type: 'task', text: 'Changed CircleCI workflow to Github Actions.' },

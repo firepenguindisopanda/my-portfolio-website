@@ -201,7 +201,8 @@ html.motion-on .rail { transition: transform .35s ease, visibility .35s; }
 }
 .rail a:hover, .rail a[aria-current='step'] { color: var(--white); }
 .rail a > span:first-child { overflow: hidden; text-overflow: ellipsis; }
-@media (max-width: 520px) { .rail a { font-size: 10.5px; letter-spacing: .02em; } }
+/* On a phone the four labels share little room: each column takes what its label needs. */
+@media (max-width: 520px) { .rail ol { grid-template-columns: repeat(4, auto); } .rail a { font-size: 10.5px; letter-spacing: .02em; } }
 .rail .bar { display: block; height: 2px; background: var(--night-rule); position: relative; overflow: hidden; }
 .rail .fill { position: absolute; inset: 0; background: var(--hl); transform-origin: left center; transform: scaleX(0); }
 

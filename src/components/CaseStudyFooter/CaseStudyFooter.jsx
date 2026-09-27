@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { usePostHog } from '@posthog/react';
 import { projects } from '../../data/projects';
 import { BackIcon, NextIcon } from '../site/icons';
+import { splitTitle } from '../home/links';
 
 /**
  * Previous / next navigation at the foot of every case study, so a reader who
@@ -20,7 +21,8 @@ const NavCell = ({ direction, project, onOpen }) => {
         {isNext ? 'Next case study' : 'Previous case study'}
         {isNext && <NextIcon />}
       </span>
-      <span className="cn-title">{project.title}</span>
+      {/* The name before any subtitle: a long title would be cut off on a phone. */}
+      <span className="cn-title">{splitTitle(project.title)[0]}</span>
       <span className="cn-cat">{project.category}</span>
     </button>
   );

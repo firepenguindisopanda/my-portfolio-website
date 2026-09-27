@@ -3,6 +3,7 @@ import PANDA_LYING from '../../assets/panda-struggle.svg';
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { canHover, gsap, gsapEnabled, ScrollTrigger } from '../../utilities/gsapSetup';
 import PandaRig, { INK, PandaHead, POSES } from './PandaRig';
+import { clerkPose } from './clerkPose';
 import { onPanda } from './pandaBus';
 import '../../styles/panda.css';
 
@@ -27,13 +28,6 @@ import '../../styles/panda.css';
  */
 
 const PAPER = '#FFFFFF';
-const clamp01 = (v) => Math.max(0, Math.min(1, v));
-const mix = (a, b, t) => {
-  const out = {};
-  Object.keys(a).forEach((k) => { out[k] = a[k] + ((b[k] ?? a[k]) - a[k]) * t; });
-  return out;
-};
-const smooth = (t) => t * t * (3 - 2 * t);
 
 /* ------------------------------------------------------------------ */
 /* Hero: a front-facing head and two paws on the card's top edge.     */
@@ -125,18 +119,6 @@ export const HeroPeek = () => {
 /* Four cases: a clerk with a rubber stamp beside the pinned stage.   */
 /* ------------------------------------------------------------------ */
 
-/** The clerk's pose for how far into a case's figure the reader is (0 to 1). */
-export const clerkPose = (p) => {
-  // Eyes on the case the whole time.
-  const idle = { ...POSES.sit, look: 1 };
-  const up = { ...POSES.stampUp, look: 1 };
-  const down = { ...POSES.stampDown, look: 1 };
-  if (p < 0.6) return idle;
-  if (p < 0.76) return mix(idle, up, smooth((p - 0.6) / 0.16));
-  if (p < 0.84) return mix(up, down, smooth((p - 0.76) / 0.08));
-  return mix(down, idle, smooth(clamp01((p - 0.9) / 0.1)));
-};
-
 export const StoryClerk = () => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const wrap = useRef(null);
@@ -156,7 +138,12 @@ export const StoryClerk = () => {
       }
       const s = stage.getBoundingClientRect();
       const v = viz.getBoundingClientRect();
-      el.style.left = `${Math.round(v.left - s.left - el.offsetWidth * 0.62)}px`;
+      // Never on the text column: at tablet widths the gap between it and the
+      // figure is narrow, so there the clerk is smaller and leans further in.
+      const textEnd = stage.querySelector('.chapter .chapter-text')?.getBoundingClientRect().right ?? -Infinity;
+      const w = v.left - textEnd < 50 ? 84 : 112;
+      el.style.width = `${w}px`;
+      el.style.left = `${Math.round(Math.max(v.left - w * 0.62, textEnd + 6) - s.left)}px`;
       el.style.top = `${Math.round(v.bottom - s.top - el.offsetHeight + 4)}px`;
       setPlaced(true);
     };

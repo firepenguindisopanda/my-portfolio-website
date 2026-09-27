@@ -58,6 +58,11 @@ const EXT = { target: '_blank', rel: 'noopener noreferrer' };
 const NewTab = () => <span className="sr-only"> (opens in a new tab)</span>;
 
 const markdownComponents = {
+  // Each write-up opens with its project's title, which the page header
+  // already shows as the page's one h1; a second would repeat it mid-page.
+  h1() {
+    return null;
+  },
   // Ids come from the same slugify the contents rail uses, so a rail link can
   // never point at a heading that is not there.
   h2({ node: _node, children, ...props }) {
@@ -175,7 +180,8 @@ const ProjectDetail = () => {
   // is decoration arriving, never text waiting to be read.
   useGSAP(
     () => {
-      if (!gsapEnabled || prefersReducedMotion) return;
+      // Not every case file has a screenshot.
+      if (!gsapEnabled || prefersReducedMotion || !headRef.current?.querySelector('.case-shot')) return;
       gsap.from('.case-shot', { y: 28, rotation: 5, opacity: 0, duration: 0.8, ease: 'power3.out', delay: 0.1 });
     },
     { scope: headRef, dependencies: [projectId, prefersReducedMotion], revertOnUpdate: true }
