@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useDocumentMeta from '../hooks/useDocumentMeta';
 import { routeMeta } from '../data/routes';
-import { bio, notes, community } from '../data/background';
+import { bio, notes, community, education } from '../data/background';
 import { awards, featuredCertificates, otherCertificates, totalCertificateCount } from '../data/certificates';
 import { Arrow } from '../components/home/links';
 
@@ -77,6 +77,7 @@ const earlier = community.filter((e) => !isOngoing(e));
 
 const PAGE_SECTIONS = [
   ['about', 'About'],
+  ['education', 'Education'],
   ['credentials', 'Certificates'],
   ['placings', 'Placings'],
   ['community', 'Mentorship'],
@@ -93,8 +94,8 @@ const Background = () => {
           <p className="sec-tab">Personal file</p>
           <h1 className="pg-title">Background</h1>
           <p className="lede">
-            How I think about the work, every certificate on file, the competition placings, and the mentoring and
-            community work alongside it.
+            How I think about the work, my education, every certificate on file, the competition placings, and the
+            mentoring and community work alongside it.
           </p>
           <nav className="pg-jump" aria-label="On this page">
             <ul>
@@ -139,6 +140,26 @@ const Background = () => {
                     ))}
                   </p>
                 )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="section" id="education" aria-labelledby="edu-title">
+        <div className="wrap">
+          <div className="sec-head">
+            <p className="sec-tab">Degrees and diploma</p>
+            <h2 className="sec-title" id="edu-title">
+              Education
+            </h2>
+          </div>
+          <ul className="cred-list" aria-label="Education">
+            {education.map((e) => (
+              <li className="cred-row" key={e.id}>
+                <span className="cred-issuer">{e.school}</span>
+                <span className="cred-name">{e.award}</span>
+                <span className="edu-when">{e.when}</span>
               </li>
             ))}
           </ul>

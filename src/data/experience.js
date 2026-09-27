@@ -1,6 +1,10 @@
 /**
  * Work history, newest first. home/Experience.jsx draws it as the timeline and
- * groups repeated roles under one heading, keeping each period visible.
+ * groups repeated roles under one heading, keeping each period visible. A
+ * `group` joins consecutive periods with different titles under one heading,
+ * as the UWI contract work and the internship are on the resume.
+ *
+ * Client work is stated at sector level only: see data/clientWork.js.
  */
 export const workExperiences = [
   {
@@ -39,6 +43,40 @@ export const workExperiences = [
       {
         type: 'task',
         text: 'Ran practical sessions and supported coursework across the department\'s computing and information technology programmes.',
+      },
+      {
+        type: 'task',
+        text: 'Produced a typeset guide of worked solutions to the COMP 3605 tutorials and assignments.',
+      },
+      {
+        type: 'task',
+        text: 'Rebuilt the INFO 3600 lab walkthroughs, added an advanced SQL track, and redesigned the Power BI labs with every figure they quote checked against the data by script.',
+      },
+    ],
+  },
+  {
+    id: 'consultancy',
+    title: 'Contract Software Engineer',
+    organization: 'A Caribbean software consultancy',
+    period: 'August 2025 to present',
+    type: 'Full Stack',
+    achievements: ['Angular and Ionic', 'Multi-tenant SaaS', 'Audits and specs'],
+    items: [
+      {
+        type: 'task',
+        text: 'Built and maintain the frontend of a payroll and HR platform used in several Caribbean countries, shipped by CI to seven tenant deployments.',
+      },
+      {
+        type: 'task',
+        text: 'Rebuilt a food manufacturer\'s production, stock and ordering app over a legacy API that could not change, testing every write path against a Docker replica of production.',
+      },
+      {
+        type: 'task',
+        text: 'Moved a licensing platform three framework versions forward, and a CRM from a hosted backend to its own API.',
+      },
+      {
+        type: 'task',
+        text: 'Wrote product and requirements specs, production readiness and security audits, and runbooks for Windows and Linux servers.',
       },
     ],
   },
@@ -87,8 +125,9 @@ export const workExperiences = [
     ],
   },
   {
-    id: 'ccudev-may24',
-    title: 'Independent Developer',
+    id: 'uwi-contract-may24',
+    title: 'Contract Developer',
+    group: { id: 'uwi-contract', title: 'Contract Developer and Intern' },
     organization: 'UWI, Department of Computing and Information Technology',
     period: 'May to June 2024',
     type: 'Development',
@@ -103,8 +142,9 @@ export const workExperiences = [
     ],
   },
   {
-    id: 'ccudev-jan24',
-    title: 'Independent Developer',
+    id: 'uwi-contract-jan24',
+    title: 'Contract Developer',
+    group: { id: 'uwi-contract', title: 'Contract Developer and Intern' },
     organization: 'UWI, Department of Computing and Information Technology',
     period: 'January to February 2024',
     type: 'Development',
@@ -117,8 +157,9 @@ export const workExperiences = [
     ],
   },
   {
-    id: 'beuwi-may23',
-    title: 'Independent Developer',
+    id: 'uwi-contract-may23',
+    title: 'Contract Developer',
+    group: { id: 'uwi-contract', title: 'Contract Developer and Intern' },
     organization: 'UWI, Department of Computing and Information Technology',
     period: 'May to July 2023',
     type: 'Development',
@@ -134,9 +175,10 @@ export const workExperiences = [
     ],
   },
   {
-    id: 'web3-intern',
+    id: 'uwi-intern-jul22',
     title: 'Intern',
-    organization: 'UWI Department of Computing and Information Technology',
+    group: { id: 'uwi-contract', title: 'Contract Developer and Intern' },
+    organization: 'UWI, Department of Computing and Information Technology',
     period: 'July to August 2022',
     type: 'Internship',
     achievements: ['Web3/Blockchain', 'CI/CD Pipeline', 'Angular'],
@@ -148,8 +190,9 @@ export const workExperiences = [
     ],
   },
   {
-    id: 'beuwi-jan22',
-    title: 'Independent Developer',
+    id: 'uwi-contract-jan22',
+    title: 'Contract Developer',
+    group: { id: 'uwi-contract', title: 'Contract Developer and Intern' },
     organization: 'UWI, Department of Computing and Information Technology',
     period: 'January to February 2022',
     type: 'Development',

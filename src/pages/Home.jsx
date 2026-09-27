@@ -8,6 +8,7 @@ import Story from '../components/home/story/Story';
 import TryIt from '../components/home/tryit/TryIt';
 import ProjectIndex from '../components/home/ProjectIndex';
 import Experience from '../components/home/Experience';
+import SealedFiles from '../components/home/SealedFiles';
 import { Skills, Recognition } from '../components/home/Skills';
 import Contact from '../components/home/Contact';
 
@@ -16,9 +17,11 @@ import Contact from '../components/home/Contact';
  *
  * Order answers what an employer opens a portfolio to find out, fastest first:
  * who and what (the cover), the work told as four cases, three pieces of it to
- * try, then everything else as a scannable index, the roles, the tools, the
- * placings, and how to get in touch. The header links straight to Work, Index,
- * Experience, Skills and Contact for anyone who would rather skip the stories.
+ * try, then everything else as a scannable index, the roles, the client work
+ * (sealed: sector and problem, never the client), the tools, the placings,
+ * and how to get in touch. The header links straight to Work, Index,
+ * Experience, Clients, Skills and Contact for anyone who would rather skip
+ * the stories.
  */
 const Home = () => {
   useDocumentMeta(routeMeta('/'));
@@ -47,6 +50,7 @@ const Home = () => {
       <TryIt />
       <ProjectIndex />
       <Experience />
+      <SealedFiles />
       <Skills />
       <Recognition />
       <Contact />

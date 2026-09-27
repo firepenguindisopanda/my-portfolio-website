@@ -246,6 +246,7 @@ html.motion-on .cf .note { transition: transform .35s cubic-bezier(.2, .7, .2, 1
 .cf .cred-name { font-size: 16px; font-weight: 500; line-height: 1.4; }
 .cf .cred-proof { display: inline-flex; align-items: center; justify-self: end; min-height: 44px; font: 500 13px var(--mono); white-space: nowrap; text-underline-offset: 4px; }
 .cf .cred-proof:hover { background: var(--hl); }
+.cf .edu-when { justify-self: end; font: 500 13px var(--mono); color: var(--graphite); white-space: nowrap; }
 .cf .cred-toggle { margin-top: 28px; }
 .cf .coursework { margin-top: 36px; }
 @media (max-width: 760px) {
