@@ -32,8 +32,9 @@ html.motion-on .pd-tryit-nap, html.motion-on .pd-tryit-rig { transition: opacity
 
 /* Footer: asleep beside the motto. */
 .pd-footer-nap { position: relative; display: inline-block; width: 64px; margin-left: 12px; vertical-align: middle; }
-.pd-footer-nap img { display: block; width: 100%; height: auto; filter: drop-shadow(0 0 1px rgba(230, 234, 240, .95)) drop-shadow(0 0 2px rgba(230, 234, 240, .5)); }
-.pd-zz { position: absolute; right: -14px; top: -16px; width: 22px; height: auto; fill: none; stroke: var(--moon); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pd-footer-nap img { display: block; width: 100%; height: auto; aspect-ratio: 548 / 293; filter: drop-shadow(0 0 1px rgba(230, 234, 240, .95)) drop-shadow(0 0 2px rgba(230, 234, 240, .5)); }
+/* Beside its head rather than above it: when the nap wraps onto a new line, above would be the text. */
+.pd-zz { position: absolute; right: -24px; top: -9px; width: 22px; height: auto; fill: none; stroke: var(--moon); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .pd-zz path { opacity: .85; }
 html.motion-on .pd-zz path { animation: pd-zz 2.4s ease-in-out infinite both; }
 html.motion-on .pd-zz path:nth-child(2) { animation-delay: .4s; }

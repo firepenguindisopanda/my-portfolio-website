@@ -105,7 +105,10 @@ export const casefileTheme = {
     MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' }, rounded: { borderRadius: 0 } } },
     MuiChip: {
       styleOverrides: {
-        root: { borderRadius: 0, fontFamily: FONTS.mono, fontWeight: 500, fontSize: 12.5, letterSpacing: '0.02em' },
+        // A finding longer than a phone is wide wraps onto a second line
+        // instead of ending in an ellipsis.
+        root: { borderRadius: 0, fontFamily: FONTS.mono, fontWeight: 500, fontSize: 12.5, letterSpacing: '0.02em', maxWidth: '100%', height: 'auto', minHeight: 32, '&.MuiChip-sizeSmall': { minHeight: 24 } },
+        label: { whiteSpace: 'normal', overflowWrap: 'anywhere', paddingTop: 3, paddingBottom: 3 },
         filled: { backgroundColor: COLORS.ink, color: COLORS.white },
         outlined: { borderColor: COLORS.rule, backgroundColor: COLORS.paper },
       },

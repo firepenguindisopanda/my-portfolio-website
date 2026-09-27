@@ -2,7 +2,8 @@ import React, { createRef } from 'react';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import PandaRig, { POSES } from './PandaRig';
-import { clerkPose, HOLD_MS } from './PandaScenes';
+import { clerkPose } from './clerkPose';
+import { HOLD_MS } from './PandaScenes';
 import { emitPanda, onPanda } from './pandaBus';
 import TryIt from '../home/tryit/TryIt';
 

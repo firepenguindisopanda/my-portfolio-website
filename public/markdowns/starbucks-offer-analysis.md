@@ -161,8 +161,6 @@ For predictive modeling, **174,583 interaction rows** were created (17,000 custo
 
 K-Means clustering was applied to 32 standardized features (demographic + behavioral). Optimal k was determined using silhouette scores, Calinski-Harabasz index, Davies-Bouldin index, gap statistic, and **stability analysis (Adjusted Rand Index across 5 random seeds)**.
 
-![Cluster Optimization](/portfolio_data/starbucks/plots/cluster_optimization.webp)
-
 ### Cluster Optimization Metrics
 
 | k | WCSS (Inertia) | Silhouette | Calinski-Harabasz | Davies-Bouldin | Gap (optimal) |
