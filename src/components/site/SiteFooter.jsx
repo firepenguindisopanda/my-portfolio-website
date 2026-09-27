@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { profile } from '../../data/profile';
+import { FooterNap } from '../panda/LazyScenes';
 
 /**
  * The night strip that closes every page: who and where, the practice
@@ -13,6 +14,7 @@ const SiteFooter = () => (
     <div className="wrap">
       <span>
         {profile.name}, {profile.location}. {profile.personal.motto}.
+        <FooterNap />
       </span>
       <ul>
         <li><a href={profile.links.github} {...EXT}>GitHub<span className="sr-only"> (opens in a new tab)</span></a></li>

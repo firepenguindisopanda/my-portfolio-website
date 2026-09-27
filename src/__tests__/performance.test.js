@@ -100,6 +100,18 @@ describe('bundle and loading', () => {
     expect(staticGraph('pages/ProjectDetail.jsx')).toContain('components/ProjectVisuals/LinkTrackerVisual.jsx');
   });
 
+  it('keeps the panda off the first load: its scenes arrive in their own chunk', () => {
+    // The scenes are decorative, so no page waits for them. Pages reach only
+    // the lazy wrappers and the tiny event bus the sections report to.
+    const allowed = new Set(['components/panda/LazyScenes.jsx', 'components/panda/pandaBus.js']);
+    ['index.jsx', 'pages/Home.jsx'].forEach((entry) => {
+      const panda = staticGraph(entry).filter((file) => file.startsWith('components/panda/') && !allowed.has(file));
+      expect({ entry, panda }).toEqual({ entry, panda: [] });
+    });
+    // Not vacuous: the home page does reach the wrappers.
+    expect(staticGraph('pages/Home.jsx')).toContain('components/panda/LazyScenes.jsx');
+  });
+
   it('does not import whole icon libraries', () => {
     sourceText.forEach(({ file, text }) => {
       const importsNamespace = /import \* as \w+ from '@mui\/icons-material'/.test(text);

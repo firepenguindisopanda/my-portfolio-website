@@ -1,0 +1,41 @@
+/*
+ * The panda's scenes (components/panda/PandaScenes). This sheet loads with
+ * their chunk, after the page itself, so nothing here may affect the layout
+ * of the sections the scenes sit in: every piece is positioned out of flow,
+ * or (the footer nap) small and inline.
+ */
+
+/* ---------- the scenes ---------- */
+.pd-rig { display: block; width: 100%; height: auto; overflow: visible; }
+/* Hero: the head sits behind the card (below the sheet), the paws in front of it. */
+.cf .filecard .pd-peek-headwrap { position: absolute; z-index: -1; right: 30px; top: -69px; width: 84px; }
+.cf .filecard .pd-peek-pawswrap { position: absolute; z-index: 3; right: 30px; top: -8px; width: 84px; }
+.pd-peek-head, .pd-peek-paws { display: block; width: 100%; height: auto; overflow: visible; }
+
+/* Four cases: the clerk on the stage's floor, beside the figure. */
+.cf .chapters { position: relative; }
+.pd-clerk { position: absolute; z-index: 3; left: 0; top: 0; width: 112px; opacity: 0; pointer-events: none; }
+.pd-clerk.is-placed { opacity: 1; }
+.pd-clerk .pd-rig { filter: drop-shadow(0 0 1px rgba(230, 234, 240, .95)) drop-shadow(0 0 2px rgba(230, 234, 240, .45)); }
+
+/* Try it: naps on the first sheet, then sits on the sheet of the demo in use.
+   PandaScenes moves it; the rig sets its size. */
+.cf .tryit .wrap { position: relative; }
+.pd-tryit { position: absolute; z-index: 3; left: 0; top: 0; width: 84px; pointer-events: none; }
+/* The art declares a square size; its own shape keeps it sitting on the edge. */
+.pd-tryit-nap { position: absolute; right: -6px; bottom: 0; width: 108px; height: auto; aspect-ratio: 548 / 293; }
+.pd-tryit-rig { opacity: 0; transform: scaleX(-1); }
+.pd-tryit.is-awake .pd-tryit-nap { opacity: 0; }
+.pd-tryit.is-awake .pd-tryit-rig { opacity: 1; }
+html.motion-on .pd-tryit-nap, html.motion-on .pd-tryit-rig { transition: opacity .3s ease; }
+@media (max-width: 600px) { .pd-tryit { width: 68px; } .pd-tryit-nap { width: 88px; } }
+
+/* Footer: asleep beside the motto. */
+.pd-footer-nap { position: relative; display: inline-block; width: 64px; margin-left: 12px; vertical-align: middle; }
+.pd-footer-nap img { display: block; width: 100%; height: auto; filter: drop-shadow(0 0 1px rgba(230, 234, 240, .95)) drop-shadow(0 0 2px rgba(230, 234, 240, .5)); }
+.pd-zz { position: absolute; right: -14px; top: -16px; width: 22px; height: auto; fill: none; stroke: var(--moon); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pd-zz path { opacity: .85; }
+html.motion-on .pd-zz path { animation: pd-zz 2.4s ease-in-out infinite both; }
+html.motion-on .pd-zz path:nth-child(2) { animation-delay: .4s; }
+html.motion-on .pd-zz path:nth-child(3) { animation-delay: .8s; }
+@keyframes pd-zz { 0%, 100% { opacity: .15; transform: translateY(2px); } 50% { opacity: .9; transform: translateY(-2px); } }

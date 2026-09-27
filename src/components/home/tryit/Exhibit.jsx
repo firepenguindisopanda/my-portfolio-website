@@ -1,6 +1,7 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { usePostHog } from '@posthog/react';
 import { CaseStudyLink, splitTitle } from '../links';
+import { emitPanda } from '../../panda/pandaBus';
 
 /**
  * The frame every Try it demo sits in: a sheet with a folder tab, the file it
@@ -12,11 +13,16 @@ import { CaseStudyLink, splitTitle } from '../links';
  * the same thing in words, so the stamp is hidden from assistive tech.
  */
 
-export const Stamp = ({ tone, children }) => (
-  <p className={`ex-stamp ${tone}`} aria-hidden="true">
-    {children}
-  </p>
-);
+export const Stamp = ({ tone, children }) => {
+  const ref = useRef(null);
+  // Tells the panda which sheet it landed on, so it can go and look.
+  useEffect(() => emitPanda('stamp', { tone, at: ref.current }), [tone]);
+  return (
+    <p ref={ref} className={`ex-stamp ${tone}`} aria-hidden="true">
+      {children}
+    </p>
+  );
+};
 
 const Exhibit = ({ id, letter, project, kicker, title, note, stamp, status, flagged, actions, children }) => (
   <article className={`exhibit ex-${id}`} aria-labelledby={`ex-${id}-title`}>
@@ -62,6 +68,7 @@ export const useDemoUsed = (demo) => {
     if (sent.current) return;
     sent.current = true;
     posthog?.capture('tryit_demo_used', { demo });
+    emitPanda('demo', { demo });
   }, [posthog, demo]);
 };
 
