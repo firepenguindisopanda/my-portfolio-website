@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePostHog } from '@posthog/react';
 import { projects } from '../../data/projects';
+import { BackIcon, NextIcon } from '../site/icons';
 
 /**
  * Previous / next navigation at the foot of every case study, so a reader who
@@ -15,9 +16,9 @@ const NavCell = ({ direction, project, onOpen }) => {
   return (
     <button type="button" className={`cn-cell ${direction}`} onClick={() => onOpen(direction, project)}>
       <span className="cn-dir">
-        {!isNext && <span aria-hidden="true">&larr; </span>}
+        {!isNext && <BackIcon />}
         {isNext ? 'Next case study' : 'Previous case study'}
-        {isNext && <span aria-hidden="true"> &rarr;</span>}
+        {isNext && <NextIcon />}
       </span>
       <span className="cn-title">{project.title}</span>
       <span className="cn-cat">{project.category}</span>

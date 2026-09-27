@@ -2,7 +2,7 @@
 
 ## Overview
 
-Point a camera at a till receipt, a handwritten grocery list, or a scanned multiple-choice quiz, and get structured data back. That much is a solved-looking problem - Tesseract is one `pip install` away. The part that is not solved is knowing whether the output is right, and this project is built around that question rather than around the extraction itself.
+Point a camera at a till receipt, a handwritten grocery list, or a scanned multiple-choice quiz, and get structured data back. That much is a solved-looking problem: Tesseract is one `pip install` away. The part that is not solved is knowing whether the output is right, and this project is built around that question rather than around the extraction itself.
 
 Three domain modules sit on one shared OCR core, and the whole thing ships as a single container: FastAPI backend, React and Vite frontend, Tesseract 5 through pytesseract, OpenCV for preprocessing and mark reading, pypdfium2 for PDFs.
 

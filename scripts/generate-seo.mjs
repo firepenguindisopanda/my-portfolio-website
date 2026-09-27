@@ -133,7 +133,7 @@ const run = async () => {
 
   const caseStudies = projects.filter((project) => project.markdown);
   const suffix = profile.name;
-  const titleFor = (title) => (title === suffix ? title : `${title} - ${suffix}`);
+  const titleFor = (title) => (title === suffix ? title : `${title} | ${suffix}`);
 
   const written = [];
 

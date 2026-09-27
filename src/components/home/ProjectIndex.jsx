@@ -187,7 +187,10 @@ const Preview = React.forwardRef(({ project }, ref) => {
         </>
       ) : (
         <div className="pv-data">
-          <span className="pv-cap">{project.id} · no screenshot</span>
+          <span className="pv-cap">
+            {project.id}
+            <span className="pv-note">no screenshot</span>
+          </span>
           <p>{project.evidence || project.highlight}</p>
         </div>
       ))}

@@ -136,14 +136,14 @@ const ModelMetricsCard = ({ dataPath }) => {
                   <Paper sx={{ p: 2.5, borderRadius: 2, height: '100%', border: `1px solid ${alpha(theme.palette.divider, 0.6)}` }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{d.dataset_label}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {d.model} - AP {d.average_precision.toFixed(3)} ({Math.round(d.ap_lift)}x chance)
+                      {d.model}, AP {d.average_precision.toFixed(3)} ({Math.round(d.ap_lift)}x chance)
                     </Typography>
                     <Box sx={{ mt: 1.5 }}>
                       <Typography variant="body2">
                         Threshold <strong>{d.threshold}</strong> catches <strong>{d.fraud_caught_pct}%</strong> of fraud
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {d.cost_optimized_fp.toLocaleString()} false alarms - <strong>{d.cost_reduction_pct}%</strong> lower loss than doing nothing
+                        {d.cost_optimized_fp.toLocaleString()} false alarms, <strong>{d.cost_reduction_pct}%</strong> lower loss than doing nothing
                       </Typography>
                     </Box>
                   </Paper>

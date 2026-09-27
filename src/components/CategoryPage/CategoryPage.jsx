@@ -4,7 +4,8 @@ import { usePostHog } from '@posthog/react';
 import { projects as allProjects } from '../../data/projects';
 import EvidenceLine from '../Evidence/EvidenceLine';
 import { PROJECT_VISUALS } from '../ProjectVisuals';
-import { splitTitle } from '../home/links';
+import { Arrow, splitTitle } from '../home/links';
+import { BackIcon, NextIcon } from '../site/icons';
 
 /**
  * One layout for every deep-dive route (/fullstack, /ml, /desktop, /android):
@@ -96,14 +97,14 @@ const Row = ({ project, surface }) => {
           <a href={project.liveUrl} {...EXT} onClick={() => posthog?.capture('project_demo_clicked', { project_id: project.id, surface })}>
             Live
             <NewTab />
-            <span aria-hidden="true">&nbsp;&#8599;</span>
+            <Arrow />
           </a>
         )}
         {project.githubUrl && (
           <a href={project.githubUrl} {...EXT} onClick={() => posthog?.capture('project_github_clicked', { project_id: project.id, surface })}>
             Code
             <NewTab />
-            <span aria-hidden="true">&nbsp;&#8599;</span>
+            <Arrow />
           </a>
         )}
       </p>
@@ -128,7 +129,7 @@ const CategoryPage = ({ eyebrow, title, description, categories, surface, emptyM
         <div className="wrap">
           <div className="crumbs">
             <Link className="back" to="/#index">
-              <span aria-hidden="true">&larr;</span> All work
+              <BackIcon /> All work
             </Link>
             <span className="crumb-path" aria-hidden="true">
               deep-dives / {surface}
@@ -149,7 +150,7 @@ const CategoryPage = ({ eyebrow, title, description, categories, surface, emptyM
             <p className="dd-empty-title">Nothing filed here yet</p>
             <p>{emptyMessage}</p>
             <Link className="btn btn-primary" to="/#index">
-              See the shipped work <span aria-hidden="true">&rarr;</span>
+              See the shipped work <NextIcon />
             </Link>
           </div>
         ) : (

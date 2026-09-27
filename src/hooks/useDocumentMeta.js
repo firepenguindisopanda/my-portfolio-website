@@ -27,7 +27,7 @@ const useDocumentMeta = ({ title, description, path, type = 'website' } = {}) =>
     const previousTitle = document.title;
 
     if (title) {
-      const full = title === SUFFIX ? title : `${title} - ${SUFFIX}`;
+      const full = title === SUFFIX ? title : `${title} | ${SUFFIX}`;
       document.title = full;
       setMeta('meta[property="og:title"]', 'content', full);
       setMeta('meta[name="twitter:title"]', 'content', full);

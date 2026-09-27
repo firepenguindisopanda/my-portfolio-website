@@ -14,16 +14,16 @@ A cognitive memory training game suite built with **React 19**, **TypeScript**, 
 
 The classic working memory challenge. Numbered tiles are briefly revealed on a 6×6 grid before being hidden. Your task: click the tiles in ascending numerical order from memory. Each successful level adds a new tile, ramping up the challenge.
 
-- **Beginner Mode:** Tiles remain visible until you're ready - perfect for practice
+- **Beginner Mode:** Tiles remain visible until you're ready, perfect for practice
 - **Advanced Mode:** Tiles auto-hide after a configurable view time (3s/5s/7s), adding time pressure
 - **Super Advanced Mode:** Timed view + random number gaps (tiles use non-sequential numbers), requiring stronger concentration
 
 ### Visual Memory Test
 
-A grid of tiles briefly highlights positions you must memorize and recall. After the showing phase, the grid may rotate 90°–180°, requiring you to track positions through spatial transformation.
+A grid of tiles briefly highlights positions you must memorize and recall. After the showing phase, the grid may rotate 90° to 180°, requiring you to track positions through spatial transformation.
 
-- **Beginner Mode:** No rotation - pure position recall
-- **Advanced Mode:** Grid rotates 1–2 steps (90°–180°) after hiding tiles
+- **Beginner Mode:** No rotation, pure position recall
+- **Advanced Mode:** Grid rotates 1 to 2 steps (90° to 180°) after hiding tiles
 - **Super Advanced Mode:** Rotation + timed viewing + 90-second recall timer
 - Dynamic grid sizing: starts at 3×3, grows every 2 levels (3×3 to 4×4 to 5×5 to 6×6 to 7×7+)
 - Retry system: 2 retries per level before the level drops back by 1
@@ -64,7 +64,7 @@ The game features a comprehensive audio feedback system:
 - **Singleton `AudioManager`** manages all sound playback with volume/mute controls
 - **`InteractionManager`** maps game events (tile click, wrong guess, level clear, game over) to specific sound effects
 - 100+ **Warcraft II**-inspired unit acknowledgment and selection sounds from Alliance and Horde factions
-- Graceful degradation: audio failures (autoplay policy, 404s) are caught silently - the game never breaks
+- Graceful degradation: audio failures (autoplay policy, 404s) are caught silently; the game never breaks
 
 ### Database (Supabase)
 A unified `game_scores` table stores scores for both games with:

@@ -1,4 +1,4 @@
-# AI Pitch Deck Generator - Full Stack Application
+# AI Pitch Deck Generator: Full Stack Application
 
 ## Overview
 
@@ -12,26 +12,26 @@ A sophisticated AI-powered platform designed to streamline the creation of profe
 ## Tech Stack
 
 ### Backend
-- **NestJS** - Progressive Node.js framework for building efficient, scalable server-side applications
-- **PostgreSQL & TypeORM** - Relational database with object-relational mapping
-- **OpenAI SDK (NVIDIA API)** - Integration with LLMs (e.g., Google Gemma) for content generation
-- **Passport & JWT** - Secure authentication strategy
-- **PDFKit** - Programmatic PDF generation
-- **Socket.io** - Real-time bidirectional event-based communication
-- **Pino** - Structured logging
-- **Docker** - Containerization for consistent development and deployment environments
+- **NestJS**: Progressive Node.js framework for building efficient, scalable server-side applications
+- **PostgreSQL & TypeORM**: Relational database with object-relational mapping
+- **OpenAI SDK (NVIDIA API)**: Integration with LLMs (e.g., Google Gemma) for content generation
+- **Passport & JWT**: Secure authentication strategy
+- **PDFKit**: Programmatic PDF generation
+- **Socket.io**: Real-time bidirectional event-based communication
+- **Pino**: Structured logging
+- **Docker**: Containerization for consistent development and deployment environments
 
 ### Frontend
-- **Next.js 16** (App Router) - React framework with server-side rendering and static site generation
-- **TypeScript** - Type-safe development
-- **Tailwind CSS 4** - Utility-first styling with modern CSS features
-- **TanStack Query** - Powerful asynchronous state management
-- **TanStack Form & Zod** - Type-safe form validation
-- **@dnd-kit** - Drag-and-drop interface for slide reordering
-- **Lucide React** - Consistent icon set
+- **Next.js 16** (App Router): React framework with server-side rendering and static site generation
+- **TypeScript**: Type-safe development
+- **Tailwind CSS 4**: Utility-first styling with modern CSS features
+- **TanStack Query**: Powerful asynchronous state management
+- **TanStack Form & Zod**: Type-safe form validation
+- **@dnd-kit**: Drag-and-drop interface for slide reordering
+- **Lucide React**: Consistent icon set
 
 ### External APIs
-- **NVIDIA NIM API** - Access to high-performance AI models like `google/gemma-3-1b-it`
+- **NVIDIA NIM API**: Access to high-performance AI models like `google/gemma-3-1b-it`
 
 ---
 
@@ -164,17 +164,17 @@ The backend provides a Swagger UI for interactive API documentation (typically a
 ### Key Endpoints
 
 **AI Generation:**
-- `POST /ai-gen/generate` - Generate a new deck draft from a prompt
+- `POST /ai-gen/generate`: Generate a new deck draft from a prompt
 
 **Pitch Decks:**
-- `GET /pitchdecks` - List all user decks
-- `POST /pitchdecks` - Create a new deck
-- `GET /pitchdecks/:id` - Get full deck details
+- `GET /pitchdecks`: List all user decks
+- `POST /pitchdecks`: Create a new deck
+- `GET /pitchdecks/:id`: Get full deck details
 
 **Slides:**
-- `POST /slides` - Add a slide
-- `PATCH /slides/:id` - Update slide content
-- `PUT /slides/reorder` - Update slide order
+- `POST /slides`: Add a slide
+- `PATCH /slides/:id`: Update slide content
+- `PUT /slides/reorder`: Update slide order
 
 ---
 

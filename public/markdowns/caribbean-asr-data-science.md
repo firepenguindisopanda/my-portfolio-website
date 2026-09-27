@@ -1,4 +1,4 @@
-# Caribbean Automatic Speech Recognition (ASR) - Wav2Vec-BERT + CTC + KenLM
+# Caribbean Automatic Speech Recognition (ASR): Wav2Vec-BERT + CTC + KenLM
 
 ## Overview
 
@@ -37,7 +37,7 @@ There are two notebooks in this workspace designed to work together or independe
    3. Train N-gram LM (KenLM `lmplz` + `build_binary`)
    4. Audio Augmentation Pipeline (Speed perturb, pitch shift, MUSAN)
    5. Initialize SSL Model & Processor (AutoProcessor / AutoModelForCTC)
-   6. Prepare Dataset for CTC Training (datasets map for audio->input, text->labels)
+   6. Prepare Dataset for CTC Training (a datasets map that turns audio into input values and text into labels)
    7. Fine-tune Model with Trainer (discriminative LR, fp16, grad accum)
    8. Inference with pyctcdecode + KenLM (beam search, alpha/beta tuning) and build `submission.csv`
 - How to run: Open `Caribbean_ASR_Pipeline.ipynb` in Jupyter (preferably GPU instance). Run cells in order. For KenLM steps on Windows, use WSL or run KenLM on a Linux/WSL environment.
@@ -52,20 +52,20 @@ Notes:
 ## Tech Stack
 
 ### Core
-- **Python 3.10+** - Project scripting
-- **PyTorch** - Model training backend
-- **Hugging Face Transformers** - Wav2Vec2 / Wav2Vec-BERT models & Processor
-- **Hugging Face Datasets** - Dataset loading / streaming
-- **torchaudio & librosa** - Audio I/O and preprocessing
-- **KenLM** - n-gram language model training (`lmplz` + `build_binary`)
-- **pyctcdecode** - CTC beam search decoder with LM fusion
-- **audiomentations** - Audio augmentation pipeline
-- **pandas** - CSV parsing and data wrangling
-- **jiwer / evaluate** - WER calculation
+- **Python 3.10+**: Project scripting
+- **PyTorch**: Model training backend
+- **Hugging Face Transformers**: Wav2Vec2 / Wav2Vec-BERT models & Processor
+- **Hugging Face Datasets**: Dataset loading / streaming
+- **torchaudio & librosa**: Audio I/O and preprocessing
+- **KenLM**: n-gram language model training (`lmplz` + `build_binary`)
+- **pyctcdecode**: CTC beam search decoder with LM fusion
+- **audiomentations**: Audio augmentation pipeline
+- **pandas**: CSV parsing and data wrangling
+- **jiwer / evaluate**: WER calculation
 
 ### Optional / Advanced
-- **NVIDIA NIM** - Low latency inference for large LLMs/Embeddings (optional)
-- **TTS (Coqui/ESPnet)** - Synthetic audio generation for augmentation
+- **NVIDIA NIM**: Low latency inference for large LLMs/Embeddings (optional)
+- **TTS (Coqui/ESPnet)**: Synthetic audio generation for augmentation
 
 ---
 
@@ -96,9 +96,9 @@ Notes:
 ## Data Model Summary
 
 ### Core files
-- `Train.csv` - columns: `ID`, `Transcription`.
-- `Test.csv` - column: `ID`.
-- `audio_files/ID.wav` - audio files with the same IDs.
+- `Train.csv`: columns `ID`, `Transcription`.
+- `Test.csv`: column `ID`.
+- `audio_files/ID.wav`: audio files with the same IDs.
 
 ### Runtime schema (Pydantic-like / typed view)
 - TrainEntry: `{ id: str, transcript: str, text_norm: str, audio_path: str }`
@@ -110,15 +110,15 @@ Notes:
 ## Architecture Highlights
 
 1. Data Preprocessing
-   - Load CSV -> normalize transcripts -> build LM corpus.
+   - Load CSV, normalize transcripts, then build the LM corpus.
 2. Augmentation
    - Speed perturb, pitch shift, MUSAN background noise injection.
 3. SSL Encoder Fine-tuning with CTC
-   - Processor feature_extractor + tokenizer -> prepare input values and labels -> Trainer/Optimizer with discriminative LR.
+   - Processor feature_extractor + tokenizer prepare the input values and labels, then Trainer/Optimizer with discriminative LR.
 4. LM Training (KenLM)
    - Build arpa and binary with `lmplz`/`build_binary`.
 5. Inference / Decoding
-   - Greedy decode (baseline) -> PyCTCDecode beam-search with KenLM to produce n-best and tune alpha/beta.
+   - Greedy decode (baseline), then PyCTCDecode beam-search with KenLM to produce n-best and tune alpha/beta.
 6. Diagnostics
    - WER by sample, confusion lists, hotword boosting for domain tokens.
 
@@ -129,7 +129,7 @@ Notes:
 ### Prerequisites
 - GPU recommended (NVIDIA CUDA), 16+ GB RAM for larger models.
 - Python 3.10+ and pip.
-- (Optional) WSL / Linux for KenLM installation on Windows - KenLM builds easier on Linux.
+- (Optional) WSL / Linux for KenLM installation on Windows. KenLM builds easier on Linux.
 
 ### Install & Setup
 
@@ -170,10 +170,10 @@ python scripts/decode_with_pyctcdecode.py --model ckpts/final --lm lm.binary --t
 ## API / CLI Documentation
 
 ### CLI helper commands
-- `python scripts/normalize_and_export_corpus.py` - Normalize transcripts and export `train_corpus.txt`.
-- `python scripts/train_lm.py` - Train KenLM (calls lmplz and build_binary) or calls remote KenLM binding.
-- `python scripts/train_ctc_finetune.py` - Run Hugging Face `Trainer` to finetune the encoder with CTC.
-- `python scripts/decode_with_pyctcdecode.py` - Use trained model logits + pyctcdecode + LM binary to decode and write `submission.csv`.
+- `python scripts/normalize_and_export_corpus.py`: Normalize transcripts and export `train_corpus.txt`.
+- `python scripts/train_lm.py`: Train KenLM (calls lmplz and build_binary) or calls remote KenLM binding.
+- `python scripts/train_ctc_finetune.py`: Run Hugging Face `Trainer` to finetune the encoder with CTC.
+- `python scripts/decode_with_pyctcdecode.py`: Use trained model logits + pyctcdecode + LM binary to decode and write `submission.csv`.
 
 ### Example: Train a CTC Model
 ```

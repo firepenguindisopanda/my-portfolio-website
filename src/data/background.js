@@ -14,7 +14,7 @@ import { profile } from './profile';
  */
 export const bio = [
   `I've always been pulled toward the same question from two different directions: why do people and systems behave the way they do? On one side, that's led me into software engineering, machine learning, and AI, where the question becomes technical: how can you model reasoning, prediction, and decision-making in code? On the other, it's led me into sociology, anthropology, psychology, and philosophy, where the question stays human: how do people construct meaning, form communities, and make choices?`,
-  `I don't see those as separate interests so much as one continuous investigation. It's what draws me to the psychology of interface design - not just whether something looks polished, but whether it matches how a real person's attention, memory, and expectations actually work as they move through a product.`,
+  `I don't see those as separate interests so much as one continuous investigation. It's what draws me to the psychology of interface design: not just whether something looks polished, but whether it matches how a real person's attention, memory, and expectations actually work as they move through a product.`,
   `I bring the same curiosity home in smaller, more hands-on ways, tinkering with Raspberry Pis and IoT devices, wiring up little systems just to watch software reach into the physical world. It's the same instinct as everything else I do: take something abstract, understand it deeply enough to rebuild it, and make it work.`,
 ];
 
@@ -22,11 +22,13 @@ export const bio = [
 export const notes = [
   {
     title: 'I teach what I use',
-    body: 'I run mentorship sessions through UWI DCIT and the WiDS Datathon, covering version control, design patterns and CI/CD with students working on their first real projects.',
+    // Present tense only for what is current: WiDS mentoring and private
+    // tutoring. The DCIT sessions were the part-time tutor role, now past.
+    body: 'I mentor with the WiDS Datathon, and I tutor students privately in their UWI courses. Earlier, as a part-time tutor at UWI DCIT, I ran sessions on version control, design patterns and CI/CD for students on their first real projects.',
   },
   {
     title: 'I argue with my own results',
-    body: 'The ML write-ups here compare methods rather than report one number - permutation importance against Gini, precision-recall against the ROC curve that flatters it. Where two methods disagree, the disagreement is the finding.',
+    body: 'The ML write-ups here compare methods rather than report one number: permutation importance against Gini, precision-recall against the ROC curve that flatters it. Where two methods disagree, the disagreement is the finding.',
   },
   {
     title: 'I still practise the fundamentals',

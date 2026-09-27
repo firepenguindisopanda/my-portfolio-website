@@ -2,7 +2,7 @@ To learn something: Step 1: Identify a topic, Step 2: Try to explain it to a 5-y
 
 ---
 
-Humans tend to have an expectation that they will be justly rewarded and praised for all of their hardwork and sacrifice. The reality is that a lot of it goes unnoticed - it's thankless. The pursuit of external affirmation just breeds resentment. - Heaven's Reward Fallacy
+Humans tend to have an expectation that they will be justly rewarded and praised for all of their hardwork and sacrifice. The reality is that a lot of it goes unnoticed; it's thankless. The pursuit of external affirmation just breeds resentment. - Heaven's Reward Fallacy
 
 ---
 
@@ -10,7 +10,7 @@ You have to put in more effort to make something appear effortless. Effortless, 
 
 ---
 
-When choosing who to spend time with, prioritize spending more time with optimists. Pessimists see closed doors. Optimists see open doors - probably kick down closed doors along the way. Pessimists sound smart, optimists get rich. - The Optimist Razor
+When choosing who to spend time with, prioritize spending more time with optimists. Pessimists see closed doors. Optimists see open doors, probably kick down closed doors along the way. Pessimists sound smart, optimists get rich. - The Optimist Razor
 
 ---
 
