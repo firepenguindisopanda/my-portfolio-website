@@ -8,6 +8,16 @@ import { profile } from './profile';
  */
 
 /**
+ * Degrees and the diploma, newest first. The M.Sc. is in progress (part
+ * time), so it says since when rather than a year awarded.
+ */
+export const education = [
+  { id: 'msc', award: 'M.Sc. Data Science, part time', school: 'The University of the West Indies, St. Augustine', when: 'Since September 2026' },
+  { id: 'bsc', award: 'B.Sc. Computer Science', school: 'The University of the West Indies, St. Augustine', when: '2024' },
+  { id: 'diploma', award: 'Diploma in Software Engineering', school: 'University of Trinidad and Tobago, John Donaldson Campus', when: '2018' },
+];
+
+/**
  * The bio used to be swapped by colour theme - one version for corporate-clean,
  * a shorter generic one for everything else. Content shouldn't change with a
  * palette, so the stronger version is the only version.

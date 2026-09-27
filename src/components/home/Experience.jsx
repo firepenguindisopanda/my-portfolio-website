@@ -7,20 +7,23 @@ import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
 /**
  * Where I've worked, newest first, on a dated timeline.
  *
- * Consecutive stints with the same title at the same place (the independent
- * developer contracts at UWI) are one entry with every period listed inside
- * it, so the page does not read as the same line four times - and no period
- * disappears.
+ * Consecutive stints with the same title at the same place are one entry
+ * with every period listed inside it, so the page does not read as the same
+ * line four times, and no period disappears. Periods that share a `group`
+ * (the UWI contract work and the internship) are joined the same way under the
+ * group's title, and each one keeps its own title.
  *
  * With motion on, the ink line draws down the timeline as you scroll and each
  * role's dot turns yellow as the line reaches it. With motion off the line is
  * drawn and every dot is lit.
  */
 
+const groupKey = (e) => (e.group ? `group:${e.group.id}` : `role:${e.title}|${e.organization}`);
+
 const groups = workExperiences.reduce((acc, e) => {
   const last = acc[acc.length - 1];
-  if (last && last.title === e.title && last.organization === e.organization) last.parts.push(e);
-  else acc.push({ id: e.id, title: e.title, organization: e.organization, parts: [e] });
+  if (last && last.key === groupKey(e)) last.parts.push(e);
+  else acc.push({ key: groupKey(e), id: e.id, title: e.group?.title || e.title, organization: e.organization, parts: [e] });
   return acc;
 }, []);
 
@@ -98,7 +101,7 @@ const Experience = () => {
     <section className="section experience" id="experience" ref={rootRef} aria-labelledby="exp-title">
       <div className="wrap">
         <div className="sec-head">
-          <p className="sec-tab">{workExperiences.length} roles, newest first</p>
+          <p className="sec-tab">{groups.length} roles, newest first</p>
           <h2 className="sec-title" id="exp-title">Experience</h2>
         </div>
         <div className="tl-wrap">
@@ -106,6 +109,7 @@ const Experience = () => {
           <ol className="tl">
             {groups.map((g) => {
               const single = g.parts.length === 1;
+              const mixed = g.parts.some((e) => e.title !== g.parts[0].title);
               const when = single ? g.parts[0].period : `${year(g.parts[g.parts.length - 1].period)} to ${year(g.parts[0].period)}`;
               return (
                 <li className="tl-item passed" key={g.id}>
@@ -127,6 +131,7 @@ const Experience = () => {
                         {g.parts.map((e) => (
                           <li key={e.id}>
                             <span className="when">{e.period}</span>
+                            {mixed && <span className="role">{e.title}</span>}
                             <Tags items={e.achievements || []} />
                             <Items list={e.items || []} open={0} />
                           </li>

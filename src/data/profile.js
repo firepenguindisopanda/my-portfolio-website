@@ -149,6 +149,7 @@ export const sections = [
   { id: 'try-it', label: 'Try it', nav: false },
   { id: 'index', label: 'Index' },
   { id: 'experience', label: 'Experience' },
+  { id: 'clients', label: 'Clients' },
   { id: 'skills', label: 'Skills' },
   { id: 'recognition', label: 'Recognition', nav: false },
   { id: 'contact', label: 'Contact' },
