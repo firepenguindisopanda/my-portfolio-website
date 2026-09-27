@@ -2,10 +2,13 @@
  * The MUI theme: Casefile, the site's one design.
  *
  * Every page is plain CSS (styles/casefile.css, pages.css, tryit.css). What
- * MUI still draws - the ML analysis blocks on three case studies and the drawn
- * project figures - has to look like the same site, so this theme mirrors
- * casefile.css's tokens. Change a colour in both places; themeConfig.test.js
- * fails if they drift.
+ * MUI still draws - the ML analysis blocks on three case studies - has to look
+ * like the same site, so this theme mirrors casefile.css's tokens. Change a
+ * colour in both places; themeConfig.test.js fails if they drift.
+ *
+ * The theme is provided by components/MLCharts/InteractiveAnalysis.jsx, not at
+ * the app's root, so MUI stays out of the bundle every visitor downloads.
+ * COLORS and FONTS are plain values: the drawn figures import them directly.
  *
  * The site used to ship four switchable presentation modes. They were replaced
  * by this single design; the last version of them is kept in git at
@@ -85,13 +88,6 @@ export const casefileTheme = {
   shape: { borderRadius: RADIUS.control },
   shadows: ['none', 'none', 'none', 'none', ...Array(21).fill(overlayShadow)],
   components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: { backgroundColor: COLORS.paper, color: COLORS.ink },
-        // `body :focus-visible` outranks MUI's per-component `outline: 0`.
-        'body :focus-visible': { outline: `2px solid ${COLORS.ink}`, outlineOffset: 3 },
-      },
-    },
     MuiButton: {
       defaultProps: { disableElevation: true, disableRipple: true },
       styleOverrides: {

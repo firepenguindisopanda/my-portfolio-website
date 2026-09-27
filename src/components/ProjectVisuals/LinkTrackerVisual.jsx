@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
-import { Box, useTheme } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { COLORS, FONTS } from '../../utilities/themeConfig';
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
 
@@ -62,18 +61,26 @@ const tabs = DECISIONS.map((lane, i) => {
   };
 });
 
+/** `#RRGGBB` at an opacity, as rgba() - what MUI's alpha() returned for these. */
+const alpha = (hex, a) => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+};
+
+// Casefile's tokens, read from the plain theme object rather than through
+// MUI's ThemeProvider: this figure sits on case-study and deep-dive pages,
+// which carry no MUI.
+const accent = COLORS.ink;
+const ink = COLORS.ink;
+const muted = COLORS.graphite;
+const line = COLORS.rule;
+const paper = COLORS.paperHi;
+const mono = FONTS.mono;
+const laneFill = { Q: accent, R: muted, D: alpha(muted, 0.35) };
+
 const LinkTrackerVisual = ({ ratio = '16 / 9' }) => {
-  const theme = useTheme();
   const rootRef = useRef(null);
   const prefersReducedMotion = usePrefersReducedMotion();
-
-  const accent = theme.palette.primary.main;
-  const ink = theme.palette.text.primary;
-  const muted = theme.palette.text.secondary;
-  const line = theme.palette.divider;
-  const paper = theme.palette.background.paper;
-  const mono = theme.custom.codeFont;
-  const laneFill = { Q: accent, R: muted, D: alpha(muted, 0.35) };
 
   useGSAP(
     () => {
@@ -137,28 +144,27 @@ const LinkTrackerVisual = ({ ratio = '16 / 9' }) => {
         .to('.lt-tab', { opacity: 0, duration: 0.35 }, '<')
         .to('.lt-arrow', { strokeDashoffset: 40, duration: 0.2 }, '<');
     },
-    { scope: rootRef, dependencies: [prefersReducedMotion, accent, muted, paper, line], revertOnUpdate: true }
+    { scope: rootRef, dependencies: [prefersReducedMotion], revertOnUpdate: true }
   );
 
   return (
-    <Box
+    <div
       ref={rootRef}
-      sx={{
+      style={{
         aspectRatio: ratio,
-        bgcolor: alpha(accent, 0.05),
+        backgroundColor: alpha(accent, 0.05),
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
       }}
     >
-      <Box
-        component="svg"
+      <svg
         viewBox={`0 0 ${W} ${H}`}
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label="Illustration of Link Tracker: a browser window of tabs is saved with one keystroke, each link is sorted into Queue, Reference or Drop, and the queue gets shorter as links are finished."
-        sx={{ width: '100%', height: '100%', display: 'block' }}
+        style={{ width: '100%', height: '100%', display: 'block' }}
       >
         <g fontFamily={mono} fontSize="9.5" letterSpacing="0.05em">
           {/* Browser window */}
@@ -231,8 +237,8 @@ const LinkTrackerVisual = ({ ratio = '16 / 9' }) => {
             />
           ))}
         </g>
-      </Box>
-    </Box>
+      </svg>
+    </div>
   );
 };
 

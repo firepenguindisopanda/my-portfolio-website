@@ -43,7 +43,7 @@ One rule came from a real bug: the reduced-motion override is keyed on the switc
 
 - Tests that read the source fail if a GSAP tween starts without a reduced-motion guard, if a CSS transition is not keyed to the Motion switch, or if a gradient or shadow appears outside the stylesheets.
 - The Material UI theme mirrors the stylesheet's colour tokens, and a test fails if the two drift apart. Another checks the text colour pairs against WCAG AA contrast.
-- Every route is code-split, and the charting library loads only on the three case studies that use it.
+- Every route is code-split, and the charting and component libraries load only on the three case studies that use them. A test walks each page's imports and fails if Material UI creeps back onto any other page.
 
 ---
 

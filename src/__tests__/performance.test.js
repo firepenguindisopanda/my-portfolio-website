@@ -36,6 +36,33 @@ const sourceText = walk(SRC).map((f) => ({
   text: fs.readFileSync(f, 'utf8'),
 }));
 
+/**
+ * The source files a module brings with it through static imports and
+ * re-exports - what ships in its chunk. `import()` is deliberately not
+ * followed: a dynamic import is a separate chunk loaded on demand.
+ */
+const staticGraph = (entry) => {
+  const seen = new Set();
+  const resolve = (from, spec) => {
+    const base = path.posix.normalize(path.posix.join(path.posix.dirname(from), spec));
+    return [base, `${base}.js`, `${base}.jsx`, `${base}/index.js`, `${base}/index.jsx`].find((f) => {
+      const full = path.join(SRC, f);
+      return /\.jsx?$/.test(f) && fs.existsSync(full) && fs.statSync(full).isFile();
+    });
+  };
+  const visit = (file) => {
+    if (seen.has(file)) return;
+    seen.add(file);
+    const text = read(file);
+    for (const [, spec] of text.matchAll(/^\s*(?:import|export)\s+(?:[^'"]*?\s+from\s+)?['"](\.{1,2}\/[^'"]+)['"]/gm)) {
+      const hit = resolve(file, spec);
+      if (hit) visit(hit);
+    }
+  };
+  visit(entry);
+  return [...seen];
+};
+
 describe('bundle and loading', () => {
   it('code-splits every route with React.lazy', () => {
     const app = read('App.jsx');
@@ -58,6 +85,19 @@ describe('bundle and loading', () => {
     const deps = Object.keys(JSON.parse(fs.readFileSync(path.join(SRC, '..', 'package.json'), 'utf8')).dependencies);
     const loaded = new Set(read('App.jsx').match(/@fontsource\/[a-z-]+/g) || []);
     expect(deps.filter((d) => d.startsWith('@fontsource/') && !loaded.has(d))).toEqual([]);
+  });
+
+  it('keeps MUI off every page, so only the ML analysis chunk carries it', () => {
+    // MUI and emotion were ~40% of the eager bundle while a provider sat at the
+    // root. Everything is plain CSS now; the analysis blocks are the one MUI
+    // user and are reached only through lazy(), which this walk does not follow.
+    const entries = ['index.jsx', ...fs.readdirSync(path.join(SRC, 'pages')).filter((f) => /\.jsx$/.test(f) && !/\.test\./.test(f)).map((f) => `pages/${f}`)];
+    entries.forEach((entry) => {
+      const offenders = staticGraph(entry).filter((file) => /from '@(mui|emotion)\//.test(read(file)));
+      expect({ entry, offenders }).toEqual({ entry, offenders: [] });
+    });
+    // Not vacuous: the walk does reach the pages' own components.
+    expect(staticGraph('pages/ProjectDetail.jsx')).toContain('components/ProjectVisuals/LinkTrackerVisual.jsx');
   });
 
   it('does not import whole icon libraries', () => {

@@ -1,6 +1,5 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import './App.css';
 import './styles/casefile.css';
 import './styles/pages.css';
 
@@ -16,10 +15,12 @@ import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import '@fontsource/ibm-plex-mono/600.css';
 
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+// No MUI here, on purpose: every page is plain CSS, and a provider at the
+// root would put MUI and emotion in the bundle every visitor downloads. The
+// two things MUI still draws - the ML analysis blocks - bring their own theme
+// (components/MLCharts/InteractiveAnalysis.jsx), inside a lazily loaded chunk.
+// The base styles CssBaseline used to inject are in styles/casefile.css.
 import { usePostHog } from '@posthog/react';
-import { casefileTheme } from './utilities/themeConfig';
 import { MotionProvider, useMotion } from './motion/Motion';
 import PageTransition from './components/PageTransition/PageTransition';
 import SiteHeader from './components/site/SiteHeader';
@@ -36,8 +37,6 @@ const MLPortfolio = lazy(() => import('./pages/MLPortfolio'));
 const Background = lazy(() => import('./pages/Background'));
 const AboutPanda = lazy(() => import('./pages/AboutPanda'));
 const NotFound = lazy(() => import('./pages/NotFound'));
-
-const theme = createTheme(casefileTheme);
 
 const LoadingFallback = () => (
   <div role="status" aria-live="polite" style={{ minHeight: '60vh', display: 'grid', placeItems: 'center' }}>
@@ -78,29 +77,26 @@ const page = (el) => <PageShell>{el}</PageShell>;
 
 const App = () => (
   <MotionProvider>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <ConsentBanner />
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        {/* Pageviews are captured by PostHog itself via capture_pageview:
-            'history_change' in index.jsx. */}
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route path="/" element={page(<Home />)} />
-            {/* The About narrative lives on /background now. */}
-            <Route path="/about" element={<Navigate to="/background" replace />} />
-            <Route path="/projects/:projectId" element={page(<ProjectDetail />)} />
-            <Route path="/fullstack" element={page(<FullstackPortfolio />)} />
-            <Route path="/desktop" element={page(<DesktopPortfolio />)} />
-            <Route path="/android" element={page(<AndroidPortfolio />)} />
-            <Route path="/ml" element={page(<MLPortfolio />)} />
-            <Route path="/background" element={page(<Background />)} />
-            <Route path="/about-panda" element={page(<AboutPanda />)} />
-            <Route path="*" element={page(<NotFound />)} />
-          </Routes>
-        </Suspense>
-      </Router>
-    </ThemeProvider>
+    <ConsentBanner />
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      {/* Pageviews are captured by PostHog itself via capture_pageview:
+          'history_change' in index.jsx. */}
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          <Route path="/" element={page(<Home />)} />
+          {/* The About narrative lives on /background now. */}
+          <Route path="/about" element={<Navigate to="/background" replace />} />
+          <Route path="/projects/:projectId" element={page(<ProjectDetail />)} />
+          <Route path="/fullstack" element={page(<FullstackPortfolio />)} />
+          <Route path="/desktop" element={page(<DesktopPortfolio />)} />
+          <Route path="/android" element={page(<AndroidPortfolio />)} />
+          <Route path="/ml" element={page(<MLPortfolio />)} />
+          <Route path="/background" element={page(<Background />)} />
+          <Route path="/about-panda" element={page(<AboutPanda />)} />
+          <Route path="*" element={page(<NotFound />)} />
+        </Routes>
+      </Suspense>
+    </Router>
   </MotionProvider>
 );
 
