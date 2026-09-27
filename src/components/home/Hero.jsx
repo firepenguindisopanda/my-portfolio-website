@@ -7,6 +7,7 @@ import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { canHover, gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
 import { CaseStudyLink, EXT, NewTab, Arrow, splitTitle } from './links';
 import { DownIcon, ExternalIcon } from '../site/icons';
+import { HeroPeek } from '../panda/LazyScenes';
 
 /**
  * The case file's cover: the name, the thesis, and a file card with the one
@@ -172,6 +173,7 @@ const Hero = ({ onSeeWork }) => {
                     <div><dt>Stack</dt><dd>{profile.skills.slice(0, 5).join(', ')}</dd></div>
                   </dl>
                 </div>
+                <HeroPeek />
               </figure>
             </div>
           </div>
