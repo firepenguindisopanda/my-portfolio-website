@@ -10,9 +10,9 @@ Live at https://nicksmith.is-a.dev
 ## Stack
 
 - React 18, React Router 6, Vite 8
-- Plain CSS for every page (`src/styles/`), with MUI 5 kept for the ML
-  analysis blocks and drawn figures; `src/utilities/themeConfig.js` mirrors the
-  CSS tokens so both paint alike
+- Plain CSS for every page (`src/styles/`). MUI 5 draws only the ML analysis
+  blocks and arrives with them in a lazily loaded chunk;
+  `src/utilities/themeConfig.js` mirrors the CSS tokens so both paint alike
 - GSAP with ScrollTrigger and Flip (pinned case stories, the index filter, the
   hover preview), behind a Motion switch that defaults to `prefers-reduced-motion`
 - react-markdown for the case studies in `public/markdowns`, recharts for the

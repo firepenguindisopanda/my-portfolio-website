@@ -1,5 +1,7 @@
 import React from 'react';
 import { Box, Container, Divider, Grid, Paper, Typography, useTheme } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { casefileTheme } from '../../utilities/themeConfig';
 import { PLOT_INTERPRETATIONS, PROJECT_PLOTS } from '../../data/projectPlots';
 import EDASummarySection from './EDASummarySection';
 import ModelMetricsCard from './ModelMetricsCard';
@@ -44,7 +46,7 @@ const Lead = ({ children }) => (
  * The heading is an h2 because it sits beside the write-up's own h2s; the
  * plot labels are paragraphs, not the h6 that `subtitle2` renders by default.
  */
-const InteractiveAnalysis = ({ project }) => {
+const Analysis = ({ project }) => {
   const theme = useTheme();
   const { radius } = theme.custom;
   const copy = COPY[project.id] ?? DEFAULT_COPY;
@@ -121,5 +123,18 @@ const InteractiveAnalysis = ({ project }) => {
     </Container>
   );
 };
+
+/*
+ * It is also the only part of the site MUI still draws, so the Casefile theme
+ * is provided here rather than at the root of the app: MUI, emotion and the
+ * theme arrive with this lazily loaded chunk, on the three pages that use it.
+ */
+const theme = createTheme(casefileTheme);
+
+const InteractiveAnalysis = (props) => (
+  <ThemeProvider theme={theme}>
+    <Analysis {...props} />
+  </ThemeProvider>
+);
 
 export default InteractiveAnalysis;

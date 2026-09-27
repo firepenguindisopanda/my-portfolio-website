@@ -1,13 +1,14 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { PROJECT_VISUALS } from './index';
 import LinkTrackerVisual from './LinkTrackerVisual';
 import { ProjectMedia } from '../CategoryPage/CategoryPage';
 import { projects } from '../../data/projects';
-import { casefileTheme } from '../../utilities/themeConfig';
+import { COLORS } from '../../utilities/themeConfig';
 
-const renderInTheme = (ui) => render(<ThemeProvider theme={createTheme(casefileTheme)}>{ui}</ThemeProvider>);
+// Rendered with no MUI ThemeProvider on purpose: these sit on pages that carry
+// no MUI, so they must draw from the plain tokens alone.
+const renderInTheme = (ui) => render(ui);
 
 const tracker = projects.find((p) => p.id === 'link-tracker');
 
@@ -18,11 +19,12 @@ describe('project visuals', () => {
     expect(missing).toEqual([]);
   });
 
-  it('draws Link Tracker as a labelled illustration', () => {
-    renderInTheme(<LinkTrackerVisual />);
+  it('draws Link Tracker as a labelled illustration, in Casefile ink', () => {
+    const { container } = renderInTheme(<LinkTrackerVisual />);
     // One image to assistive tech, labelled as an illustration - its counts
     // are illustrative and should not be read out as data.
     expect(screen.getByRole('img', { name: /^Illustration of Link Tracker/ })).toBeInTheDocument();
+    expect(container.querySelector('.lt-arrow')).toHaveAttribute('stroke', COLORS.ink);
   });
 
   it('shows the real screenshot on a row when the project has one', () => {
