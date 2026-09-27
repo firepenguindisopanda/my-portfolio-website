@@ -6,6 +6,7 @@ import useDocumentMeta from '../hooks/useDocumentMeta';
 import usePrefersReducedMotion from '../hooks/usePrefersReducedMotion';
 import { canHover, gsap, gsapEnabled, useGSAP } from '../utilities/gsapSetup';
 import { routeMeta } from '../data/routes';
+import { BackIcon } from '../components/site/icons';
 
 /**
  * The panda's page: the one place on the site allowed to be playful, filed
@@ -70,7 +71,7 @@ const AboutPanda = () => {
           <div>
             <div className="crumbs">
               <Link className="back" to="/">
-                <span aria-hidden="true">&larr;</span> Home
+                <BackIcon /> Home
               </Link>
               <span className="crumb-path" aria-hidden="true">
                 personal / panda
@@ -114,7 +115,7 @@ const AboutPanda = () => {
       </header>
       <div className="wrap panda-foot">
         <Link className="btn btn-primary" to="/">
-          <span aria-hidden="true">&larr;</span> Back to home
+          <BackIcon /> Back to home
         </Link>
       </div>
     </div>

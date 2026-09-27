@@ -89,7 +89,7 @@ const FEATURED = [
   },
   {
     file: 'nicholas_dcit_bootcampt_2024_mentor',
-    label: 'DCIT Bootcamp 2024 - Mentor',
+    label: 'DCIT Bootcamp 2024: Mentor',
     issuer: 'UWI DCIT',
   },
   {
@@ -150,14 +150,14 @@ export const awards = [
     url: 'https://www.linkedin.com/posts/nicholas-smith-933125148_ai-programming-with-python-nanodegree-activity-7005266589868564480-KAxF',
   },
   {
-    title: 'WiDS Datathon 2023 - 2nd in Trinidad & Tobago',
+    title: 'WiDS Datathon 2023: 2nd in Trinidad & Tobago',
     subtitle: 'Women in Data Science, sub-seasonal temperature forecasting',
     description:
       'Placed 2nd in the Trinidad & Tobago chapter and 183rd of 697 teams globally.',
     url: 'https://www.linkedin.com/posts/nicholas-smith-933125148_certificate-of-participation-in-wids-2023-activity-7040796180926099457-wvrs',
   },
   {
-    title: 'WiDS Datathon 2024 - 3rd in Trinidad & Tobago',
+    title: 'WiDS Datathon 2024: 3rd in Trinidad & Tobago',
     subtitle: 'Women in Data Science',
     description: 'Placed 3rd in the Trinidad & Tobago chapter.',
   },

@@ -46,8 +46,30 @@ const writeChoice = (v) => {
   }
 };
 
+/*
+ * Places that know better than a bounding box where the reader is. The Four
+ * cases story stacks its chapters on one pinned stage, so every chapter has
+ * the same box there; the story registers a resolver that answers with the
+ * case being read and how far into it, and restores that place afterwards.
+ */
+const resolvers = new Set();
+
+/**
+ * Register `() => ({ restore }) | null`. It is asked just before motion flips;
+ * returning an anchor claims the reader's place, and `restore()` is called
+ * once the page has been rebuilt for the new setting. Returns an unregister.
+ */
+export const registerMotionAnchor = (resolve) => {
+  resolvers.add(resolve);
+  return () => resolvers.delete(resolve);
+};
+
 /** The chapter or section at the top of the screen, and where its top sits. */
 const findAnchor = () => {
+  for (const resolve of resolvers) {
+    const claimed = resolve();
+    if (claimed) return claimed;
+  }
   const els = Array.from(document.querySelectorAll('main section[id], main .chapter'));
   let best = null;
   for (const el of els) {
@@ -60,11 +82,24 @@ const findAnchor = () => {
   }
   return best;
 };
-const restoreAnchor = ({ el, top }) => {
+const restoreAnchor = (anchor) => {
+  if (anchor.restore) {
+    anchor.restore();
+    return;
+  }
+  const { el, top } = anchor;
   if (!el.isConnected) return;
   const y = el.getBoundingClientRect().top + window.scrollY - top;
   window.scrollTo({ top: Math.max(0, y), behavior: 'instant' });
 };
+
+/**
+ * Where the reader is, and a way back there after the page is rebuilt. The
+ * Motion switch uses these around its flip; the story uses them when the
+ * window crosses the size at which its stage pins (see Story.jsx).
+ */
+export const captureReadingPlace = findAnchor;
+export const restoreReadingPlace = restoreAnchor;
 
 const MotionContext = createContext(null);
 

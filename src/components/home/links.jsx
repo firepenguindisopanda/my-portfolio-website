@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { usePostHog } from '@posthog/react';
+import { ExternalIcon } from '../site/icons';
 
 /**
  * Links every section of the home page shares, so the analytics a link fires
@@ -14,7 +15,7 @@ import { usePostHog } from '@posthog/react';
 
 export const EXT = { target: '_blank', rel: 'noopener noreferrer' };
 export const NewTab = () => <span className="sr-only"> (opens in a new tab)</span>;
-export const Arrow = () => <span aria-hidden="true">&nbsp;&#8599;</span>;
+export const Arrow = () => <ExternalIcon className="icon-after" />;
 
 /**
  * Remembers where the reader was on the home page, so the back button from a

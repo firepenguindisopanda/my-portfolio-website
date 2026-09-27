@@ -107,7 +107,7 @@ const PredictionVsActualChart = ({ dataPath }) => {
             }}
           >
             <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-              Confusion Matrix - {data.dataset || ''}
+              Confusion matrix: {data.dataset || ''}
             </Typography>
             <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               <ConfusionMatrixCell

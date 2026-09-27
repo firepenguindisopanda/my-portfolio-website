@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { workExperiences } from '../../data/experience';
+import { CollapseIcon, ExpandIcon } from '../site/icons';
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
 
@@ -44,7 +45,11 @@ const Items = ({ list, open }) => {
       {shown.length > 0 && <ul className="items">{shown.map((t) => <li key={t}>{t}</li>)}</ul>}
       {rest.length > 0 && (
         <details>
-          <summary>{shown.length ? `${rest.length} more` : 'What I did'}</summary>
+          <summary>
+            <ExpandIcon className="when-closed" />
+            <CollapseIcon className="when-open" />
+            {shown.length ? `${rest.length} more` : 'What I did'}
+          </summary>
           <ul className="items">{rest.map((t) => <li key={t}>{t}</li>)}</ul>
         </details>
       )}

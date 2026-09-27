@@ -41,7 +41,7 @@ export const staticRoutes = [
     path: '/fullstack',
     title: 'Full-Stack Web Development',
     description:
-      'Full-stack projects across React, Next.js, FastAPI, NestJS and PostgreSQL - from multi-agent AI systems to cache-aware crawlers.',
+      'Full-stack projects across React, Next.js, FastAPI, NestJS and PostgreSQL, from multi-agent AI systems to cache-aware crawlers.',
     changefreq: 'monthly',
     priority: '0.8',
   },
@@ -57,7 +57,7 @@ export const staticRoutes = [
     path: '/desktop',
     title: 'Desktop Tools',
     description:
-      'Native desktop tools for work that should never leave the machine - a Rust and Tauri PDF utility, and a .NET, WPF and browser-extension tool that turns 100+ open tabs into a queue that shrinks.',
+      'Native desktop tools for work that should never leave the machine: a Rust and Tauri PDF utility, and a .NET, WPF and browser-extension tool that turns 100+ open tabs into a queue that shrinks.',
     changefreq: 'monthly',
     priority: '0.7',
   },
@@ -72,7 +72,7 @@ export const staticRoutes = [
     path: '/background',
     title: 'Background',
     description:
-      'About Nicholas Smith, the full credential index - specialisations, professional certificates and competition placings - and mentoring and community work at UWI, WiDS and Rotary.',
+      'About Nicholas Smith, the full credential index (specialisations, professional certificates and competition placings), and mentoring and community work with WiDS, UWI and Rotary.',
     changefreq: 'monthly',
     priority: '0.5',
   },

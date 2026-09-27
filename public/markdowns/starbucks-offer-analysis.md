@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-Starbucks sends promotional offers to mobile app users, but customer response varies significantly. Not all customers respond to the same offers, leading to wasted ad spend and missed opportunities. This project aims to **optimize offer targeting** by identifying customer segments, predicting offer completion, and building a recommendation system - all validated with rigorous statistical methodology.
+Starbucks sends promotional offers to mobile app users, but customer response varies significantly. Not all customers respond to the same offers, leading to wasted ad spend and missed opportunities. This project aims to **optimize offer targeting** by identifying customer segments, predicting offer completion, and building a recommendation system, all validated with rigorous statistical methodology.
 
 **Key Business Questions:**
 1. How do customer offer response rates vary across demographics?
@@ -24,7 +24,7 @@ The simulated Starbucks Rewards app data contains **306,534 events** from **17,0
 | **transcript.json** | 306,534 | Event log (transactions, offer received/viewed/completed) |
 
 **Data Quality:**
-- 2,175 records (12.8%) have missing gender and income (age=118 sentinel value) - handled with missing flags and median imputation
+- 2,175 records (12.8%) have missing gender and income (age=118 sentinel value), handled with missing flags and median imputation
 - Schema validation passed for all three datasets via custom JSONL parser
 - All 17,000 customers appear in the transcript (no orphans)
 - All 10 offers appear in the transcript (no orphans)
@@ -111,7 +111,7 @@ Beyond descriptive statistics, the improved analysis pipeline includes rigorous 
 
 ### Cohort Analysis (by Membership Year)
 
-Earlier join cohorts (2013-2016) show higher completion rates (~44-59%) compared to recent joiners (2018: 28%), suggesting engagement increases with tenure - or that earlier cohorts had more favorable offer conditions.
+Earlier join cohorts (2013-2016) show higher completion rates (~44-59%) compared to recent joiners (2018: 28%), suggesting engagement increases with tenure, or that earlier cohorts had more favorable offer conditions.
 
 ### Channel Effectiveness
 
@@ -151,7 +151,7 @@ For predictive modeling, **174,583 interaction rows** were created (17,000 custo
 
 **Target Distribution:**
 - Negative (did not complete): 80.8%
-- Positive (completed): 19.2% - a 4.2:1 imbalance
+- Positive (completed): 19.2%, a 4.2:1 imbalance
 
 ---
 
@@ -174,31 +174,31 @@ K-Means clustering was applied to 32 standardized features (demographic + behavi
 
 **Why k=4 despite k=3 having higher silhouette:** The k=4 solution reveals a **business-critical distinction** between Discount Seekers and BOGO Advocates that k=3 collapses into one group. The recommendation system built on k=4 (+7.9% lift) validates this choice empirically, and the stability analysis (mean ARI = **0.85**, highly stable) confirms the clusters are robust.
 
-The k=3 silhouette (0.170) is also only 0.023 higher than k=4 - both indicate weak separation typical of behavioral data. The clusters serve as **directional guides**, not hard rules.
+The k=3 silhouette (0.170) is also only 0.023 higher than k=4; both indicate weak separation typical of behavioral data. The clusters serve as **directional guides**, not hard rules.
 
 ### Segment Profiles
 
 ![Cluster PCA](/portfolio_data/starbucks/plots/cluster_pca_scatter.webp)
 
-#### Unengaged Unknowns (12.8% - 2,170 customers)
+#### Unengaged Unknowns (12.8%, 2,170 customers)
 - **Demographics:** Age=55, Income=$64K, 100% missing gender
 - **Behavior:** Low transaction activity ($18.53 avg spend), low completion (11.4%)
 - **CLV Proxy (12-mo):** $222
 - **Recommendation:** Informational offers only; prioritize data collection incentives
 
-#### Discount Seekers (24.9% - 4,228 customers)
+#### Discount Seekers (24.9%, 4,228 customers)
 - **Demographics:** Age=55.6, Income=$68K, 53% Male
 - **Behavior:** High transaction activity ($152.50 avg spend), **89.2% discount completion rate**
 - **CLV Proxy (12-mo):** $1,830 | **Offer ROI: 15.7x**
 - **Recommendation:** Prioritize discount offers
 
-#### BOGO Advocates (28.5% - 4,837 customers)
+#### BOGO Advocates (28.5%, 4,837 customers)
 - **Demographics:** Age=57.0, Income=$72K, 54% Female
 - **Behavior:** Highest transaction activity ($180.80 avg spend), **87.1% BOGO completion rate**
 - **CLV Proxy (12-mo):** $2,170 | **Offer ROI: 7.4x**
 - **Recommendation:** Prioritize BOGO offers; they are your highest-value segment
 
-#### Passive Browsers (33.9% - 5,765 customers)
+#### Passive Browsers (33.9%, 5,765 customers)
 - **Demographics:** Age=51.3, Income=$57K, 71% Male
 - **Behavior:** Moderate transaction activity ($37.45 avg spend), low completion (14.8%)
 - **CLV Proxy (12-mo):** $449
@@ -221,7 +221,7 @@ Segments were validated against business metrics to confirm practical relevance:
 
 ### Candid Assessment of Clustering Quality
 
-The silhouette score of 0.147 (k=4) indicates **weak separation** - clusters overlap. This is expected for behavioral data where customer segments have fuzzy boundaries. The stability analysis (ARI=0.85, "highly stable") provides confidence that the identified segments are real structures, not artifacts of randomness. The clusters serve as **directional guides** for targeting, and the recommendation system includes secondary offer types for this reason.
+The silhouette score of 0.147 (k=4) indicates **weak separation**: clusters overlap. This is expected for behavioral data where customer segments have fuzzy boundaries. The stability analysis (ARI=0.85, "highly stable") provides confidence that the identified segments are real structures, not artifacts of randomness. The clusters serve as **directional guides** for targeting, and the recommendation system includes secondary offer types for this reason.
 
 ---
 
@@ -248,7 +248,7 @@ The silhouette score of 0.147 (k=4) indicates **weak separation** - clusters ove
 
 ![Model Comparison](/portfolio_data/starbucks/plots/model_comparison.webp)
 
-XGBoost achieves **AUC-ROC of 0.994** - dramatically exceeding the 0.70 target, with precision of 0.847 and recall of 0.965 (catching 96.5% of actual completions).
+XGBoost achieves **AUC-ROC of 0.994**, dramatically exceeding the 0.70 target, with precision of 0.847 and recall of 0.965 (catching 96.5% of actual completions).
 
 ### 5-Fold Cross-Validation
 
@@ -278,7 +278,7 @@ Default threshold (0.50) may not maximize business value. F1-score optimization 
 | Threshold | F1 | Precision | Recall | Use Case |
 |-----------|-----|-----------|--------|----------|
 | 0.50 (default) | 0.581 | 0.633 | 0.536 | Balanced |
-| **0.42 (optimal)** | **0.612** | **0.567** | **0.665** | Higher recall - catch more completions |
+| **0.42 (optimal)** | **0.612** | **0.567** | **0.665** | Higher recall: catch more completions |
 | 0.60 (conservative) | 0.540 | 0.741 | 0.429 | Minimize false positives |
 
 > **Business Recommendation:** Use threshold **0.42** for targeting campaigns (maximizes F1 by capturing 66.5% of potential completions). Use 0.60 for high-precision scenarios (e.g., premium offers where false positives are costly).
@@ -292,7 +292,7 @@ Default threshold (0.50) may not maximize business value. F1-score optimization 
 | Gradient Boosting | 0.134 | Good calibration |
 | **XGBoost** | **0.133** | **Best calibration** |
 
-> XGBoost's Brier score of 0.133 indicates **well-calibrated probability estimates** - the predicted probabilities match actual outcomes.
+> XGBoost's Brier score of 0.133 indicates **well-calibrated probability estimates**: the predicted probabilities match actual outcomes.
 
 ### Feature Importance
 
@@ -302,7 +302,7 @@ Default threshold (0.50) may not maximize business value. F1-score optimization 
 
 | Feature | Importance | Interpretation |
 |---------|------------|----------------|
-| **viewed_via_email** | 0.445 | Email viewing is the strongest predictor - customers who view offers via email are far more likely to complete |
+| **viewed_via_email** | 0.445 | Email viewing is the strongest predictor; customers who view offers via email are far more likely to complete |
 | offers_completed | 0.149 | Historical completion behavior |
 | view_to_completion_rate | 0.068 | Customers who view and then act |
 | reward | 0.042 | Higher reward offers more likely to complete |
@@ -416,7 +416,7 @@ The rule-based system achieves a **+7.9% lift** in offer completion rates over r
 | **Best Case (Full Personalization)** | ML model + segments | **$6,375** | **$76,500** |
 
 - **+7.9% increase** in offer completion rates
-- **85.6% of revenue** concentrated in 2 of 4 segments - targeted spend reduces waste on unresponsive segments
+- **85.6% of revenue** concentrated in 2 of 4 segments; targeted spend reduces waste on unresponsive segments
 - **Scalable:** Simple rules can be implemented in production without complex model inference
 
 ---
@@ -455,16 +455,16 @@ The rule-based system achieves a **+7.9% lift** in offer completion rates over r
 
 ## Key Insights
 
-1. **4 distinct customer segments** - Unengaged Unknowns, Discount Seekers, BOGO Advocates, Passive Browsers - with clear offer preferences and validated business metrics
-2. **XGBoost achieves near-perfect predictive performance** - AUC-ROC of 0.994 (up from 0.909 after critical bug fix), 5-fold CV stable at 0.908±0.003, well-calibrated (Brier=0.133)
-3. **Email engagement is the strongest signal** - `viewed_via_email` (importance 0.445) dominates all other features; customers who open email offers complete at much higher rates
-4. **Customer segments drive 85.6% of revenue** - 53.3% of customers (Discount Seekers + BOGO Advocates) generate the vast majority of revenue
+1. **4 distinct customer segments** (Unengaged Unknowns, Discount Seekers, BOGO Advocates, Passive Browsers) with clear offer preferences and validated business metrics
+2. **XGBoost achieves near-perfect predictive performance**: AUC-ROC of 0.994 (up from 0.909 after critical bug fix), 5-fold CV stable at 0.908±0.003, well-calibrated (Brier=0.133)
+3. **Email engagement is the strongest signal**: `viewed_via_email` (importance 0.445) dominates all other features; customers who open email offers complete at much higher rates
+4. **Customer segments drive 85.6% of revenue**: 53.3% of customers (Discount Seekers + BOGO Advocates) generate the vast majority of revenue
 5. **Simple rule-based recommendations provide +7.9% lift** over random targeting, validated with A/B test simulation (power=0.80, feasible at n=3,277/group)
-6. **Causal analysis reveals differential impacts** - BOGO offers drive +$0.24/transaction, discounts reduce by -$0.25; all effect sizes are statistically significant but negligible (Cohen's d < 0.02)
-7. **Statistical rigor improves credibility** - hypothesis tests, bootstrap CIs, effect sizes, propensity score matching, and heterogeneous treatment effects paint a complete picture
-8. **Clustering quality is modest but robust** - silhouette 0.147 but stability ARI=0.85 confirms clusters are real structures, not noise
-9. **Missing demographics (12.8%)** form their own segment with low engagement - a common real-world challenge solvable with data collection incentives
-10. **The recommendation gap** (+7.9% vs +10% target) is driven by large low-engagement segments - future work on re-engagement strategies could close this gap
+6. **Causal analysis reveals differential impacts**: BOGO offers drive +$0.24/transaction, discounts reduce by -$0.25; all effect sizes are statistically significant but negligible (Cohen's d < 0.02)
+7. **Statistical rigor improves credibility**: hypothesis tests, bootstrap CIs, effect sizes, propensity score matching, and heterogeneous treatment effects paint a complete picture
+8. **Clustering quality is modest but robust**: silhouette 0.147 but stability ARI=0.85 confirms clusters are real structures, not noise
+9. **Missing demographics (12.8%)** form their own segment with low engagement, a common real-world challenge solvable with data collection incentives
+10. **The recommendation gap** (+7.9% vs +10% target) is driven by large low-engagement segments; future work on re-engagement strategies could close this gap
 
 ---
 

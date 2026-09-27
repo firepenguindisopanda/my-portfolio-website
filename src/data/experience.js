@@ -11,7 +11,7 @@ export const workExperiences = [
     // 2026 September 01 to 2027 May 31. Stated as the term rather than as
     // "present" because it has a defined end date, which is the same standard
     // every other row here is written to.
-    period: 'September 2026 - May 2027',
+    period: 'September 2026 to May 2027',
     type: 'Education',
     // 'Cloud computing' rather than 'Two semesters': both of these are terms a
     // recruiter or an ATS actually matches on, and the period is already stated
@@ -46,7 +46,7 @@ export const workExperiences = [
     id: 'tutor',
     title: 'Part Time Tutor',
     organization: 'UWI, Department of Computing and Information Technology',
-    period: 'September 2024 - May 2026',
+    period: 'September 2024 to May 2026',
     type: 'Education',
     achievements: ['Software Engineering', 'Mentorship', 'Best Practices'],
     items: [
@@ -64,7 +64,7 @@ export const workExperiences = [
     id: 'scs-contract',
     title: 'Full Stack Developer',
     organization: 'Scarlet Creative Software',
-    period: 'September 2024 - May 2025',
+    period: 'September 2024 to May 2025',
     type: 'Full Stack',
     achievements: ['Nuxt.js', 'Firebase', 'Cloud Functions'],
     items: [
@@ -90,7 +90,7 @@ export const workExperiences = [
     id: 'ccudev-may24',
     title: 'Independent Developer',
     organization: 'UWI, Department of Computing and Information Technology',
-    period: 'May - June 2024',
+    period: 'May to June 2024',
     type: 'Development',
     achievements: ['99.59% Performance', 'System Design', 'Optimization'],
     items: [
@@ -106,7 +106,7 @@ export const workExperiences = [
     id: 'ccudev-jan24',
     title: 'Independent Developer',
     organization: 'UWI, Department of Computing and Information Technology',
-    period: 'January - February 2024',
+    period: 'January to February 2024',
     type: 'Development',
     achievements: ['System Design', 'Testing', 'Deployment'],
     items: [
@@ -120,7 +120,7 @@ export const workExperiences = [
     id: 'beuwi-may23',
     title: 'Independent Developer',
     organization: 'UWI, Department of Computing and Information Technology',
-    period: 'May - July 2023',
+    period: 'May to July 2023',
     type: 'Development',
     achievements: ['Migration', 'CI/CD', 'Production Deploy'],
     items: [
@@ -137,7 +137,7 @@ export const workExperiences = [
     id: 'web3-intern',
     title: 'Intern',
     organization: 'UWI Department of Computing and Information Technology',
-    period: 'July - August, 2022',
+    period: 'July to August 2022',
     type: 'Internship',
     achievements: ['Web3/Blockchain', 'CI/CD Pipeline', 'Angular'],
     items: [
@@ -151,7 +151,7 @@ export const workExperiences = [
     id: 'beuwi-jan22',
     title: 'Independent Developer',
     organization: 'UWI, Department of Computing and Information Technology',
-    period: 'January - February, 2022',
+    period: 'January to February 2022',
     type: 'Development',
     achievements: ['Angular Migration', 'Search Feature', 'CI/CD'],
     items: [

@@ -6,6 +6,7 @@ import { projects } from '../../data/projects';
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { canHover, gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
 import { CaseStudyLink, EXT, NewTab, Arrow, splitTitle } from './links';
+import { DownIcon, ExternalIcon } from '../site/icons';
 
 /**
  * The case file's cover: the name, the thesis, and a file card with the one
@@ -110,7 +111,8 @@ const Hero = ({ onSeeWork }) => {
                   }
                 }}
               >
-                See my work<span aria-hidden="true">&#8595;</span>
+                See my work
+                <DownIcon />
               </a>
               <a
                 className="btn btn-ghost"
@@ -120,7 +122,7 @@ const Hero = ({ onSeeWork }) => {
               >
                 Resume
                 <NewTab />
-                <span aria-hidden="true">&#8599;</span>
+                <ExternalIcon />
               </a>
             </div>
             <ul className="socials">

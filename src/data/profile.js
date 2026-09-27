@@ -98,11 +98,12 @@ export const profile = {
   ],
 
   /**
-   * Derived from the earliest entry in WorkExperience (January 2022). Stated as
-   * a start year rather than a running total so it never needs updating and
-   * never overstates.
+   * When Nicholas started building software: 2015, during his diploma - years
+   * before the earliest paid role on the Experience timeline (January 2022).
+   * Stated as a start year rather than a running total so it never needs
+   * updating.
    */
-  since: 2022,
+  since: 2015,
 
   personal: {
     // Kept off the app bar and shown in the footer instead.

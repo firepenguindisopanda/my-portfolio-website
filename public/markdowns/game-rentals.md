@@ -1,4 +1,4 @@
-# Game Rentals Platform - Full Stack Application
+# Game Rentals Platform: Full Stack Application
 
 ## Overview
 
@@ -13,22 +13,22 @@ A comprehensive game rental management system built with the MERN stack (MongoDB
 ## Tech Stack
 
 ### Backend
-- **Node.js & Express.js** - RESTful API server
-- **MongoDB & Mongoose** - Document database with schema validation
-- **Redis** - Session management and response caching
-- **JWT (jsonwebtoken)** - Secure authentication with refresh tokens
-- **bcryptjs** - Password hashing
-- **Joi** - Request validation
-- **Swagger/OpenAPI** - API documentation
+- **Node.js & Express.js**: RESTful API server
+- **MongoDB & Mongoose**: Document database with schema validation
+- **Redis**: Session management and response caching
+- **JWT (jsonwebtoken)**: Secure authentication with refresh tokens
+- **bcryptjs**: Password hashing
+- **Joi**: Request validation
+- **Swagger/OpenAPI**: API documentation
 
 ### Frontend
-- **Next.js 14** (App Router) - React framework with server-side rendering
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first styling
-- **Axios** - HTTP client with interceptors
+- **Next.js 14** (App Router): React framework with server-side rendering
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Utility-first styling
+- **Axios**: HTTP client with interceptors
 
 ### External APIs
-- **RAWG Video Games Database** - Game catalog integration with 200+ games
+- **RAWG Video Games Database**: Game catalog integration with 200+ games
 
 ---
 
@@ -48,7 +48,7 @@ A comprehensive game rental management system built with the MERN stack (MongoDB
 
 ### Rental System
 - **Listing Management:** Users can list their games for rent with custom pricing
-- **Rental Lifecycle:** Create rentals -> Track due dates -> Process returns
+- **Rental Lifecycle:** Create rentals, track due dates, process returns
 - **Late Fee Calculation:** Automated 10% daily late fees after due date
 - **Collateral Limits:** Customer-specific rental limits to manage risk
 - **Status Tracking:** Real-time rental status (ongoing, overdue, returned)
@@ -124,8 +124,8 @@ Base payment ledger with discriminators:
 
 ### Discriminator Inheritance
 Uses Mongoose discriminators for polymorphic data models:
-- **User -> Customer/Staff:** Shared authentication, specialized fields
-- **Payment -> RentalPayment:** Extensible for future payment types
+- **User, extended by Customer and Staff:** Shared authentication, specialized fields
+- **Payment, extended by RentalPayment:** Extensible for future payment types
 
 ### Service Layer Pattern
 Business logic separated from routes:
@@ -206,26 +206,26 @@ http://localhost:3003/api/docs
 ### Key Endpoints
 
 **Authentication:**
-- `POST /api/auth/register` - Create new user
-- `POST /api/auth/login` - Login and receive tokens
-- `POST /api/auth/refresh` - Refresh access token
-- `POST /api/auth/logout` - Invalidate tokens
+- `POST /api/auth/register`: Create new user
+- `POST /api/auth/login`: Login and receive tokens
+- `POST /api/auth/refresh`: Refresh access token
+- `POST /api/auth/logout`: Invalidate tokens
 
 **Games:**
-- `GET /api/games` - Browse games with filters
-- `GET /api/games/:id` - Get game details
-- `POST /api/games/sync` - Sync from RAWG (staff only)
+- `GET /api/games`: Browse games with filters
+- `GET /api/games/:id`: Get game details
+- `POST /api/games/sync`: Sync from RAWG (staff only)
 
 **Listings:**
-- `GET /api/listings` - View all listings with filters
-- `POST /api/listings` - Create new listing (customer only)
-- `GET /api/listings/mine` - View own listings
-- `PATCH /api/listings/:id/status` - Update listing status
+- `GET /api/listings`: View all listings with filters
+- `POST /api/listings`: Create new listing (customer only)
+- `GET /api/listings/mine`: View own listings
+- `PATCH /api/listings/:id/status`: Update listing status
 
 **Rentals:**
-- `GET /api/rentals` - View rentals (mine or all for staff)
-- `POST /api/rentals` - Create new rental
-- `POST /api/rentals/:id/return` - Process return with late fees
+- `GET /api/rentals`: View rentals (mine or all for staff)
+- `POST /api/rentals`: Create new rental
+- `POST /api/rentals/:id/return`: Process return with late fees
 
 ---
 

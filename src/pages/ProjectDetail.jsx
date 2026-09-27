@@ -8,6 +8,7 @@ import LazySpaceEmbed from '../components/SpacesEmbed/LazySpaceEmbed';
 import CaseStudyFooter from '../components/CaseStudyFooter/CaseStudyFooter';
 import { PROJECT_VISUALS } from '../components/ProjectVisuals';
 import { splitTitle } from '../components/home/links';
+import { BackIcon, ExternalIcon } from '../components/site/icons';
 import useDocumentMeta from '../hooks/useDocumentMeta';
 import usePrefersReducedMotion from '../hooks/usePrefersReducedMotion';
 import useSectionSpy from '../hooks/useSectionSpy';
@@ -212,7 +213,7 @@ const ProjectDetail = () => {
         <div className="wrap">
           <div className="crumbs">
             <button type="button" className="back" onClick={goBack}>
-              <span aria-hidden="true">&larr;</span> Back
+              <BackIcon /> Back
             </button>
             <span className="crumb-path" aria-hidden="true">
               case-files / {project.id}
@@ -221,7 +222,9 @@ const ProjectDetail = () => {
 
           <div className={`case-grid${image ? '' : ' no-shot'}`}>
             <div className="case-intro">
-              <p className="sec-tab">Case study &middot; {project.category}</p>
+              <p className="sec-tab">
+                Case study <span aria-hidden="true">/</span> {project.category}
+              </p>
               <h1 className="pg-title case-title">
                 {title}
                 {sub && <span className="sub">{sub}</span>}
@@ -260,21 +263,21 @@ const ProjectDetail = () => {
                     <a className="btn btn-primary btn-sm" href={project.liveUrl} {...EXT}>
                       Open the live site
                       <NewTab />
-                      <span aria-hidden="true">&#8599;</span>
+                      <ExternalIcon />
                     </a>
                   )}
                   {project.githubUrl && (
                     <a className="btn btn-ghost btn-sm" href={project.githubUrl} {...EXT}>
                       Source
                       <NewTab />
-                      <span aria-hidden="true">&#8599;</span>
+                      <ExternalIcon />
                     </a>
                   )}
                   {isFraud && (
                     <a className="btn btn-ghost btn-sm" href="/reports/fraud_analysis_report.html" {...EXT}>
                       Full report
                       <NewTab />
-                      <span aria-hidden="true">&#8599;</span>
+                      <ExternalIcon />
                     </a>
                   )}
                 </dd>
@@ -362,7 +365,7 @@ const ProjectDetail = () => {
       <div className="wrap case-foot">
         <CaseStudyFooter currentId={project.id} />
         <button type="button" className="btn btn-ghost" onClick={() => navigate('/', { state: { scrollTo: 'index' } })}>
-          <span aria-hidden="true">&larr;</span> Back to all projects
+          <BackIcon /> Back to all projects
         </button>
       </div>
     </article>

@@ -3,6 +3,7 @@ import useDocumentMeta from '../hooks/useDocumentMeta';
 import { routeMeta } from '../data/routes';
 import { bio, notes, community } from '../data/background';
 import { awards, featuredCertificates, otherCertificates, totalCertificateCount } from '../data/certificates';
+import { Arrow } from '../components/home/links';
 
 /**
  * The rest of the file: who I am past the projects, every certificate on
@@ -15,7 +16,6 @@ import { awards, featuredCertificates, otherCertificates, totalCertificateCount 
  */
 
 const EXT = { target: '_blank', rel: 'noopener noreferrer' };
-const Arrow = () => <span aria-hidden="true">&nbsp;&#8599;</span>;
 
 /**
  * One credential, one ruled line: who issued it, what it is, and the proof.
@@ -42,6 +42,39 @@ const CredentialRow = ({ cert }) => {
   );
 };
 
+/**
+ * One programme. Split into what is ongoing and what is past, so nothing past
+ * reads as current: the WiDS mentoring is ongoing, the rest has ended.
+ */
+const CommunityEntry = ({ entry }) => (
+  <li className="cm-entry">
+    <p className="cm-credit">
+      <span>{entry.organisation}</span>
+      {entry.period && <span>{entry.period}</span>}
+    </p>
+    <h4>{entry.role}</h4>
+    <ul className="items">
+      {entry.points.map((point) => (
+        <li key={point}>{point}</li>
+      ))}
+    </ul>
+    {entry.links.length > 0 && (
+      <p className="cm-links">
+        {entry.links.map((link) => (
+          <a key={link.href} href={link.href} {...EXT}>
+            {link.label}
+            <span className="sr-only">: {entry.role} (opens in a new tab)</span>
+            <Arrow />
+          </a>
+        ))}
+      </p>
+    )}
+  </li>
+);
+const isOngoing = (entry) => /present/i.test(entry.period || '');
+const ongoing = community.filter(isOngoing);
+const earlier = community.filter((e) => !isOngoing(e));
+
 const PAGE_SECTIONS = [
   ['about', 'About'],
   ['credentials', 'Certificates'],
@@ -60,8 +93,8 @@ const Background = () => {
           <p className="sec-tab">Personal file</p>
           <h1 className="pg-title">Background</h1>
           <p className="lede">
-            How I think about the work, every certificate on file, the competition placings, and the mentoring I do
-            alongside it.
+            How I think about the work, every certificate on file, the competition placings, and the mentoring and
+            community work alongside it.
           </p>
           <nav className="pg-jump" aria-label="On this page">
             <ul>
@@ -185,30 +218,21 @@ const Background = () => {
             <h2 className="sec-title" id="community-title">
               Mentorship &amp; community
             </h2>
-            <p className="lede">Leadership and mentoring across university programmes, datathons and bootcamps.</p>
+            <p className="lede">
+              I mentor with the WiDS Datathon now. Before that, I led and mentored in university programmes, a datathon
+              and bootcamps.
+            </p>
           </div>
+          <h3 className="cm-group">Now</h3>
           <ul className="community">
-            {community.map((entry) => (
-              <li key={entry.id} className="cm-entry">
-                <p className="cm-credit">{[entry.organisation, entry.period].filter(Boolean).join(' · ')}</p>
-                <h3>{entry.role}</h3>
-                <ul className="items">
-                  {entry.points.map((point) => (
-                    <li key={point}>{point}</li>
-                  ))}
-                </ul>
-                {entry.links.length > 0 && (
-                  <p className="cm-links">
-                    {entry.links.map((link) => (
-                      <a key={link.href} href={link.href} {...EXT}>
-                        {link.label}
-                        <span className="sr-only">: {entry.role} (opens in a new tab)</span>
-                        <Arrow />
-                      </a>
-                    ))}
-                  </p>
-                )}
-              </li>
+            {ongoing.map((entry) => (
+              <CommunityEntry key={entry.id} entry={entry} />
+            ))}
+          </ul>
+          <h3 className="cm-group">Earlier</h3>
+          <ul className="community">
+            {earlier.map((entry) => (
+              <CommunityEntry key={entry.id} entry={entry} />
             ))}
           </ul>
         </div>

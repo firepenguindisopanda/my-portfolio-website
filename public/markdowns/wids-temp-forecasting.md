@@ -2,14 +2,14 @@
 
 ## Problem Statement
 
-The WiDS Datathon 2023 challenged participants to forecast the 14-day average temperature (mean of daily max and min) across US locations. This is a **sub-seasonal forecasting** problem - predicting weather 2 weeks ahead, which sits between short-term weather forecasts and long-term climate predictions.
+The WiDS Datathon 2023 challenged participants to forecast the 14-day average temperature (mean of daily max and min) across US locations. This is a **sub-seasonal forecasting** problem: predicting weather 2 weeks ahead, which sits between short-term weather forecasts and long-term climate predictions.
 
 Accurate sub-seasonal forecasts are critical for agriculture, energy planning, and disaster preparedness.
 
 ## Dataset
 
 - **375,734** training samples across **514 US locations**
-- **731 days** of observations (September 2014 - August 2016)
+- **731 days** of observations (September 2014 to August 2016)
 - **246 features** from multiple climate and atmospheric data sources
 - **15 Köppen-Geiger climate regions** represented
 
@@ -54,19 +54,19 @@ NMME model forecasts show the strongest correlation with the target, as expected
 
 ### Key Engineered Features
 
-- `nmme_34w_mean/std/range` - Ensemble statistics across 10 NMME models
-- `nmme_uncertainty` - Model spread × mean (high uncertainty when models disagree)
-- `elev_x_nmme` - Elevation modulates temperature forecasts
-- `precip_x_rhum` - Precipitation-humidity interaction
+- `nmme_34w_mean/std/range`: Ensemble statistics across 10 NMME models
+- `nmme_uncertainty`: Model spread × mean (high uncertainty when models disagree)
+- `elev_x_nmme`: Elevation modulates temperature forecasts
+- `precip_x_rhum`: Precipitation-humidity interaction
 
 ## Model: LightGBM
 
 ### Why LightGBM?
 
-- **Best-in-class for tabular data** - consistently outperforms other algorithms on structured datasets
-- **Fast training** - handles 375K samples efficiently with histogram-based splitting
-- **Built-in feature importance** - provides interpretable feature rankings
-- **Handles mixed feature types** - no need for extensive preprocessing
+- **Best-in-class for tabular data**: consistently outperforms other algorithms on structured datasets
+- **Fast training**: handles 375K samples efficiently with histogram-based splitting
+- **Built-in feature importance**: provides interpretable feature rankings
+- **Handles mixed feature types**: no need for extensive preprocessing
 
 ### Training Setup
 
@@ -107,11 +107,11 @@ Residuals are approximately normally distributed with a slight bias at temperatu
 
 ## Key Insights
 
-1. **NMME forecasts are strong but imperfect** - The ensemble mean achieves R²=0.88, but there's significant room for improvement through ML-based correction
-2. **Model disagreement is informative** - The spread between NMME models is itself a predictive feature
-3. **Seasonal patterns dominate** - Month/season features rank high in importance
-4. **Geography matters** - Elevation and climate region interactions improve predictions
-5. **Two years of data is limiting** - A longer training period would likely improve extreme temperature predictions
+1. **NMME forecasts are strong but imperfect**: The ensemble mean achieves R²=0.88, but there's significant room for improvement through ML-based correction
+2. **Model disagreement is informative**: The spread between NMME models is itself a predictive feature
+3. **Seasonal patterns dominate**: Month/season features rank high in importance
+4. **Geography matters**: Elevation and climate region interactions improve predictions
+5. **Two years of data is limiting**: A longer training period would likely improve extreme temperature predictions
 
 ## Technical Details
 

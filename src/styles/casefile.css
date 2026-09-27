@@ -86,6 +86,9 @@ html.rail-on .site-header :focus-visible { outline-color: var(--hl); }
   position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
+/* Icons (components/site/icons.jsx) sit on the text's baseline at its size. */
+.icon { flex: none; width: 1em; height: 1em; vertical-align: -0.14em; }
+.icon-after { margin-left: .3em; width: .95em; height: .95em; }
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); box-sizing: border-box; }
 .mono { font-family: var(--mono); }
 
@@ -291,6 +294,11 @@ html.motion-on .cf .ev-claim .hl { transition: background-size .6s cubic-bezier(
 .cf .lede-2 { max-width: 65ch; margin: 14px 0 0; color: var(--moon-2); font-size: 16.5px; }
 .cf .chapter { position: relative; border-top: 1px solid var(--night-rule); scroll-margin-top: calc(var(--header-h) + var(--rail-h)); }
 html.pin-mode .cf .chapter { scroll-margin-top: 0; }
+/* One stage for all four cases: stacked in one cell, they take turns in place
+   (Story.jsx drives the handover). A case that is not showing takes no clicks. */
+html.pin-mode .cf .chapters { display: grid; }
+html.pin-mode .cf .chapters > .chapter { grid-area: 1 / 1; min-width: 0; }
+html.pin-mode .cf .chapter:not(.is-current) { pointer-events: none; }
 .cf .stage {
   position: relative; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(24px, 4vw, 64px);
   align-items: center; max-width: var(--maxw); margin: 0 auto; padding: clamp(56px, 8vw, 104px) var(--gutter); box-sizing: border-box;
@@ -414,6 +422,7 @@ html.motion-on .cf .ix-thumb img { transition: transform .5s cubic-bezier(.2, .7
 .cf .ix-preview img { display: block; width: 100%; aspect-ratio: 16/10; object-fit: cover; object-position: top left; border: 1px solid var(--rule); }
 .cf .ix-preview .pv-data { aspect-ratio: 16/10; display: flex; flex-direction: column; justify-content: space-between; padding: 12px; box-sizing: border-box; background: var(--night); color: var(--moon); }
 .cf .ix-preview .pv-data p { margin: 0; font-family: var(--serif); font-size: 19px; line-height: 1.25; color: var(--white); }
+.cf .ix-preview .pv-note { margin-left: 12px; }
 .cf .ix-preview .pv-cap { display: block; margin-top: 8px; font: 500 11.5px/1.3 var(--mono); letter-spacing: .04em; color: var(--graphite); }
 .cf .ix-preview .pv-data .pv-cap { margin: 0; color: var(--moon-2); }
 
@@ -438,8 +447,8 @@ html.motion-on .cf .tl-dot { transition: background-color .3s ease; }
 .cf .tl details { margin-top: 4px; }
 .cf .tl summary { display: inline-flex; align-items: center; min-height: 44px; cursor: pointer; font: 500 13px var(--mono); text-decoration: underline; text-underline-offset: 4px; list-style: none; }
 .cf .tl summary::-webkit-details-marker { display: none; }
-.cf .tl summary::before { content: '+'; display: inline-block; width: 14px; text-decoration: none; }
-.cf .tl details[open] > summary::before { content: '\2212'; }
+.cf .tl summary .icon { width: 14px; height: 14px; margin-right: 6px; }
+.cf .tl details[open] > summary .when-closed, .cf .tl details:not([open]) > summary .when-open { display: none; }
 .cf .periods { list-style: none; margin: 6px 0 0; padding: 0; border-left: 1.5px dashed var(--rule); }
 .cf .periods > li { padding: 6px 0 10px 16px; }
 .cf .periods .when { display: block; font: 600 13px var(--mono); margin-bottom: 6px; }

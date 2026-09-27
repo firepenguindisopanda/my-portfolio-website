@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { COLORS, FONTS } from '../../utilities/themeConfig';
+import { ShiftIcon } from '../site/icons';
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
 
@@ -189,7 +190,9 @@ const LinkTrackerVisual = ({ ratio = '16 / 9' }) => {
           <path d="M 173 76.5 L 178 80 L 173 83.5" stroke={accent} strokeWidth="1.5" fill="none" />
           <g className="lt-key">
             <rect className="lt-key-face" x="137" y="90" width="44" height="17" rx="3" fill={paper} stroke={line} />
-            <text x="159" y="101.5" textAnchor="middle" fill={ink} fontSize="8.5" letterSpacing="0.02em">ALT⇧W</text>
+            <text x="154.5" y="101.5" textAnchor="end" fill={ink} fontSize="8.5" letterSpacing="0.02em">ALT</text>
+            <ShiftIcon x="155" y="93.5" size={9} color={ink} strokeWidth={1.6} />
+            <text x="164.5" y="101.5" fill={ink} fontSize="8.5">W</text>
           </g>
           <text x="159" y="118" textAnchor="middle" fill={muted} fontSize="7.5">SAVE+CLOSE</text>
 
@@ -219,7 +222,7 @@ const LinkTrackerVisual = ({ ratio = '16 / 9' }) => {
             );
           })}
           <text className="lt-done" x="308" y="168" textAnchor="end" fill={accent} fontSize="8" opacity="0">
-            X = DONE · THE QUEUE SHRINKS
+            X = DONE, THE QUEUE SHRINKS
           </text>
 
           {/* The tabs themselves - drawn last so they fly over both windows. */}

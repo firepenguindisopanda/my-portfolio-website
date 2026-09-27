@@ -32,9 +32,11 @@ The home page, in order:
 
 - **Cover** - name, thesis and a file card, with three evidence rows that each
   open a case study.
-- **Four cases** - on a desktop each chapter pins while its figure plays
-  against the scroll; on phones each figure plays once as it arrives, and with
-  motion off every figure is drawn in its finished state.
+- **Four cases** - on a laptop or desktop the four cases share one pinned
+  stage: each figure plays against the scroll, holds on its result, and the
+  next case takes its place. On phones each figure plays once as it arrives,
+  and with motion off every figure is drawn in its finished state. Switching
+  motion or resizing mid-story keeps the reader on the same case.
 - **Try it** - the Chimp Test, Link Tracker's Q/R/D/X triage and the timetable
   drag, on example data. All three work by keyboard and touch.
 - **Index** - every featured project, filterable, with a floating screenshot

@@ -13,7 +13,7 @@ export const PLOT_INTERPRETATIONS = {
   'fraud-detection': {
     'target_distribution.webp': {
       what: 'Class balance for each of the three datasets, with the imbalance ratio annotated.',
-      insight: 'Fraud is 0.13% to 1.10% of transactions - between 87 and 774 legitimate cases for every fraudulent one.',
+      insight: 'Fraud is 0.13% to 1.10% of transactions: between 87 and 774 legitimate cases for every fraudulent one.',
       why: 'This is why accuracy is discarded. A model that predicts "never fraud" scores 99.83% accuracy on the Credit Card data and catches none of the 98 frauds. Average precision is used instead, because it summarises the precision-recall curve, which is the curve a fraud team actually operates on.',
     },
     'amount_by_class.webp': {
@@ -33,7 +33,7 @@ export const PLOT_INTERPRETATIONS = {
     },
     'confusion_matrix_best.webp': {
       what: 'Confusion matrix for XGBoost on the Credit Card test split at the default 0.5 threshold.',
-      insight: 'At 0.5 the model catches 82 of 98 frauds with 11 false alarms - 88% precision at 84% recall.',
+      insight: 'At 0.5 the model catches 82 of 98 frauds with 11 false alarms: 88% precision at 84% recall.',
       why: 'This is the starting point, not the recommendation. 0.5 is an arbitrary default that implicitly assumes a missed fraud and a false alarm cost the same, which they do not.',
     },
     'feature_importance_direction.webp': {
@@ -48,12 +48,12 @@ export const PLOT_INTERPRETATIONS = {
     },
     'roc_curves.webp': {
       what: 'ROC curves for every model on the Credit Card test split.',
-      insight: 'Every model, including logistic regression at 0.971, looks excellent - even the one whose precision is 6%.',
+      insight: 'Every model, including logistic regression at 0.971, looks excellent, even the one whose precision is 6%.',
       why: 'This chart is included as a caution. ROC-AUC is dominated by the true-negative mass at a 0.17% base rate, so it stays flattering for models that are not useful. Compare it with the precision-recall curve beside it.',
     },
     'pr_curves.webp': {
       what: 'Precision-recall curves, with the no-skill line drawn at the base rate rather than 0.5.',
-      insight: 'XGBoost reaches an average precision of 0.876 (95% CI 0.811 to 0.931) against a chance baseline of 0.0017 - a 509x lift.',
+      insight: 'XGBoost reaches an average precision of 0.876 (95% CI 0.811 to 0.931) against a chance baseline of 0.0017, a 509x lift.',
       why: 'This is the honest picture of the same models the ROC chart flatters. The no-skill line sits at the fraud rate, so the gap between the curve and that line is the real measure of skill.',
     },
     'calibration_curve.webp': {
@@ -84,7 +84,7 @@ export const PLOT_INTERPRETATIONS = {
     'effect_size_vs_pvalue.webp': {
       what: 'Effect size against statistical significance for all 30 features.',
       insight: '28 of 30 features are significant after Benjamini-Hochberg correction, but only 15 reach a large effect size and 8 are negligible.',
-      why: 'At n = 284,807 the p-value stops discriminating - a difference far too small to act on still clears any significance bar. This is the chart that argues for ranking by effect size, and it does it in one picture.',
+      why: 'At n = 284,807 the p-value stops discriminating: a difference far too small to act on still clears any significance bar. This is the chart that argues for ranking by effect size, and it does it in one picture.',
     },
     'radar_chart.webp': {
       what: 'Precision, recall, F1 and ROC-AUC per model on one set of axes.',
@@ -103,7 +103,7 @@ export const PLOT_INTERPRETATIONS = {
     },
     'bank_account_effect_sizes.webp': {
       what: 'Effect size against significance for the Bank Account application data.',
-      insight: '24 of 25 features are statistically significant and not one reaches a large effect size - the mirror image of the Credit Card chart.',
+      insight: '24 of 25 features are statistically significant and not one reaches a large effect size (the mirror image of the Credit Card chart).',
       why: 'This single chart is the diagnosis for the dataset that did not work. The signal is real but uniformly thin, spread across many weak features rather than concentrated in a few strong ones. No amount of tuning manufactures separation that is not in the features.',
     },
     'z_score_feature_separation_ranking.webp': {
@@ -113,7 +113,7 @@ export const PLOT_INTERPRETATIONS = {
     },
     'z_score_multivariate_chi_distribution.webp': {
       what: 'Distribution of the summed squared z-score across all PCA components, for both classes.',
-      insight: 'Fraud averages a chi-score of 667.6 against 26.9 for legitimate transactions - a 24.8x ratio - and 63.2% of fraud sits above the 99th percentile of normal.',
+      insight: 'Fraud averages a chi-score of 667.6 against 26.9 for legitimate transactions (a 24.8x ratio), and 63.2% of fraud sits above the 99th percentile of normal.',
       why: 'It shows fraud is anomalous in aggregate even when no individual feature is extreme. That is the statistical justification for a multivariate model over a set of single-feature rules.',
     },
     'z_score_distribution_all_features.webp': {
@@ -123,7 +123,7 @@ export const PLOT_INTERPRETATIONS = {
     },
     'z_score_amount_time_scatter.webp': {
       what: 'Amount z-score against Time z-score, fraud in red, with reference lines at plus and minus two standard deviations.',
-      insight: 'Most fraud sits near z = 0 on Amount - perfectly ordinary transaction sizes.',
+      insight: 'Most fraud sits near z = 0 on Amount: perfectly ordinary transaction sizes.',
       why: 'The clearest refutation of the "fraud means big transactions" intuition. Fraudulent amounts are deliberately unremarkable, which is exactly why the anonymised behavioural features carry the signal instead.',
     },
   },
@@ -133,29 +133,29 @@ export const PROJECT_PLOTS = {
   // Ordered as a narrative: what the data looks like, how the models compare,
   // what the operating point costs, and what actually drives a prediction.
   'fraud-detection': [
-    { file: 'target_distribution.webp', label: 'Class distribution across all three datasets - fraud is 0.13% to 1.10% of transactions' },
-    { file: 'amount_by_class.webp', label: 'Amount by class - fraud does not sit at unusually large amounts, which rules out the obvious heuristic' },
-    { file: 'correlation_heatmap.webp', label: 'Feature correlation with the fraud label - no single feature is decisive, so the problem is inherently multivariate' },
+    { file: 'target_distribution.webp', label: 'Class distribution across all three datasets: fraud is 0.13% to 1.10% of transactions' },
+    { file: 'amount_by_class.webp', label: 'Amount by class: fraud does not sit at unusually large amounts, which rules out the obvious heuristic' },
+    { file: 'correlation_heatmap.webp', label: 'Feature correlation with the fraud label: no single feature is decisive, so the problem is inherently multivariate' },
     { file: 'model_comparison_f1.webp', label: 'Model comparison including both dummy baselines, which score near-zero F1 despite 99%+ accuracy' },
-    { file: 'pr_curves.webp', label: 'Precision-recall curves - XGBoost reaches 0.876 average precision against a 0.0017 chance baseline, a 509x lift' },
-    { file: 'roc_curves.webp', label: 'ROC curves - included as a caution: every model looks excellent here, including one with 6% precision' },
-    { file: 'confusion_matrix_best.webp', label: 'XGBoost confusion matrix at the default 0.5 threshold - 82 of 98 frauds caught, 11 false alarms' },
-    { file: 'calibration_curve.webp', label: 'Calibration - class weighting distorts the probabilities even where the ranking stays sound' },
-    { file: 'cost_heatmap.webp', label: 'Cost surface - the optimal threshold slides from 0.97 at equal costs to 0.02 once a missed fraud costs 50x a false alarm' },
-    { file: 'threshold_sensitivity.webp', label: 'Precision, recall and F1 across the threshold range - the 0.5 default sits far from the cost optimum' },
-    { file: 'business_impact.webp', label: 'Business impact - at threshold 0.02, $1,083 of loss against $9,800 for doing nothing, an 88.9% reduction' },
-    { file: 'lift_gain.webp', label: 'Cumulative gain - how much fraud is caught per unit of analyst review effort' },
-    { file: 'feature_importance_direction.webp', label: 'Odds ratios with 95% confidence intervals - V4 multiplies fraud odds by 3.3 per standard deviation, V10 cuts them to 0.41' },
+    { file: 'pr_curves.webp', label: 'Precision-recall curves: XGBoost reaches 0.876 average precision against a 0.0017 chance baseline, a 509x lift' },
+    { file: 'roc_curves.webp', label: 'ROC curves, included as a caution: every model looks excellent here, including one with 6% precision' },
+    { file: 'confusion_matrix_best.webp', label: 'XGBoost confusion matrix at the default 0.5 threshold: 82 of 98 frauds caught, 11 false alarms' },
+    { file: 'calibration_curve.webp', label: 'Calibration: class weighting distorts the probabilities even where the ranking stays sound' },
+    { file: 'cost_heatmap.webp', label: 'Cost surface: the optimal threshold slides from 0.97 at equal costs to 0.02 once a missed fraud costs 50x a false alarm' },
+    { file: 'threshold_sensitivity.webp', label: 'Precision, recall and F1 across the threshold range: the 0.5 default sits far from the cost optimum' },
+    { file: 'business_impact.webp', label: 'Business impact: at threshold 0.02, $1,083 of loss against $9,800 for doing nothing, an 88.9% reduction' },
+    { file: 'lift_gain.webp', label: 'Cumulative gain: how much fraud is caught per unit of analyst review effort' },
+    { file: 'feature_importance_direction.webp', label: 'Odds ratios with 95% confidence intervals: V4 multiplies fraud odds by 3.3 per standard deviation, V10 cuts them to 0.41' },
     { file: 'feature_comparison.webp', label: 'Importance across gini, gain and permutation, each normalised so the methods are directly comparable' },
-    { file: 'effect_size_vs_pvalue.webp', label: 'Effect size vs significance - 28 of 30 features are significant, but only 15 have a large effect' },
+    { file: 'effect_size_vs_pvalue.webp', label: 'Effect size vs significance: 28 of 30 features are significant, but only 15 have a large effect' },
     { file: 'radar_chart.webp', label: 'Model shape across precision, recall, F1 and ROC-AUC' },
-    { file: 'temporal_fraud.webp', label: 'Fraud rate by hour - the argument for time features and for forward-in-time evaluation' },
+    { file: 'temporal_fraud.webp', label: 'Fraud rate by hour: the argument for time features and for forward-in-time evaluation' },
     { file: 'online_fraud_by_type.webp', label: 'Online Payment fraud rate by transaction type, with Wilson confidence intervals' },
-    { file: 'bank_account_effect_sizes.webp', label: 'Bank Account effect sizes - 24 of 25 features significant, none with a large effect: the diagnosis for the dataset that failed' },
-    { file: 'z_score_feature_separation_ranking.webp', label: 'Features ranked by Cohen\'s d - V17, V14, V12 and V10 separate the classes by several standard deviations' },
-    { file: 'z_score_multivariate_chi_distribution.webp', label: 'Multivariate chi-score - fraud averages 667.6 against 26.9 for legitimate, a 24.8x ratio' },
+    { file: 'bank_account_effect_sizes.webp', label: 'Bank Account effect sizes (24 of 25 features significant, none with a large effect): the diagnosis for the dataset that failed' },
+    { file: 'z_score_feature_separation_ranking.webp', label: 'Features ranked by Cohen\'s d: V17, V14, V12 and V10 separate the classes by several standard deviations' },
+    { file: 'z_score_multivariate_chi_distribution.webp', label: 'Multivariate chi-score: fraud averages 667.6 against 26.9 for legitimate, a 24.8x ratio' },
     { file: 'z_score_distribution_all_features.webp', label: 'Per-feature z-score distributions for both classes, ordered by effect size' },
-    { file: 'z_score_amount_time_scatter.webp', label: 'Amount vs Time z-scores - most fraud uses perfectly ordinary amounts' },
+    { file: 'z_score_amount_time_scatter.webp', label: 'Amount vs Time z-scores: most fraud uses perfectly ordinary amounts' },
   ],
   'wids-temp-forecasting': [
     { file: 'target_distribution.webp', label: 'Target Distribution' },
@@ -164,18 +164,18 @@ export const PROJECT_PLOTS = {
     { file: 'model_residuals.webp', label: 'Model Residuals' },
   ],
   'starbucks-offer-analysis': [
-    { file: 'demographic_distributions.webp', label: 'Customer Demographics - Age, Income & Gender Distribution' },
-    { file: 'offer_funnel.webp', label: 'Offer Engagement Funnel - Received to Viewed to Completed' },
-    { file: 'offer_characteristics_boxplots.webp', label: 'Offer Characteristics - Duration, Difficulty & Reward vs Completion' },
-    { file: 'transaction_behavior.webp', label: 'Transaction Behavior - Responders vs Non-Responders' },
+    { file: 'demographic_distributions.webp', label: 'Customer Demographics: Age, Income & Gender Distribution' },
+    { file: 'offer_funnel.webp', label: 'Offer Engagement Funnel: Received to Viewed to Completed' },
+    { file: 'offer_characteristics_boxplots.webp', label: 'Offer Characteristics: Duration, Difficulty & Reward vs Completion' },
+    { file: 'transaction_behavior.webp', label: 'Transaction Behavior: Responders vs Non-Responders' },
     { file: 'cluster_pca_scatter.webp', label: 'PCA Visualization of 4 Customer Segments' },
     { file: 'cluster_sizes.webp', label: 'Segment Size Distribution' },
     { file: 'cluster_boxplots.webp', label: 'Feature Distributions Across Segments' },
-    { file: 'model_comparison.webp', label: 'Model Comparison - 4 Algorithms Benchmarked' },
+    { file: 'model_comparison.webp', label: 'Model Comparison: 4 Algorithms Benchmarked' },
     { file: 'best_model_performance.webp', label: 'XGBoost Confusion Matrix & Performance' },
     { file: 'feature_importance.webp', label: 'Top Predictive Features for Offer Completion' },
     { file: 'shap_summary_bar.webp', label: 'SHAP Feature Importance Summary' },
-    { file: 'ate_by_offer_type.webp', label: 'Causal ATE - Impact of Offers on Transaction Spend' },
+    { file: 'ate_by_offer_type.webp', label: 'Causal ATE: Impact of Offers on Transaction Spend' },
     { file: 'recommendation_performance.webp', label: 'Recommendation System Lift vs Random Targeting' },
   ],
 };
