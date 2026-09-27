@@ -1,60 +1,112 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import emailjs from '@emailjs/browser';
 import Home from '../pages/Home';
-import { getThemePersonality } from '../utilities/themeConfig';
+import { profile, sections } from '../data/profile';
+import { projects } from '../data/projects';
 
-vi.mock('../components/Hero/Hero', () => ({ default: () => <div data-testid="hero">Hero</div> }));
-vi.mock('../components/AboutMe/AboutMe', () => ({ default: () => <div data-testid="about-me">About Me</div> }));
-vi.mock('../components/TechnicalExperiences/TechnicalExperiences', () => ({ default: () => <div data-testid="technical">Skills</div> }));
-vi.mock('../components/Projects/Projects', () => ({ default: () => <div data-testid="projects">Projects</div> }));
-vi.mock('../components/WorkExperience/WorkExperience', () => ({ default: () => <div data-testid="work">Experience</div> }));
-vi.mock('../components/AcademicAchievements/AcademicAchievements', () => ({ default: () => <div data-testid="academic">Certificates</div> }));
-vi.mock('../components/contact/Contact', () => ({ default: () => <div data-testid="contact">Contact</div> }));
-vi.mock('../components/TechnicalSkills/ExtraCurricular', () => ({ default: () => <div data-testid="extra">Extra Curricular</div> }));
-vi.mock('../components/BackToTop/BackToTop', () => ({ default: ({ children }) => <div data-testid="scroll-top">{children}</div> }));
+const capture = vi.fn();
+vi.mock('@posthog/react', () => ({
+  usePostHog: () => ({ capture, setPersonProperties: vi.fn(), captureException: vi.fn() }),
+}));
+vi.mock('@emailjs/browser', () => ({ default: { sendForm: vi.fn() } }));
 vi.mock('../assets/NicholasSmith_Resume.pdf', () => ({ default: 'mocked-resume.pdf' }));
 
-const theme = createTheme(getThemePersonality('technical-precision'));
-
-const renderHome = (initialEntries = ['/']) =>
+const renderHome = () =>
   render(
-    <ThemeProvider theme={theme}>
-      <MemoryRouter initialEntries={initialEntries}>
-        <Home />
-      </MemoryRouter>
-    </ThemeProvider>
+    <MemoryRouter initialEntries={['/']}>
+      <Home />
+    </MemoryRouter>
   );
 
+beforeEach(() => {
+  capture.mockClear();
+  emailjs.sendForm.mockReset();
+});
+
 describe('Home page', () => {
-  it('renders every section', () => {
-    renderHome();
-
-    ['hero', 'projects', 'work', 'about-me', 'technical', 'academic', 'extra', 'contact']
-      .forEach((testId) => expect(screen.getByTestId(testId)).toBeInTheDocument());
-  });
-
-  it('renders the scroll-to-top control', () => {
-    renderHome();
-    expect(screen.getByTestId('scroll-top')).toBeInTheDocument();
-  });
-
-  it('puts projects and experience ahead of credentials in the DOM', () => {
+  it('anchors every section the header and the 404 page link to, in order', () => {
     const { container } = renderHome();
-    const order = [...container.querySelectorAll('[data-testid]')].map((el) => el.dataset.testid);
-
-    // The whole point of the reorder: an employer meets the work first.
-    expect(order.indexOf('projects')).toBeLessThan(order.indexOf('academic'));
-    expect(order.indexOf('work')).toBeLessThan(order.indexOf('academic'));
-    expect(order.indexOf('hero')).toBeLessThan(order.indexOf('projects'));
+    const found = [...container.querySelectorAll('section[id]')].map((el) => el.id);
+    const expected = sections.map((s) => s.id);
+    expected.forEach((id) => expect(found).toContain(id));
+    // Document order follows `sections`, which is the order the header lists.
+    expect(found.filter((id) => expected.includes(id))).toEqual(expected);
   });
 
-  it('gives the app bar real anchor targets for every nav section', () => {
-    const { container } = renderHome();
+  it('has one h1, the name', () => {
+    renderHome();
+    const h1s = screen.getAllByRole('heading', { level: 1 });
+    expect(h1s).toHaveLength(1);
+    expect(h1s[0]).toHaveTextContent(profile.name.split(' ')[0]);
+  });
 
-    ['projects', 'experience', 'skills', 'credentials', 'contact'].forEach((id) => {
-      expect(container.querySelector(`#${id}`)).not.toBeNull();
+  it('tells the work as four cases, each with its case study', () => {
+    const { container } = renderHome();
+    const chapters = container.querySelectorAll('#story .chapter');
+    expect(chapters).toHaveLength(4);
+    chapters.forEach((ch) => {
+      expect(within(ch).getAllByRole('link', { name: /case study/i })[0].getAttribute('href')).toMatch(/^\/projects\//);
     });
+  });
+
+  it('indexes every featured project', () => {
+    const { container } = renderHome();
+    const featured = projects.filter((p) => p.featured);
+    expect(container.querySelectorAll('#index .ix-row')).toHaveLength(featured.length);
+  });
+
+  it('keeps the full credential index and the mentoring off the home page', () => {
+    // Both live on /background; the home page links there from Recognition.
+    const { container } = renderHome();
+    expect(container.querySelector('#community')).toBeNull();
+    expect(container.querySelector('#credentials')).toBeNull();
+    expect(within(container.querySelector('#recognition')).getByRole('link', { name: /every certificate/i })).toHaveAttribute(
+      'href',
+      '/background'
+    );
+  });
+});
+
+describe('contact form', () => {
+  const fill = () => {
+    fireEvent.change(screen.getByLabelText('Your name'), { target: { value: 'Ada Lovelace' } });
+    fireEvent.change(screen.getByLabelText('Your email'), { target: { value: 'ada@example.com' } });
+    fireEvent.change(screen.getByLabelText('Message'), { target: { value: 'We have a contract role.' } });
+  };
+  const form = () => screen.getByRole('form', { name: 'Send a message' });
+
+  it('sends through EmailJS with the fields the template reads', async () => {
+    emailjs.sendForm.mockResolvedValue({ status: 200 });
+    renderHome();
+    fill();
+    fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+
+    await waitFor(() => expect(within(form()).getByRole('status')).toHaveTextContent('Message sent.'));
+    const [service, template, sentForm, key] = emailjs.sendForm.mock.calls[0];
+    expect([service, template, key]).toEqual(['service_wf5ex2f', 'template_0ouoimq', 'Mbp02i3iokIucc48d']);
+    expect(['name', 'email', 'message'].map((n) => sentForm.elements.namedItem(n)?.name)).toEqual(['name', 'email', 'message']);
+    expect(capture).toHaveBeenCalledWith('contact_form_submitted');
+    // Sent, so the fields clear.
+    expect(screen.getByLabelText('Your name')).toHaveValue('');
+  });
+
+  it('says how else to reach me when sending fails, and keeps the message', async () => {
+    emailjs.sendForm.mockRejectedValue({ text: 'The service is unavailable' });
+    renderHome();
+    fill();
+    fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+
+    await waitFor(() => expect(within(form()).getByRole('status')).toHaveTextContent(profile.email));
+    expect(capture).toHaveBeenCalledWith('contact_form_failed', { error: 'The service is unavailable' });
+    expect(screen.getByLabelText('Message')).toHaveValue('We have a contract role.');
+  });
+
+  it('does not send an incomplete form', () => {
+    renderHome();
+    fireEvent.change(screen.getByLabelText('Your name'), { target: { value: 'Ada' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+    expect(emailjs.sendForm).not.toHaveBeenCalled();
   });
 });

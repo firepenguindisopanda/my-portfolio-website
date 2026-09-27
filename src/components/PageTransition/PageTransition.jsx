@@ -43,7 +43,7 @@ const PageTransition = ({ children }) => {
   );
 
   return (
-    <main key={location.pathname} ref={ref} style={{ width: '100%', minHeight: '100vh' }}>
+    <main id="main" tabIndex={-1} key={location.pathname} ref={ref} style={{ width: '100%', minHeight: '100vh', outline: 'none' }}>
       {children}
     </main>
   );

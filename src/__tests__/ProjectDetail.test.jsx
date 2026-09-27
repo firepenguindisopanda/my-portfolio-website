@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ProjectDetail from '../pages/ProjectDetail';
-import { getThemePersonality } from '../utilities/themeConfig';
+import { casefileTheme } from '../utilities/themeConfig';
 
 vi.mock('react-markdown', () => ({
   __esModule: true,
@@ -44,13 +44,11 @@ vi.mock('../data/projects', () => ({
   ],
 }));
 
-vi.mock('../components/Layout/Layout', () => ({ children }) => <div data-testid="layout">{children}</div>);
 vi.mock('../components/SpacesEmbed/LazySpaceEmbed', () => ({ default: () => <div data-testid="space-embed">Space Embed</div> }));
 
-// The real personality, not a stub palette: the page reads theme.custom tokens
-// (codeFont, displayFont) that only the app's own themes define, so a bare
-// createTheme() here would pass tests the running app could not.
-const theme = createTheme(getThemePersonality('technical-precision'));
+// The app's own theme, not a bare createTheme(): the figures and analysis
+// blocks a case study can render read theme.custom tokens only it defines.
+const theme = createTheme(casefileTheme);
 
 global.fetch = vi.fn();
 
@@ -75,12 +73,12 @@ describe('ProjectDetail Page', () => {
 
   it('renders project not found for invalid projectId', () => {
     renderWithRouter('invalid-project-id');
-    expect(screen.getByText('Project not found')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'No case file by that name' })).toBeInTheDocument();
   });
 
-  it('renders back to home button for not found projects', () => {
+  it('sends a reader who followed a dead link to the project index', () => {
     renderWithRouter('invalid-project');
-    expect(screen.getByRole('button', { name: /back to home/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /see every project/i })).toHaveAttribute('href', '/#index');
   });
 
   it('renders project content for valid project', async () => {
@@ -90,7 +88,11 @@ describe('ProjectDetail Page', () => {
     });
 
     renderWithRouter('test-project');
-    expect(screen.getByText('Test Project')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Test Project' })).toBeInTheDocument();
+    // The spec table states what a reader can do with it right now.
+    expect(screen.getByText('Deployed and reachable')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /open the live site/i })).toHaveAttribute('href', 'https://test-project.com');
+    expect(screen.getByRole('link', { name: /source/i })).toHaveAttribute('href', 'https://github.com/test/project');
   });
 
   it('shows error message when markdown fails to load', async () => {
@@ -107,7 +109,7 @@ describe('ProjectDetail Page', () => {
     renderWithRouter('project-no-markdown');
 
     await waitFor(() => {
-      expect(screen.getByText(/no detailed writeup available/i)).toBeInTheDocument();
+      expect(screen.getByText(/no detailed write-up/i)).toBeInTheDocument();
     });
   });
 });

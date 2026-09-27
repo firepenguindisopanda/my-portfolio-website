@@ -27,8 +27,12 @@ const walk = (dir, files = []) => {
   return files;
 };
 
+// Forward slashes on every platform. The assertions below compare against
+// POSIX-style paths ('utilities/', 'components/Projects'), and on Windows
+// path.relative returns backslashes, which failed three guards there while
+// they passed in CI.
 const sourceText = walk(SRC).map((f) => ({
-  file: path.relative(SRC, f),
+  file: path.relative(SRC, f).split(path.sep).join('/'),
   text: fs.readFileSync(f, 'utf8'),
 }));
 
@@ -40,20 +44,20 @@ describe('bundle and loading', () => {
     expect(app).toMatch(/<Suspense/);
   });
 
-  it('does not eagerly import every font family', () => {
+  it('loads exactly the three Casefile faces', () => {
     const app = read('App.jsx');
     const eager = app.match(/^import '@fontsource\/([a-z-]+)/gm) || [];
     const families = new Set(eager.map((line) => line.split('/')[1]));
-    // Space Grotesk and IBM Plex Sans (Instrument's pair - Instrument is the
-    // default) plus JetBrains Mono, which carries labels and evidence lines in
-    // every mode and so cannot be deferred. The other three modes pull their
-    // own pair on demand. Three is the ceiling; a fourth means a mode's face
-    // has leaked into the eager set and every visitor pays for it.
-    expect(families.size).toBeLessThanOrEqual(3);
+    // Instrument Serif for display, IBM Plex Sans to read, IBM Plex Mono for
+    // labels. A fourth family is a face nothing is designed around, and every
+    // visitor pays for it.
+    expect([...families].sort()).toEqual(['ibm-plex-mono', 'ibm-plex-sans', 'instrument-serif']);
   });
 
-  it('loads non-default theme fonts on demand', () => {
-    expect(read('App.jsx')).toMatch(/THEME_FONTS/);
+  it('ships no font package the site does not load', () => {
+    const deps = Object.keys(JSON.parse(fs.readFileSync(path.join(SRC, '..', 'package.json'), 'utf8')).dependencies);
+    const loaded = new Set(read('App.jsx').match(/@fontsource\/[a-z-]+/g) || []);
+    expect(deps.filter((d) => d.startsWith('@fontsource/') && !loaded.has(d))).toEqual([]);
   });
 
   it('does not import whole icon libraries', () => {
@@ -71,69 +75,49 @@ describe('rendering cost', () => {
     expect(hook).not.toMatch(/addEventListener\('scroll'/);
   });
 
-  it('keeps scroll-driven layout reads out of the app bar', () => {
-    const appBar = read('components/DrawerAppBar/DrawerAppBar.jsx');
-    expect(appBar).not.toMatch(/addEventListener\('scroll'/);
-    expect(appBar).not.toMatch(/offsetTop/);
+  it('keeps scroll-driven layout reads out of the header', () => {
+    const header = read('components/site/SiteHeader.jsx');
+    expect(header).not.toMatch(/addEventListener\('scroll'/);
+    expect(header).not.toMatch(/offsetTop/);
   });
 
   it('lazy-loads images that are not above the fold', () => {
-    // By directory, not by file: the project renderers moved the screenshot out
-    // of Projects.jsx and into shared parts, and a check pinned to one filename
-    // would have gone quietly vacuous rather than failing. Every below-the-fold
-    // component that renders an image has to opt into lazy loading, wherever in
-    // that component's directory the image ends up living.
-    // AcademicAchievements came off this list when the certificate wall became
-    // an index: it renders no images at all now, so asserting it renders lazy
-    // ones would assert the wall back into existence.
-    ['components/Projects'].forEach((dir) => {
-      const files = sourceText.filter(
-        ({ file, text }) => file.startsWith(dir) && /component="img"|<img\b/.test(text)
-      );
+    // Every file that renders a below-the-fold image has to opt into lazy
+    // loading. The hero's portrait, a case study's cover screenshot and the
+    // panda are the first thing on their pages, so they load eagerly.
+    const aboveTheFold = new Set(['components/home/Hero.jsx', 'pages/ProjectDetail.jsx', 'pages/AboutPanda.jsx']);
+    const files = sourceText.filter(({ file, text }) => !aboveTheFold.has(file) && /<img\b/.test(text));
 
-      expect({ dir, rendersImages: files.length > 0 }).toEqual({ dir, rendersImages: true });
-
-      files.forEach(({ file, text }) => {
-        expect({ file, lazy: /loading="lazy"/.test(text) }).toEqual({ file, lazy: true });
-      });
+    // Not vacuous: the index, the deep dives and the story's screenshot all render images.
+    expect(files.map((f) => f.file)).toEqual(
+      expect.arrayContaining([
+        'components/home/ProjectIndex.jsx',
+        'components/CategoryPage/CategoryPage.jsx',
+        'components/home/story/storyFigures.js',
+      ])
+    );
+    files.forEach(({ file, text }) => {
+      expect({ file, lazy: /loading="lazy"/.test(text) }).toEqual({ file, lazy: true });
     });
   });
 });
 
 describe('design system constraints', () => {
-  it('contains no gradients', () => {
-    const offenders = sourceText.filter(({ text }) => /(linear|radial|conic)-gradient/.test(text));
-    expect(offenders.map((o) => o.file)).toEqual([]);
-  });
-
-  it('keeps box-shadow usage in the theme, not scattered through components', () => {
+  it('keeps gradients in the stylesheets', () => {
+    // Casefile uses them for drawn things only - the highlighter stroke, ruled
+    // paper, graph-paper dots, a clash's hatching - all defined in styles/. A
+    // gradient anywhere else is decoration creeping into a component.
     const offenders = sourceText.filter(
-      ({ file, text }) => /boxShadow:|box-shadow:/.test(text) && !file.startsWith('utilities/')
+      ({ file, text }) => /(linear|radial|conic)-gradient/.test(text) && !file.startsWith('styles/')
     );
     expect(offenders.map((o) => o.file)).toEqual([]);
   });
 
-  /**
-   * Radius is per mode now - a ledger sheet and a gallery plate are square,
-   * an instrument panel is not - so the old assertion that every theme shared
-   * one 4px/8px scale no longer describes the system. What still has to hold is
-   * that no mode invents a radius: they differ within RADIUS_SCALE, never
-   * outside it. That covers all four modes rather than one shared pair.
-   */
-  it('draws every radius from the shared scale', async () => {
-    const { themePersonalities, RADIUS_SCALE } = await import('../utilities/themeConfig');
-
-    Object.values(themePersonalities).forEach((theme) => {
-      const { control, container } = theme.custom.radius;
-      expect(RADIUS_SCALE).toContain(control);
-      expect(RADIUS_SCALE).toContain(container);
-      // MUI multiplies `borderRadius: n` by shape.borderRadius, so a mode whose
-      // shape drifts from its own control radius silently rescales every chip,
-      // button and input in that mode.
-      expect(theme.shape.borderRadius).toBe(control);
-    });
-
-    expect(RADIUS_SCALE).toEqual([0, 2, 4, 8]);
+  it('keeps box-shadow usage in the stylesheets and the theme, not scattered through components', () => {
+    const offenders = sourceText.filter(
+      ({ file, text }) => /boxShadow:|box-shadow:/.test(text) && !file.startsWith('utilities/') && !file.startsWith('styles/')
+    );
+    expect(offenders.map((o) => o.file)).toEqual([]);
   });
 
   it('ships one animation library', () => {
@@ -153,23 +137,11 @@ describe('design system constraints', () => {
     const needsOwnGuard = /gsap\.(timeline|from|fromTo|to)\(/;
     const guards = /prefersReducedMotion|gsapEnabled/;
 
-    // The reading-progress hairline is scrubbed to scroll position: it only
-    // moves when the reader does, which is not motion in the sense the
-    // preference asks to be rid of, so it is the one tween that runs unguarded.
-    const scrubOnly = new Set(['components/ScrollProgress/ScrollProgress.jsx']);
-
     const unguarded = sourceText
-      .filter(({ file, text }) => !scrubOnly.has(file) && needsOwnGuard.test(text) && !guards.test(text))
+      .filter(({ text }) => needsOwnGuard.test(text) && !guards.test(text))
       .map((o) => o.file);
 
     expect(unguarded).toEqual([]);
-  });
-
-  it('keeps low elevations flat in every theme', async () => {
-    const { themePersonalities } = await import('../utilities/themeConfig');
-    Object.values(themePersonalities).forEach((theme) => {
-      expect(theme.shadows.slice(0, 4)).toEqual(['none', 'none', 'none', 'none']);
-    });
   });
 });
 
@@ -189,6 +161,43 @@ describe('global CSS', () => {
 
   it('honours prefers-reduced-motion', () => {
     expect(read('index.css')).toMatch(/prefers-reduced-motion/);
+  });
+
+  it('keys the reduced-motion override on html.motion-off, never on a bare global rule', () => {
+    // A global `transition-duration: 0.01ms` while GSAP runs turns every GSAP
+    // style write into a CSS transition that GSAP reads back mid-flight, and
+    // delayed from() tweens then record their hidden start as their end. The
+    // hero once stayed invisible that way. The override may only apply when
+    // motion is off, which is exactly when GSAP does not run.
+    const css = read('index.css').replace(/\/\*[\s\S]*?\*\//g, '');
+    const blocks = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)].filter(([, , body]) => /(transition|animation)-duration/.test(body));
+    expect(blocks.length).toBeGreaterThan(0);
+    blocks.forEach(([, selector]) => {
+      selector
+        .split(',')
+        .map((sel) => sel.trim())
+        .forEach((sel) => expect(sel).toMatch(/^html\.motion-off\b/));
+    });
+  });
+
+  it('keys CSS transitions and animations in the stylesheets on html.motion-on', () => {
+    // So turning motion off stops them without the global override above.
+    sourceText
+      .filter(({ file }) => file.startsWith('styles/'))
+      .forEach(({ file, text }) => {
+        const css = text
+          .replace(/\/\*[\s\S]*?\*\//g, '')
+          .replace(/@keyframes[^{]+\{(?:[^{}]*\{[^}]*\})*[^}]*\}/g, '');
+        const moving = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)].filter(([, , body]) =>
+          /(^|;)\s*(transition|animation)\s*:/.test(body)
+        );
+        moving.forEach(([, selector]) => {
+          selector
+            .split(',')
+            .map((sel) => sel.trim().replace(/^@media[^{]*/, ''))
+            .forEach((sel) => expect({ file, sel }).toEqual({ file, sel: expect.stringMatching(/^html\.motion-on\b/) }));
+        });
+      });
   });
 });
 

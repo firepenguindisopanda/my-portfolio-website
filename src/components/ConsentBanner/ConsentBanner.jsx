@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Box, Button, Paper, Stack, Typography, Slide, Link } from '@mui/material';
 import { usePostHog } from '@posthog/react';
 
 /**
@@ -20,6 +19,9 @@ import { usePostHog } from '@posthog/react';
  * The consent answer itself is stored under `__ph_opt_in_out_<token>` in local
  * storage. That is "strictly necessary" storage under ePrivacy - remembering a
  * refusal is the one thing you are allowed to persist without asking first.
+ *
+ * Drawn as a slip of paper pinned to the corner of the page; it slides up when
+ * motion is on (casefile's pages.css), and simply appears when it is off.
  */
 const ConsentBanner = () => {
   const posthog = usePostHog();
@@ -45,58 +47,26 @@ const ConsentBanner = () => {
   if (!visible) return null;
 
   return (
-    <Slide direction="up" in={visible} mountOnEnter unmountOnExit>
-      <Paper
-        elevation={8}
-        role="region"
-        aria-label="Cookie consent"
-        sx={{
-          position: 'fixed',
-          zIndex: (theme) => theme.zIndex.snackbar,
-          bottom: { xs: 0, sm: 16 },
-          left: { xs: 0, sm: 16 },
-          right: { xs: 0, sm: 'auto' },
-          maxWidth: { sm: 460 },
-          p: { xs: 2, sm: 2.5 },
-          border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: { xs: 0, sm: 2 },
-        }}
-      >
-        {/* `component="p"`: subtitle2 renders as <h6> by default, which put a
-            heading in the outline ahead of the page's h1. */}
-        <Typography variant="subtitle2" component="p" sx={{ fontWeight: 700, mb: 0.75 }}>
-          Cookies
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          I use PostHog to see which projects people actually read. Accept and it
-          can recognise you across visits and record how the pages are used.
-          Decline and I still get anonymous page counts, with nothing stored on
-          your device. Either way, nothing is sold or shared.{' '}
-          <Link
-            href="https://posthog.com/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-            underline="hover"
-          >
-            PostHog&rsquo;s privacy policy
-          </Link>
-        </Typography>
-        <Stack direction={{ xs: 'column-reverse', sm: 'row' }} spacing={1}>
-          <Button onClick={reject} variant="outlined" size="small" fullWidth>
-            Decline
-          </Button>
-          <Button onClick={accept} variant="contained" size="small" fullWidth>
-            Accept
-          </Button>
-        </Stack>
-        <Box sx={{ mt: 1.5 }}>
-          <Typography variant="caption" color="text.secondary">
-            No ads, no third-party trackers.
-          </Typography>
-        </Box>
-      </Paper>
-    </Slide>
+    <section className="consent" aria-label="Cookie consent">
+      <p className="consent-title">Cookies</p>
+      <p className="consent-text">
+        I use PostHog to see which projects people actually read. Accept and it can recognise you across visits and
+        record how the pages are used. Decline and I still get anonymous page counts, with nothing stored on your
+        device. Either way, nothing is sold or shared.{' '}
+        <a href="https://posthog.com/privacy" target="_blank" rel="noopener noreferrer">
+          PostHog&rsquo;s privacy policy<span className="sr-only"> (opens in a new tab)</span>
+        </a>
+      </p>
+      <div className="consent-actions">
+        <button type="button" className="btn btn-ghost" onClick={reject}>
+          Decline
+        </button>
+        <button type="button" className="btn btn-primary" onClick={accept}>
+          Accept
+        </button>
+      </div>
+      <p className="consent-note">No ads, no third-party trackers.</p>
+    </section>
   );
 };
 

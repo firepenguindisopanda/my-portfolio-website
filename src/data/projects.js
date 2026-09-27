@@ -1,4 +1,4 @@
-import { DataScience, PostgresqlIcon, NodejsIcon, Python, Flask, Angular, MaterialUi, ReactIcon, FirebaseIcon, Windows } from '../components/SvgIcons';
+import { DataScience, PostgresqlIcon, NodejsIcon, Python, Flask, Angular, MaterialUi, ReactIcon, FirebaseIcon, Windows, Javascript } from '../components/SvgIcons';
 import widsThumbnail from '../assets/wids_2023_datathon.webp';
 import caribbeanAsrThumbnail from '../assets/zindi_caribbean_voices_hackathon.webp';
 import pokemonDashboardProPic from '../assets/pokemon_dashboard_pro_pic.webp';
@@ -9,6 +9,8 @@ import uwiScraperShot from '../assets/screenshots/uwi-scraper.webp';
 import pythonOcrShot from '../assets/screenshots/python-ocr.webp';
 import biReportingShot from '../assets/screenshots/bi-automatic-reporting.webp';
 import fastapiMockerShot from '../assets/screenshots/fastapimocker.webp';
+import timetableBuilderShot from '../assets/screenshots/timetable-builder.webp';
+import linkTrackerShot from '../assets/screenshots/link-tracker.webp';
 
 export const projects = [
   {
@@ -126,7 +128,11 @@ export const projects = [
     technologies: ['Python 3.13', 'FastAPI', 'SQLModel', 'SQLAlchemy', 'Alembic', 'Neon Postgres', 'Upstash Redis', 'asyncpg', 'pydantic-settings', 'JWT', 'pytest', 'uv'],
     thumbnail: null,
     featured: true,
-    topPick: true,
+    // No longer a top pick. It was the FastAPI-service showcase in the first
+    // row until timetable-builder shipped, which is the same shape of work at
+    // seven publications' worth of operational history, so it took the slot.
+    // The first screen holds six cards and the badge only means something if
+    // fewer than six carry it.
     githubUrl: null,
     liveUrl: 'https://fastapimocker.fastapicloud.dev/',
     markdown: '/markdowns/fastapimocker.md',
@@ -287,19 +293,19 @@ export const projects = [
   },
   {
     id: 'portfolio-website',
-    highlight: 'This site. React and MUI with four switchable theme personalities, route-level code splitting and a Vitest suite in CI.',
-    primaryTech: ['React', 'Material UI', 'Framer Motion', 'Firebase'],
+    highlight: 'This site, designed as a case file: four case stories that pin and play against the scroll, three demos to use on the page, and a Motion switch that follows the reduced-motion setting until the visitor overrides it.',
+    primaryTech: ['React', 'GSAP', 'Vite', 'Firebase'],
     title: 'Portfolio Website',
-    shortDescription: 'Personal portfolio showcasing projects and skills with modern design principles.',
+    shortDescription: 'Personal portfolio designed as a case file: scroll-driven case stories, working demos, a filterable project index and a case study behind every project.',
     category: 'Frontend',
-    technologies: ['React', 'Material UI', 'Firebase', 'Framer Motion'],
+    technologies: ['React', 'React Router', 'GSAP', 'Vite', 'Material UI', 'Recharts', 'Vitest', 'PostHog', 'Firebase'],
     thumbnail: null,
     featured: false,
     githubUrl: 'https://github.com/firepenguindisopanda/react-portfolio-website',
-    liveUrl: 'https://nicksportfolio.tech/',
+    liveUrl: 'https://nicksmith.is-a.dev/',
     markdown: '/markdowns/portfolio-website.md',
-    evidence: 'A Vitest suite runs in CI on every push, and the four theme personalities share one set of structural tokens so they cannot drift into four different websites.',
-    techIcons: [ { Icon: ReactIcon, label: 'React' }, { Icon: MaterialUi, label: 'Material UI' }, { Icon: FirebaseIcon, label: 'Firebase' } ],
+    evidence: 'Tests that read the source fail CI if an animation starts without a reduced-motion guard, if the motion override stops being keyed to the Motion switch, or if the stylesheet and theme colours drift apart.',
+    techIcons: [ { Icon: ReactIcon, label: 'React' }, { Icon: FirebaseIcon, label: 'Firebase' } ],
   },
   {
     id: 'caribbean-asr-data-science',
@@ -446,6 +452,46 @@ export const projects = [
     ],
   },
   {
+    id: 'timetable-builder',
+    highlight: 'Every published UWI timetable PDF - about 1,600 of them - extracted into a Postgres warehouse and served as a searchable explorer, a public API and a drag-to-arrange timetable builder. A corpus validator gates every load, and each session carries a count of how many independent PDFs confirmed it.',
+    primaryTech: ['FastAPI', 'PostgreSQL', 'pdfplumber', 'Vanilla JS'],
+    // The builder with four courses auto-placed: lecture, lab and tutorial
+    // blocks colour-coded across the week, rooms named on each. It is the page
+    // students actually use, so it is the one the card shows.
+    screenshot: timetableBuilderShot,
+    title: 'Timetable Builder: UWI Timetable PDFs Into a Warehouse Students Plan From',
+    shortDescription: 'Extracts UWI St. Augustine\'s CELCAT timetable PDFs - one per course, room and lecturer - into a PostgreSQL warehouse, and serves a course, room and lecturer explorer, a public JSON API, and a timetable builder that fills a week in from course codes and lets a student drag any class to another sitting. Live through seven republished timetables.',
+    description: 'UWI publishes its timetable as roughly 1,600 CELCAT PDFs and nothing lets a student ask what their week looks like for a given set of courses. This extracts every PDF with pdfplumber geometry and keyword parsing into a Postgres warehouse where sessions are stored per publication and never overwritten, so any two publications can be diffed. Off that it serves a read-only explorer, a public API, and a builder: pick courses and the week fills itself in, drag a class to any of its alternative sittings, see clashes, undo and redo, and be told what moved when UWI republishes - with the option to update while keeping what you placed yourself. Every session records which PDFs described it; 3,438 of the current 3,684 (93%) are confirmed by two or more independently published timetables. Before any load, a corpus validator cross-references every extracted room and course code against the registry UWI publishes and exits non-zero if a required field drops below 99% or a sanity check fails. The telemetry is built around a real silent failure: a missing reversed-day entry filed one PDF in five\'s Wednesday classes under Tuesday, with every field populated and nothing raised - the only symptom was a corpus-wide day histogram. Extraction now returns named diagnostics for near-misses, and a weekday-skew gate sits in the validator. A vision LLM was benchmarked against the deterministic extractor on a ten-PDF sample and lost - twelve entries missed, eight invented, every block read as one hour - so it is kept only as an admin calibration tool. 444 Python and 308 JavaScript tests.',
+    category: 'Full Stack',
+    technologies: ['Python 3.12', 'FastAPI', 'PostgreSQL', 'psycopg 3', 'pdfplumber', 'PyMuPDF', 'Jinja2', 'JavaScript', 'pytest', 'MongoDB', 'NVIDIA NIM', 'uv', 'FastAPI Cloud'],
+    thumbnail: null,
+    featured: true,
+    // Top pick in place of fastapimocker - see the note on that entry. Keep the
+    // count at five: Projects.test.jsx fails if the badge is on every one of
+    // the six first-screen cards.
+    topPick: true,
+    githubUrl: 'https://github.com/firepenguindisopanda/timetable-builder',
+    liveUrl: 'https://celcat-timetable-extraction.fastapicloud.dev/',
+    markdown: '/markdowns/timetable-builder.md',
+    evidence: 'Every session records which PDFs described it - 93% of the current publication is confirmed by two or more independently published timetables - and a corpus validator cross-references every extracted room and course code against UWI\'s own registry before a load, exiting non-zero rather than commenting.',
+    techIcons: [
+      { Icon: Python, label: 'Python' },
+      { Icon: PostgresqlIcon, label: 'PostgreSQL' },
+    ],
+    tasks: [
+      'Deterministic PDF extraction with pdfplumber geometry and keyword parsing across roughly 1,600 course, room and lecturer timetables, returning a diagnostics block that names near-misses instead of swallowing them',
+      'PostgreSQL warehouse storing sessions per publication, never overwritten, with a current_sessions view that flips on its own when a genuine republish is loaded - publication identity is the SHA-256 of the registry XML',
+      'Corpus validator that cross-references extracted rooms and course codes against the published finder.xml registry, reports coverage, malformed times, merged blocks and phantom codes, and exits non-zero below a 99% coverage gate',
+      'Sync tooling that detects a republish and pulls it, writing the registry only after every link is walked without error - a partial pull would otherwise attach changed sessions to the previous publication silently; the guard has fired in production',
+      'Timetable builder: pick courses and the week auto-places one lecture, lab and tutorial per course, drag any class to another sitting, clash detection, undo and redo, and placements the student made persisting across reloads and republishes',
+      'Republish handling for saved timetables - detects that a saved week is behind, lists what moved, and refreshes courses while keeping pins; a changes feed diffs any publication against the one before it',
+      'Explorer for courses, rooms and lecturers with a week view, teaching-weeks strip and a provenance rail on every page saying when UWI published, when it was imported and when it was last checked',
+      'Public JSON API - sessions per course with a source count on each, a changes endpoint, and an ops health endpoint - alongside key-guarded admin routes that close, not open, when the key is unset',
+      'Observability built around a real silent misfile: structured logs with correlation ids, extraction findings, and a weekday-skew gate, after a missing reversed-day entry filed one PDF in five\'s Wednesday classes under Tuesday',
+      'Content-hashed asset versioning after a deploy served new HTML against a cached old script and rendered a blank calendar over a good saved timetable; 444 Python and 308 JavaScript tests, the JS suite run in a vm context in browser load order',
+    ],
+  },
+  {
     id: 'bi-automatic-reporting',
     highlight: 'Submit a URL, get a researched business analysis as PDF and DOCX. Every stage is scored twice - a deterministic contract plus an LLM critic - and a 7-fixture eval harness gates prompt changes.',
     primaryTech: ['FastAPI', 'React 19', 'LangChain', 'NVIDIA NIM'],
@@ -542,6 +588,45 @@ export const projects = [
       'Document logic kept free of Tauri dependencies so it is testable as plain Rust, with one AppError enum serializing straight to user-facing strings',
       'Angular standalone components with lazy routes, modern @if/@for control flow, and Tauri capabilities scoped to dialog open/save only',
       'Degraded-input handling throughout: missing or empty PDFs become warnings and are skipped, unparseable files become per-file errors instead of blanking the report',
+    ],
+  },
+  {
+    id: 'link-tracker',
+    highlight: 'A Windows tool that turns 100+ hoarded browser tabs into a queue that shrinks: one keystroke saves and closes them through a native-messaging host, and a keyboard-first WPF app gives every link a decision. One local SQLite file, no account, no cloud.',
+    primaryTech: ['C# / .NET 10', 'WPF', 'SQLite', 'MV3 extension'],
+    // The Queue view of the WPF app, captured from a demo database of public
+    // links (never the real one - it holds private browsing).
+    screenshot: linkTrackerShot,
+    // The part no single screen shows - tabs leaving the browser and the
+    // queue shrinking - drawn as the case study's opening figure. See
+    // components/ProjectVisuals.
+    visual: 'link-tracker',
+    title: 'Link Tracker: 100+ Browser Tabs Into a Queue That Shrinks',
+    shortDescription: 'A self-owned Windows tool for tab hoarders. A Chrome/Edge extension saves and closes tabs with one keystroke through a .NET native-messaging host; a keyboard-first WPF app triages every link into Queue, Reference or Drop, resurfaces what has waited longest, and picks a video that fits the minutes you have. Everything lives in one local SQLite file.',
+    description: 'Two real tab dumps held 164 entries but only 99 unique pages, and a third of those were YouTube videos - so the problem was never storage, it was deciding. Link Tracker is built around that: every saved link lands in an Inbox and gets a decision (Queue, Reference or Drop), and the Queue is supposed to get shorter. Capture is a Manifest V3 extension with no build step that hands tabs to a short-lived .NET host over native messaging - no localhost server, no open port, and it works with the app closed. Each save is one transaction with a result per link, and a tab is closed only if the host confirmed it stored and the tab still shows the page that was saved; if a save fails, nothing closes. Links are identified by a normalized URL, so watch?v=, youtu.be, /shorts/ and /embed/ forms of one video merge into one row, tracking parameters are stripped, and a timestamp becomes a resume point rather than a new link. The WPF app is keyboard-first (Q, R, D, X, Ctrl+Z), reads video length and resume position captured from the player at save time, answers "I have N minutes" with the oldest queued video that fits, and once a day asks "Still want this?" about the three links that have waited longest. Link checking is in progress, designed never to mistake my own outage for link rot: a link is only marked gone after three failed checks over at least seven days, and a run that cannot reach its first five sites writes nothing. Every decision has an ADR (25), every spec has numbered acceptance criteria, and every test is named after the criterion it proves.',
+    category: 'Desktop Tools',
+    technologies: ['C#', '.NET 10', 'WPF', 'CommunityToolkit.Mvvm', 'SQLite', 'Dapper', 'Native Messaging', 'JavaScript', 'Chrome Extensions MV3', 'YouTube Data API', 'xUnit v3', 'node:test'],
+    thumbnail: null,
+    featured: true,
+    githubUrl: null,
+    liveUrl: null,
+    markdown: '/markdowns/link-tracker.md',
+    evidence: 'A tab is closed only after the host confirms its link is stored and the tab is re-read still showing that page - the whole rule is one pure, tested function - and a failed save closes nothing.',
+    techIcons: [
+      { Icon: Windows, label: 'Desktop' },
+      { Icon: Javascript, label: 'JavaScript' },
+    ],
+    tasks: [
+      'Manifest V3 extension (plain JavaScript, no build step, three permissions) that saves and closes the current tab or every unpinned tab in a window, with Alt+Shift+S and Alt+Shift+W',
+      'Native-messaging host in .NET started per save: 4-byte length-prefixed JSON over stdin/stdout, source-generated serialization for a fast start, and only listed extension IDs allowed to connect',
+      'All-or-nothing batched saves - one transaction per click with a result per link - and a close rule that keeps pinned tabs, non-web pages and any tab that changed during the save',
+      'Normalized URL identity: four YouTube URL forms merge into one video, tracking parameters are stripped, and t= becomes a resume point instead of a duplicate',
+      'Keyboard-first WPF triage app (MVVM) with Inbox, Queue, Reference, Done and Dropped views, undo, a filter that cannot triage by accident, and auto-archive of untouched Inbox links',
+      'YouTube length and resume position read from the player at save time in an isolated world, and titles, channels and thumbnails fetched 50 videos per Data API request',
+      '"I have N minutes" picks the oldest queued video that fits the time left; "Still want this?" resurfaces the three longest-waiting links once a day, and Keep sends a link to the back of the line',
+      'Link checking in progress: six outcomes, polite serial requests that never download a body, "gone" only after three failures over seven days, and an offline guard so a dead connection is never recorded as dead links',
+      'Measured on a 1,000-link database: 157-232 ms start-up and a 1.3-1.7 ms median triage keystroke; a 53-tab window saves and closes in about 1.2 s in a real browser',
+      '25 ADRs, 8 specs with numbered acceptance criteria, and tests named after the criterion they prove - xUnit v3 for .NET and the Node built-in runner for the extension',
     ],
   },
 ];

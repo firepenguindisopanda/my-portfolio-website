@@ -12,7 +12,7 @@ const DesktopPortfolio = () => {
     <CategoryPage
       eyebrow="Deep dive"
       title="Desktop tools"
-      description="Native applications for documents that should never leave the machine - no upload, no account, no server. Rust cores with Angular front ends, shipped as a single binary per platform."
+      description="Native tools for work that should never leave the machine - no upload, no account, no server. A Rust and Tauri PDF utility, and a .NET tool that turns a hundred browser tabs into a queue that shrinks."
       categories={CATEGORIES}
       surface="desktop"
       emptyMessage="Desktop work is in progress."

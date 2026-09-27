@@ -90,7 +90,7 @@ const CausalAtteChart = ({ dataPath }) => {
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
               <Chip label={`BOGO: $${data.propensity_score_matching.bogo_matched_ate.toFixed(2)}`} size="small" variant="outlined" color="primary" />
-              <Chip label={`Discount: $${data.propensity_score_matching.discount_matched_ate.toFixed(2)}`} size="small" variant="outlined" color="secondary" />
+              <Chip label={`Discount: $${data.propensity_score_matching.discount_matched_ate.toFixed(2)}`} size="small" variant="outlined" color="primary" />
               <Chip label={`Info: $${data.propensity_score_matching.informational_matched_ate.toFixed(2)}`} size="small" variant="outlined" />
             </Box>
           </Paper>

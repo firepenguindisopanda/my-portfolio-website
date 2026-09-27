@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nicksportfolio.tech/sitemap.xml
+Sitemap: https://nicksmith.is-a.dev/sitemap.xml

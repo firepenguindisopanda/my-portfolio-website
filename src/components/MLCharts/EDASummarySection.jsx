@@ -84,8 +84,9 @@ const EDASummarySection = ({ dataPath }) => {
                 {Object.values(data.methodology).map((m, i) => (
                   <Box key={i} sx={{
                     px: 1, py: 0.3, borderRadius: 1, fontSize: '0.75rem',
-                    background: alpha(theme.palette.secondary.main, 0.1),
-                    color: theme.palette.secondary.main,
+                    // Highlighter yellow is a background, never a text colour: as text it is unreadable on paper.
+                    background: alpha(theme.palette.secondary.main, 0.28),
+                    color: theme.palette.text.primary,
                   }}>
                     {m}
                   </Box>
@@ -206,8 +207,9 @@ const EDASummarySection = ({ dataPath }) => {
               {Object.values(data.methodology).map((m, i) => (
                 <Box key={i} sx={{
                   px: 1, py: 0.3, borderRadius: 1, fontSize: '0.75rem',
-                  background: alpha(theme.palette.secondary.main, 0.1),
-                  color: theme.palette.secondary.main,
+                  // Highlighter yellow is a background, never a text colour: as text it is unreadable on paper.
+                  background: alpha(theme.palette.secondary.main, 0.28),
+                  color: theme.palette.text.primary,
                 }}>
                   {m}
                 </Box>
