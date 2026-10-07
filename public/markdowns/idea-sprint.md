@@ -1,131 +1,133 @@
-# specs before code (IdeaSprinter): Multi-Agent Software Team
+# specs before code: A System-Design Learning Platform
 
-## Overview
+> A model proposes a system design and code decides whether it holds. Every
+> design is first settled as a typed plan that parser rules check, then written
+> up once by a writer whose document is checked against that plan. The status a
+> design ends with is set by code, never by the model.
 
-You describe a product idea. Eleven specialist agents (product owner, business analyst, solution architect, data architect, security analyst, UX designer, API designer, QA strategist, DevOps architect, technical writer, spec coordinator) argue their way to a full software specification you can hand to a team.
+**[Source on GitHub](https://github.com/firepenguindisopanda/idea-sprinter)**
 
-The design bet is that the hard part is not *generating* a spec. It is producing one a senior engineer will disagree with productively rather than skim and discard. Most of the system exists to make the reasoning legible, adversarial, and checkable.
+## The problem
 
-**Live Demo:** [https://idea-sprinter-web.vercel.app/](https://idea-sprinter-web.vercel.app/)
-**Frontend:** [https://github.com/firepenguindisopanda/idea-sprinter](https://github.com/firepenguindisopanda/idea-sprinter)
-**Backend:** [https://huggingface.co/spaces/ai-robotix-nick/multi-agent-system](https://huggingface.co/spaces/ai-robotix-nick/multi-agent-system)
+The first version of this project had eleven specialist agents (product owner,
+architect, security analyst and so on) each write part of a software
+specification. It looked thorough and read badly. Measured against answer keys
+for real system-design exercises, the documents passed **12 of 65** checks, and
+each one carried around eleven contradictions: eleven authors restating one
+design from eleven partial views.
+
+The second version starts from that measurement. Decide the design once, in a
+structured plan. Check the plan in code. Write it up once, from the whole plan.
+Check the writing against the plan. The agents, the graph that ran them and the
+retrieval stack behind them were removed: more than 30,000 lines.
+
+## What it does
+
+It is a place to practise system design, with a generator as the evidence for
+what good looks like.
+
+| Part | What happens |
+|---|---|
+| **Workshop** | A one-line idea goes in. "Check my idea" scores how vague it is on five dimensions; clarifying questions and a chosen direction follow; "Write the spec" produces a design spec and streams each stage live. Export as Markdown, PDF or JSON. |
+| **Practise** | Five exercises with answer keys. You draft a design, take hints, then reveal the key. A grader marks the draft against it, labelled provisional, and missed checks link to reading. A keyed exercise cannot be generated in the Workshop until you have revealed it. |
+| **Architecture Studio** | Architecture options with diagrams. You can contest an assumption, ask for the case against the recommendation, and draft a decision record that is only saved when you save it. |
+| **PRD** | A requirements conversation tailored to four kinds of user, which can hand its result to the Workshop. |
+
+A design spec has ten required sections: requirements, estimates, the core
+decision, architecture, APIs, data model, promises, failure modes, tests and
+open questions.
+
+## How a design is made
+
+A run is a few model calls, against 18 to 25 in the first version. Each model
+call is followed by checks that run in code.
+
+| Stage | The model | Then code checks |
+|---|---|---|
+| **1. The plan (ledger)** | Writes the design as one structured object in seven fields: numbers, workloads, decisions, data access, capacity, promises and replicated state. | About twenty parser rules, such as a decision with no stated cost, a reference to a number that does not exist, capacity in mismatched units, or sensitive data read outside its readers. Each finding names its rule and field, such as `decision_no_cost` on the second decision, and goes back to the model, for up to two revisions. |
+| **2. The document (writer)** | Writes the spec once, from the whole plan, with every reference already replaced by its value. | Every estimate must trace to a number in the plan; every stated sum is recomputed; comparisons must hold; the core decision must be named with its cost; every component must appear in the architecture; all ten sections must be present, within 2,500 words. Findings get one revision. |
+| **3. The status** | Nothing. | Set in code from what is left: **checked against its plan**, **plan unresolved**, **document unresolved** or **not written**. An unresolved plan is stated at the top of the document itself. |
+
+The checks are built precision first. A finding costs a revision and, if it
+survives, marks the design unresolved, so a check that cries wolf teaches people
+to ignore it. Where a rule cannot tell, it says nothing: unit conversions are
+accepted rather than guessed at.
+
+## A claim has to come from the person
+
+The same rule runs through the learning side: the model may trim what you said,
+not supply it.
+
+- **The grader.** A "yes" on an answer-key check only counts if the quote it
+  gives is really in your draft and long enough to be evidence. Otherwise it is
+  listed as unverified, not passed.
+- **Contesting the Studio.** An option only changes when the new fact is at
+  least 80% your own words. If you stated nothing new, it says so and leaves the
+  recommendation alone. Whether the recommendation changed is derived in code
+  from the model's structured answer, not asked for as a verdict.
+- **The keys.** Answer keys are split on the server, so the grader never sees
+  the explanation meant for the learner and the learner never sees the grader's
+  pass conditions.
+
+## Results
+
+Measured on five keyed exercises (10 to 15 yes/no checks each, 65 in all):
+
+| | Answer-key checks passed | Core checks passed |
+|---|---|---|
+| First version (eleven agents) | 12 of 65 | |
+| Plan, then one writer | **24 of 65** | 12 of 18 |
+
+Twice the first version, and still well short of a good design. Every generated
+document passes its own code checks, and the contradictions that remain are
+mostly ones a parser cannot see: of 70 number contradictions found across 30
+written designs, 60 were about what two numbers mean (a per-instance rate used
+as a system-wide one, a threshold met with "<" in one place and "<=" in
+another), while each number agreed with the plan. The checks say nothing where
+they cannot tell, rather than guess.
+
+## Grounding
+
+There is no vector store. A corpus of 143 reference chunks, each with its
+source, licence and link (Azure architecture patterns and antipatterns, the
+System Design Primer, nine sets of book rules and notes written for the
+project), backs the
+Studio and the reading links. An optional context pack lets one call choose up
+to five chunks for a run; code drops unknown ids, anything that would give away
+an exercise, and anything over budget.
+
+## Engineering
+
+- **Durable runs.** A run is a database row that owns the work; its events are
+  stored with sequence numbers, so a page that reloads mid-run replays from where
+  it left off, and a run can be cancelled.
+- **Prompt injection.** Anything that came from outside is marked as data, and a
+  suite of 24 canary cases checks it by string search, not by asking a model.
+- **Cost.** Token budgets are checked whenever a model is built, and a budget
+  refusal ends a run cleanly.
+- **Resilience.** Retries and circuit breakers around every model call.
+- **The rest.** Google sign-in with JWT sessions, SQLAlchemy and Alembic on
+  Postgres, Docker on a Hugging Face Space for the API, the frontend on Vercel.
 
 | | |
 |---|---|
-| Backend | ~22,200 lines of Python (FastAPI, LangGraph, 3.12+) |
-| Frontend | ~19,400 lines of TypeScript (Next.js 16, React 19) |
-| Tests | 50 backend test modules, 18 frontend suites, Playwright E2E |
-| Agents | 11 specialists + 4 auxiliary (critic, skeptic, quality judge, verdict judge) |
-| Deployment | Docker on Hugging Face Spaces; frontend on Vercel |
+| Backend | About 19,600 lines of Python, 64 test modules |
+| Frontend | About 15,300 lines of TypeScript, 34 Vitest test files and a Playwright suite |
+| API | 16 routers |
 
----
+## Limitations
 
-## Tech Stack
+- A design takes 14 to 28 minutes and 80,000 to 150,000 tokens on the current
+  model, which is slow for a learner waiting on it.
+- The generator passes 37% of the answer-key checks. The code checks keep it
+  consistent with its own plan; they cannot make the plan right.
+- The grader's marks are labelled provisional, and its model is still an open
+  choice.
+- The injection suite and the 2,500-word limit have not yet been measured on
+  live runs of the new path.
 
-**Backend**: FastAPI, LangGraph `StateGraph`, LangChain, NVIDIA NIM (chat + `nv-embed` embeddings), Pinecone, SQLAlchemy + Alembic, Upstash Redis, NetworkX, Pydantic, `python-jose` + `passlib`, fpdf2, Docker.
+## Stack
 
-**Frontend**: Next.js 16 (App Router), React 19 with the React Compiler, TypeScript, Tailwind CSS v4, shadcn/ui + Radix primitives, Zustand, TanStack Form, Streamdown with Mermaid rendering, Vitest, Playwright, PWA support.
-
----
-
-## Orchestration: three phases, not a chain
-
-The pipeline is a LangGraph `StateGraph` with a deliberate phase structure rather than one long sequential chain. Phases 2 and 3 fan out through LangGraph's `Send` API, so five architecture specialists run concurrently instead of queuing behind each other.
-
-```
-Phase 1  Foundation    Project Refiner -> Product Owner            (sequential)
-Phase 2  Architecture  Business Analyst, Solution Architect,
-                       Data Architect, Security Analyst, UX        (parallel via Send)
-Phase 3  Contracts     API Designer, QA Strategist,
-                       DevOps Architect, Spec Coordinator          (parallel via Send)
-```
-
-Two rules the rewrite enforces: no file-based IPC between agents, and no inline LLM calls outside graph nodes. Every model call is a node with state in and state out, which is what makes the run inspectable and resumable.
-
-Agent personas are **markdown files**, not string literals (`app/prompts/solution_architect.md` and friends), loaded by a prompt loader, so a persona can be revised without touching Python.
-
----
-
-## The defensible recommender
-
-The Architecture Studio originally did what most AI tools do: show a name, some pros and cons, and a score of 8. That gives the user nothing to reason against. It was rebuilt in four deliberately ordered steps.
-
-**1. Show the reasoning.** Options come with explicit justifications and *stated assumptions*, generated by the solution architect at `temperature=0.4` and scored by a separate judge model at `temperature=0.1`: structured creativity for proposals, determinism for evaluation.
-
-**2. Argue against it.** `SkepticAgent.attack()` already existed in the SRS pipeline, where its output is hidden from the user. On this page that output *is* the point: the strongest case against the recommendation sits next to the recommendation.
-
-**3. Let the user push back.** The user asserts that a stated assumption is wrong, and the model must either revise or defend. The response is schema-constrained on purpose; asked in free text, a model reliably produces agreeable waffle. Two fields are forced apart:
-
-```python
-assumption_was_wrong: bool   # did the correction invalidate the assumption?
-changes_recommendation: bool # does that change which option is right?
-```
-
-Collapsed into one verdict, the model conflated them: told "we do have someone on call", it accepted the correction *and* withdrew a recommendation the correction did not undermine. Accepting a fact and changing a conclusion are different judgements.
-
-**4. Write it down, last.** An ADR is drafted from the session's reasoning trail, and deliberately *not* persisted until the user edits and saves it. Capturing a decision before the reasoning was legible would have recorded a click. The model is also not asked to restate the contested exchanges or which options were rejected; both are taken verbatim from session history, because a model asked to restate facts already in hand will eventually restate them wrong.
-
----
-
-## Quality machinery
-
-**Sufficiency-based judging.** The judge asks "is there enough here to proceed?", not "is this technically perfect?". Perfectionist judging deadlocks a non-technical founder who genuinely cannot answer a question about their data retention policy.
-
-**Persona-tailored intake.** Four personas (Founder, Product Manager, Developer, Non-Technical PM) each get a question bank written in their own register, with follow-ups and worked examples. The founder gets *"What problem does your product solve, and who is it for?"*; the developer gets the technical version.
-
-**QualityEngine.** Deterministic scoring on readability (ARI) plus budget enforcement, with a domain-term whitelist of 100+ software engineering terms. Words like "microservices" and "containerization" inflate readability scores by syllable count alone, so they are swapped for short placeholders first; the score then measures *structural* complexity rather than vocabulary density.
-
-**ConsistencyValidator.** Purely deterministic, no LLM calls. Agents write into role-scoped sub-graphs of a NetworkX knowledge graph, and the validator sweeps them for cross-agent contradictions before SRS assembly, catching the case where the data architect and the security analyst have quietly assumed different things. Writes are append-only; no code path mutates another agent's entities.
-
-**Vagueness evaluation.** The Workshop Studio scores how underspecified an idea is before generation runs, rather than letting eleven agents elaborate confidently on nothing.
-
----
-
-## RAG grounding
-
-Two retrieval layers over Pinecone with NVIDIA embeddings:
-
-- **Role corpora**: ten per-role corpora (`corpus_rag/solution_architect/`, `.../security_analyst/`, ...) so each agent retrieves against its own discipline instead of one undifferentiated pile.
-- **Engineering books**, indexed in three variants per title: *nano* (2-5 KB) injected as prompt guardrails, *mini* (5-8 KB) used as judge rubrics, *full* (11-62 KB) chunked for retrieval. Cheap guidance is always present; expensive guidance is fetched only when it earns its tokens.
-
-Agent skills follow the same progressive-disclosure pattern: frontmatter always loaded (~50 words), summary on activation, full content only on demand.
-
----
-
-## Operations
-
-Not usually present in a portfolio project, and the reason this one is worth reading:
-
-| Concern | Implementation |
-|---|---|
-| **SLOs** | Error-budget tracking per operation: 99.9% success target on HTTP requests, separate budget for agent execution, with warning and critical thresholds |
-| **Cost control** | Token accounting per request and in aggregate, monthly budget enforcement, provider fallback, batching, cost alerts |
-| **Resilience** | Retry decorators, circuit breakers, graceful degradation when the LLM endpoint is unavailable |
-| **Caching** | Upstash Redis for session state and the architecture pattern library, with a cache-management API |
-| **Observability** | Structured logging, performance monitor, quality dashboard endpoints, audit trail |
-| **Human-in-the-loop** | Checkpoint records with explicit approve/reject endpoints at pipeline boundaries |
-
----
-
-## API surface
-
-Fifteen routers, including:
-
-| Router | Purpose |
-|---|---|
-| `/prd` | Persona-driven PRD generation |
-| `/architecture` | Sessions, generation, compare, refine, chat, **contest**, **challenge**, ADR draft/save, pattern library |
-| `/workspace` | Workshop Studio: clarify, directions, generate, refine, vagueness evaluate |
-| `/checkpoints` | Create, approve, reject: human gates between phases |
-| `/oracle` | Free-form advisory chat backed by the role prompts |
-| `/quality-dashboard`, `/slo`, `/token-usage`, `/cache` | Operational surfaces |
-| `/downloads` | Markdown and PDF export of assembled specs |
-
----
-
-## Frontend
-
-Next.js App Router with routes for ideation, PRD, generator, architecture, workspace, dashboard and profile. Live per-agent progress with judge verdicts (Approved / Needs Revision) and inline feedback, Mermaid diagram rendering inside streamed markdown, draft persistence so a refresh does not lose work, and Zustand stores for auth, draft and workspace state.
-
-Tested with Vitest across 18 suites (stores, API clients, forms, decision records, ideation flows) plus Playwright end-to-end coverage.
-
+FastAPI, Python 3.12, LangChain (messages and the NVIDIA connector), NVIDIA NIM,
+SQLAlchemy, Alembic, PostgreSQL, Upstash Redis, Docker; Next.js 16, React 19,
+TypeScript, Tailwind CSS v4, Vitest, Playwright.

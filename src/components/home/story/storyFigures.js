@@ -16,7 +16,8 @@ import { gsap, gsapEnabled } from '../../../utilities/gsapSetup';
  * Numbers are real and come from data, never retyped: the timetable sessions
  * are the ones in the timetable-builder screenshot, the fraud figures are
  * data/workedExample.js (itself checked against the analysis artifact by a
- * test), and the agent graph follows the idea-sprint case study's phase table.
+ * test), and the design path follows the idea-sprint case study's table of how
+ * a design is made.
  */
 
 export const C = {
@@ -156,64 +157,63 @@ const vizFraud = ({ accPct, caught, frauds, datasets }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/* 3. idea-sprint: the case study's phase table, a skeptic, an ADR      */
+/* 3. idea-sprint: a plan checked in code, then a spec checked against it */
 /* ------------------------------------------------------------------ */
-// Project Refiner -> Product Owner, then five architecture and four contract
-// specialists fanned out in parallel - eleven in all. The skeptic is not one
-// of them: it is an auxiliary agent that argues against the Solution
-// Architect's (index 3) recommendation, so it is drawn apart, as node 11.
-const N3 = [[70, 210], [70, 330], [190, 110], [190, 190], [190, 270], [190, 350], [190, 430], [310, 130], [310, 220], [310, 310], [310, 400], [262, 262]];
-const PH = [[0, 1], [2, 3, 4, 5, 6], [7, 8, 9, 10]];
-const SKEP = 11;
-const E3 = [[0, 1, 'p1'], [1, 2, 'fan'], [1, 3, 'fan'], [1, 4, 'fan'], [1, 5, 'fan'], [1, 6, 'fan'], [2, 7, 'p23'], [3, 8, 'p23'], [5, 9, 'p23'], [6, 10, 'p23']];
-const trimSeg = (x1, y1, x2, y2, a, b) => {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  const L = Math.sqrt(dx * dx + dy * dy);
-  const ux = dx / L;
-  const uy = dy / L;
-  return [x1 + ux * a, y1 + uy * a, x2 - ux * b, y2 - uy * b];
-};
-const lineEl = (s, set, stroke, w, op) =>
-  `<line class="c3-edge" data-set="${set}" x1="${s[0].toFixed(1)}" y1="${s[1].toFixed(1)}" x2="${s[2].toFixed(1)}" y2="${s[3].toFixed(1)}" stroke="${stroke}" stroke-width="${w}"${op ? ` opacity="${op}"` : ''}/>`;
+// The design path of specs before code, as its case study's "How a design is
+// made" table has it: the model writes the plan (the ledger, seven typed
+// fields); parser rules check it and send findings back by field, up to two
+// revisions; one writer writes the spec from the plan; code checks the spec
+// against it, one revision; the status is set in code.
+const LEDGER = ['numbers', 'workloads', 'decisions', 'data access', 'capacity', 'promises', 'replicated state'];
+const FIND_ROW = 2; // the decisions row: where the drawn finding lands
+const SPEC = ['requirements', 'estimates', 'core decision', 'architecture', 'APIs', 'data model', 'promises', 'failure modes', 'tests', 'open questions'];
+const L3 = { x: 156, w: 196, y: 100, rh: 38 };
+const D3 = { x: 404, w: 212, y: 150, rh: 25 };
 
-const vizAgents = () => {
+const vizPlan = () => {
   let g = '';
-  ['foundation', 'architecture', 'contracts'].forEach((nm, k) => {
-    const x = N3[PH[k][0]][0];
-    g += `<g class="c3-phase">${tx(x, 60, `phase ${k + 1}`, { size: 10.5, anchor: 'middle', fill: C.moon, weight: 600 })}${tx(x, 76, nm, { size: 10, anchor: 'middle' })}</g>`;
+  [['brief', 70], ['plan', L3.x + L3.w / 2], ['spec', D3.x + D3.w / 2]].forEach(([nm, x], k) => {
+    g += `<g class="c3-phase">${tx(x, 60, nm, { size: 10.5, anchor: 'middle', fill: C.moon, weight: 600 })}${tx(x, 76, ['one line in', 'model writes, code checks', 'written once, then checked'][k], { size: 10, anchor: 'middle' })}</g>`;
   });
-  g += tx(616, 60, `${N3.length - 1} agents + skeptic`, { size: 10.5, anchor: 'end', fill: C.moon });
-  E3.forEach((e) => {
-    const a = N3[e[0]];
-    const b = N3[e[1]];
-    g += lineEl(trimSeg(a[0], a[1], b[0], b[1], 15, 15), e[2], C.moon2, 1.3, 0.8);
+  // The brief: a one-line idea.
+  g += `<g class="c3-brief"><rect x="22" y="112" width="96" height="64" fill="${C.paperHi}" stroke="${C.paperRule}"/>` +
+    `<text class="serif" x="34" y="138" font-size="17" fill="${C.ink}">an idea</text>` +
+    '<rect x="34" y="150" width="70" height="5" rx="1" fill="#AEB7C2"/><rect x="34" y="161" width="52" height="5" rx="1" fill="#AEB7C2"/></g>';
+  g += `<path class="c3-edge" data-set="in" d="M 120 144 L ${L3.x - 6} 144" fill="none" stroke="${C.moon2}" stroke-width="1.3"/>`;
+  // The ledger: seven typed fields, each ticked once the parser rules pass.
+  const lh = L3.rh * LEDGER.length + 34;
+  g += `<g class="c3-ledger"><rect x="${L3.x}" y="${L3.y}" width="${L3.w}" height="${lh}" rx="3" fill="${C.night2}" stroke="${C.moon2}" stroke-width="1.3"/>` +
+    tx(L3.x + 14, L3.y + 22, 'LEDGER', { size: 10.5, fill: C.moon, weight: 600, ls: 1.5 }) + '</g>';
+  LEDGER.forEach((f, k) => {
+    const y = L3.y + 48 + k * L3.rh;
+    g += `<g class="c3-field">${tx(L3.x + 14, y + 4, f, { size: 11, fill: C.moon })}<rect x="${L3.x + 14}" y="${y + 11}" width="${[96, 120, 84, 108, 90, 116, 72][k]}" height="4" rx="1" fill="${C.rule}"/></g>` +
+      `<g class="c3-tick"><circle cx="${L3.x + L3.w - 20}" cy="${y}" r="7" fill="${C.hl}"/><path d="M${L3.x + L3.w - 23.5} ${y} l2.5 2.6 l4.5 -5" fill="none" stroke="${C.ink}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>`;
   });
-  PH[2].forEach((n, k) => {
-    const a = N3[n];
-    g += lineEl(trimSeg(a[0], a[1], 440, 170 + k * 60, 15, 0), 'adr', C.hl, 1.2, 0.7);
+  // The finding the rules send back, by field name. Shown only while the
+  // timeline plays it: in the final state the revision has resolved it.
+  const fy = L3.y + 48 + FIND_ROW * L3.rh;
+  g += `<g class="c3-find" opacity="0"><rect x="${L3.x + 64}" y="${fy - 11}" width="106" height="20" rx="2" fill="#3A1520" stroke="${C.red}" stroke-width="1.5"/>` +
+    tx(L3.x + 117, fy + 3, 'decision_no_cost', { size: 9.5, anchor: 'middle', fill: C.redLight, weight: 600 }) + '</g>';
+  // Findings go back to the model: up to two revisions.
+  g += `<path class="c3-loop" d="M ${L3.x + 40} ${L3.y + lh + 6} C ${L3.x + 40} ${L3.y + lh + 46}, ${L3.x + L3.w - 40} ${L3.y + lh + 46}, ${L3.x + L3.w - 40} ${L3.y + lh + 10}" fill="none" stroke="${C.redLight}" stroke-width="1.6"/>` +
+    `<path class="c3-loophead" d="M${L3.x + L3.w - 40} ${L3.y + lh + 8} l-4.6 8.4 l9.2 0 Z" fill="${C.redLight}"/>` +
+    tx(L3.x + L3.w / 2, L3.y + lh + 60, 'findings go back by field, up to 2 revisions', { size: 10, anchor: 'middle', fill: C.redLight, cls: 'c3-looplab' });
+  g += `<path class="c3-edge" data-set="out" d="M ${L3.x + L3.w + 4} 244 L ${D3.x - 6} 244" fill="none" stroke="${C.moon2}" stroke-width="1.3"/>`;
+  // The spec: ten required sections, each checked against the plan.
+  const dh = D3.rh * SPEC.length + 66;
+  g += `<g class="c3-doc"><rect x="${D3.x}" y="100" width="${D3.w}" height="${dh}" fill="${C.paperHi}" stroke="${C.paperRule}"/>` +
+    `<text class="serif" x="${D3.x + 16}" y="134" font-size="24" fill="${C.ink}">Design spec</text></g>`;
+  SPEC.forEach((sec, k) => {
+    const y = D3.y + 8 + k * D3.rh;
+    g += `<g class="c3-part">${tx(D3.x + 16, y, sec, { size: 9.5, fill: C.graphite, weight: 600 })}<rect x="${D3.x + 16}" y="${y + 5}" width="${[150, 120, 96, 142, 110, 128, 100, 136, 90, 118][k]}" height="4" rx="1" fill="#AEB7C2"/></g>` +
+      `<path class="c3-dtick" d="M${D3.x + D3.w - 26} ${y - 3} l3 3.2 l6 -7" fill="none" stroke="${C.graphite}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
   });
-  g += `<path class="c3-obj" d="M 256 250 C 250 226, 230 206, 204 196" fill="none" stroke="${C.red}" stroke-width="2"/>` +
-    `<path class="c3-objhead" d="M204 196 L213.2 193.6 L210.6 201.2 Z" fill="${C.red}"/>` +
-    tx(268, 236, 'objection', { size: 10.5, fill: C.redLight, weight: 600, cls: 'c3-objlab' });
-  N3.forEach((n, k) => {
-    const sk = k === SKEP;
-    g += `<g class="c3-node"><circle class="c3-ring" cx="${n[0]}" cy="${n[1]}" r="13" fill="${sk ? '#3A1520' : C.night2}" stroke="${sk ? C.red : C.hl}" stroke-width="2"/>` +
-      `<circle class="c3-core" cx="${n[0]}" cy="${n[1]}" r="4" fill="${sk ? C.redLight : C.moon}"/></g>`;
-  });
-  g += `<g class="c3-lab">${tx(190, 226, 'recommender', { size: 10.5, anchor: 'middle', fill: C.moon })}${tx(262, 294, 'skeptic', { size: 10.5, anchor: 'middle', fill: C.redLight, weight: 600 })}</g>`;
-  g += `<g class="c3-sweep" opacity="0"><rect x="-4" y="92" width="8" height="356" fill="${C.hl}" opacity=".12"/><line x1="0" x2="0" y1="92" y2="448" stroke="${C.hl}" stroke-width="2"/>${tx(6, 104, 'validator', { size: 10.5, fill: C.hl, weight: 600 })}</g>`;
-  g += `<g class="c3-doc"><rect x="440" y="100" width="176" height="300" fill="${C.paperHi}" stroke="${C.paperRule}"/>` +
-    `<text class="serif" x="458" y="142" font-size="30" fill="${C.ink}">ADR</text>${tx(458, 160, 'decision record', { size: 9.5, fill: C.graphite })}</g>`;
-  ['context', 'decision', 'consequences'].forEach((s, k) => {
-    const y0 = 190 + k * 66;
-    const w = [[138, 116, 82], [120, 140, 66], [142, 98, 124]][k];
-    g += `<g class="c3-part">${tx(458, y0, s, { size: 9.5, fill: C.graphite, weight: 600 })}${w.map((ww, j) => `<rect x="458" y="${y0 + 9 + j * 11}" width="${ww}" height="5" rx="1" fill="#AEB7C2"/>`).join('')}</g>`;
-  });
-  g += '<g transform="translate(528 452) rotate(-5)"><g class="c3-approve">' +
-    `<rect x="-86" y="-20" width="172" height="40" rx="3" fill="rgba(11,18,32,.92)" stroke="${C.hl}" stroke-width="2.5"/>` +
-    `<path d="M-72 0 l6 6 l11 -12" fill="none" stroke="${C.hl}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>` +
-    `${tx(-48, 5, 'APPROVED BY YOU', { size: 12.5, fill: C.hl, weight: 600, ls: 1 })}</g></g>`;
+  g += tx(D3.x + D3.w / 2, 100 + dh + 18, 'checked against the plan, 1 revision', { size: 10, anchor: 'middle', fill: C.moon2, cls: 'c3-doclab' });
+  // The status, set in code.
+  g += '<g transform="translate(486 486) rotate(-4)"><g class="c3-approve">' +
+    `<rect x="-124" y="-20" width="248" height="40" rx="3" fill="rgba(11,18,32,.92)" stroke="${C.hl}" stroke-width="2.5"/>` +
+    `<path d="M-110 0 l6 6 l11 -12" fill="none" stroke="${C.hl}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `${tx(-86, 5, 'CHECKED AGAINST ITS PLAN', { size: 11.5, fill: C.hl, weight: 600, ls: 0.6 })}</g></g>`;
   return svg(g);
 };
 
@@ -355,45 +355,37 @@ const tlFraud = (fig, { accPct }) => {
   return tl;
 };
 
-const tlAgents = (fig) => {
+const tlPlan = (fig) => {
   const q = (s) => $$(s, fig);
   const tl = newTL();
   if (!tl) return null;
-  const nodes = q('.c3-node');
-  const rings = q('.c3-ring');
   const phases = q('.c3-phase');
   const edges = q('.c3-edge');
   const edgeSet = (s) => edges.filter((e) => e.getAttribute('data-set') === s);
-  const pick = (idx) => idx.map((k) => nodes[k]);
+  const ticks = q('.c3-tick');
   const pop = { scale: 0, opacity: 0, transformOrigin: '50% 50%' };
-  const popTo = { scale: 1, opacity: 1, duration: 0.05, stagger: 0.015, ease: 'back.out(2.2)' };
-  rings.forEach((r, k) => {
-    if (k === SKEP) return;
-    tl.fromTo(r, { attr: { stroke: C.moon2 } }, { attr: { stroke: C.hl }, duration: 0.02 }, 0.56 + ((N3[k][0] - 36) / 308) * 0.12);
+  // 1. The model writes the plan, field by field.
+  draw(tl, edgeSet('in'), 0.02, 0.06);
+  tl.fromTo(phases[1], { opacity: 0 }, { opacity: 1, duration: 0.04 }, 0.04);
+  tl.fromTo(q('.c3-ledger'), { opacity: 0 }, { opacity: 1, duration: 0.04 }, 0.06);
+  tl.fromTo(q('.c3-field'), { x: -18, opacity: 0 }, { x: 0, opacity: 1, duration: 0.04, stagger: 0.025 }, 0.08);
+  // 2. Code checks it: the rows pass, one finding goes back by name and is revised.
+  ticks.forEach((t, k) => {
+    const at = k === FIND_ROW ? 0.5 : 0.3 + k * 0.022;
+    tl.fromTo(t, pop, { scale: 1, opacity: 1, duration: 0.03, ease: 'back.out(2.2)' }, at);
   });
-  draw(tl, edgeSet('p1'), 0.02, 0.07, 0.03);
-  tl.fromTo(phases[1], { opacity: 0 }, { opacity: 1, duration: 0.04 }, 0.1);
-  tl.fromTo(pick(PH[1]), pop, popTo, 0.1);
-  tl.fromTo(q('.c3-lab'), { opacity: 0 }, { opacity: 1, duration: 0.04 }, 0.15);
-  draw(tl, edgeSet('fan'), 0.14, 0.08, 0.02);
-  tl.fromTo(phases[2], { opacity: 0 }, { opacity: 1, duration: 0.04 }, 0.22);
-  tl.fromTo(pick(PH[2]), pop, popTo, 0.22);
-  draw(tl, edgeSet('p23'), 0.26, 0.07, 0.015);
-  tl.fromTo(nodes[SKEP], pop, popTo, 0.34);
-  tl.fromTo(rings[SKEP], { attr: { stroke: C.moon2, fill: C.night2 } }, { attr: { stroke: C.red, fill: '#3A1520' }, duration: 0.04 }, 0.38);
-  tl.fromTo(nodes[SKEP].querySelector('.c3-core'), { attr: { fill: C.moon } }, { attr: { fill: C.redLight }, duration: 0.04 }, 0.38);
-  tl.fromTo(nodes[SKEP], { scale: 1 }, { scale: 1.3, duration: 0.04, transformOrigin: '50% 50%', immediateRender: false }, 0.38);
-  tl.to(nodes[SKEP], { scale: 1, duration: 0.05 }, 0.43);
-  draw(tl, q('.c3-obj'), 0.44, 0.09);
-  tl.fromTo(q('.c3-objhead, .c3-objlab'), { opacity: 0 }, { opacity: 1, duration: 0.04 }, 0.5);
-  const sweep = q('.c3-sweep');
-  tl.fromTo(sweep, { x: 36 }, { x: 344, duration: 0.12, ease: 'none' }, 0.56);
-  tl.fromTo(sweep, { opacity: 0 }, { opacity: 1, duration: 0.015 }, 0.56);
-  tl.to(sweep, { opacity: 0, duration: 0.02 }, 0.68);
-  tl.fromTo(q('.c3-approve'), { scale: 2.2, opacity: 0, transformOrigin: '50% 50%' }, { scale: 1, opacity: 1, duration: 0.07, ease: 'power3.in' }, 0.7);
-  tl.fromTo(q('.c3-doc'), { scaleY: 0.02, opacity: 0, transformOrigin: '50% 0%' }, { scaleY: 1, opacity: 1, duration: 0.07 }, 0.79);
-  tl.fromTo(q('.c3-part'), { x: -26, opacity: 0 }, { x: 0, opacity: 1, duration: 0.06, stagger: 0.035 }, 0.85);
-  draw(tl, edgeSet('adr'), 0.8, 0.08, 0.015);
+  tl.fromTo(q('.c3-find'), { opacity: 0, scale: 1.4, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: 0.03 }, 0.33);
+  draw(tl, q('.c3-loop'), 0.37, 0.08);
+  tl.fromTo(q('.c3-loophead, .c3-looplab'), { opacity: 0 }, { opacity: 1, duration: 0.03 }, 0.43);
+  tl.to(q('.c3-find'), { opacity: 0, duration: 0.03 }, 0.47);
+  // 3. One writer writes the spec, and code checks it against the plan.
+  draw(tl, edgeSet('out'), 0.56, 0.05);
+  tl.fromTo(phases[2], { opacity: 0 }, { opacity: 1, duration: 0.04 }, 0.58);
+  tl.fromTo(q('.c3-doc'), { scaleY: 0.02, opacity: 0, transformOrigin: '50% 0%' }, { scaleY: 1, opacity: 1, duration: 0.06 }, 0.6);
+  tl.fromTo(q('.c3-part'), { x: -20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.04, stagger: 0.014 }, 0.65);
+  draw(tl, q('.c3-dtick'), 0.8, 0.03, 0.006);
+  tl.fromTo(q('.c3-doclab'), { opacity: 0 }, { opacity: 1, duration: 0.03 }, 0.86);
+  tl.fromTo(q('.c3-approve'), { scale: 2.2, opacity: 0, transformOrigin: '50% 50%' }, { scale: 1, opacity: 1, duration: 0.07, ease: 'power3.in' }, 0.9);
   tl.to({}, { duration: 0.02 }, 0.98);
   return tl;
 };
@@ -458,7 +450,6 @@ export const buildChapters = ({ projects, worked, linkTrackerImage }) => {
   const caught = NULL_MODEL.fraudCaught;
   const frauds = NULL_MODEL.fraudPresent;
   const pdfCount = pick(/about\s+([\d,]+)/i, pTT.highlight, '1,600');
-  const agentWord = pick(/^(\w+)\s+specialist agents/i, pIS.highlight, 'Eleven');
   const tabCount = pick(/(\d+\+)\s+(?:hoarded\s+)?browser tabs/i, pLT.highlight, '100+');
   const fraudIntro =
     `A classifier that always answers "not fraud" scores ${accPct}% accuracy on this data and catches ${caught} of the ${frauds} frauds in the test split. ` +
@@ -492,13 +483,13 @@ export const buildChapters = ({ projects, worked, linkTrackerImage }) => {
     },
     {
       project: pIS,
-      short: 'Agents',
-      title: `${agentWord} agents argue a spec`,
+      short: 'Specs',
+      title: 'The model proposes, code decides',
       body: [pIS.highlight],
-      steps: [`${agentWord} agents work through three phases`, 'A skeptic builds the case against the recommendation', 'You contest or accept it, then the ADR is drafted'],
-      bounds: [0.36, 0.69],
-      figure: () => vizAgents(),
-      timeline: (fig) => tlAgents(fig),
+      steps: ['The model writes the plan in seven typed fields', 'Code checks it and sends findings back by field', 'One writer writes the spec, checked against the plan'],
+      bounds: [0.3, 0.56],
+      figure: () => vizPlan(),
+      timeline: (fig) => tlPlan(fig),
     },
     {
       project: pLT,

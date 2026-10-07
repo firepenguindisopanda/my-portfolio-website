@@ -24,7 +24,7 @@ This site, designed as a case file. Employers and clients skim a portfolio in we
 ## What is on the page
 
 - **The cover**: name, role and the thesis, with three evidence rows that each open the case study behind them.
-- **Four cases**: four projects told as stories on one stage that stays in place while you scroll: each figure plays against the scroll, holds on its result, and the next case takes its place: timetable PDFs cross-checked into a confirmed session, a fraud threshold chosen by cost, a multi-agent graph with its skeptic, a queue of saved tabs getting shorter. Every figure is drawn from the project's real data.
+- **Four cases**: four projects told as stories on one stage that stays in place while you scroll: each figure plays against the scroll, holds on its result, and the next case takes its place: timetable PDFs cross-checked into a confirmed session, a fraud threshold chosen by cost, a design plan checked in code before a spec is written from it, a queue of saved tabs getting shorter. Every figure is drawn from the project's real data.
 - **Try it**: three projects small enough to use on the page: the Chimp Test, Link Tracker's keyboard triage (Q, R, D and X, as in the real app) and the timetable builder's drag, with clashes marked. They run on example data and work by keyboard and touch.
 - **The index**: every featured project, filterable by category. Pointing at a row in "More projects" floats its screenshot beside the cursor.
 - Experience, skills, placings and contact, then a case study like this one for every project.
