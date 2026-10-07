@@ -4,8 +4,11 @@ import { usePostHog } from '@posthog/react';
 /**
  * Cookie consent for analytics.
  *
- * PostHog is initialised with `cookieless_mode: 'on_reject'`, which makes the
- * three states behave like this:
+ * PostHog is initialised with `cookieless_mode: 'on_reject'` and
+ * `opt_out_capturing_by_default: true` (utilities/posthogOptions.js), which
+ * make the three states behave like this (the second setting is what makes
+ * "pending" count: without it nothing is captured until the banner is
+ * answered; __tests__/analytics.test.js checks all three):
  *
  *   pending  - treated as opted out, so nothing is written to cookies or local
  *              storage, but events still flow in cookieless mode. Identity is a
