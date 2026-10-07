@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ProjectDetail from '../pages/ProjectDetail';
@@ -89,10 +89,19 @@ describe('ProjectDetail Page', () => {
 
     renderWithRouter('test-project');
     expect(screen.getByRole('heading', { level: 1, name: 'Test Project' })).toBeInTheDocument();
-    // The spec table states what a reader can do with it right now.
-    expect(screen.getByText('Deployed and reachable')).toBeInTheDocument();
+    // The spec table states what a reader can do with it right now, and the
+    // file summary beside the write-up repeats it, links and all, in reach.
+    const summary = screen.getByRole('complementary', { name: 'File summary and contents' });
+    expect(screen.getAllByText('Deployed and reachable')).toHaveLength(2);
+    expect(within(summary).getByText('Deployed and reachable')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /open the live site/i })).toHaveAttribute('href', 'https://test-project.com');
-    expect(screen.getByRole('link', { name: /source/i })).toHaveAttribute('href', 'https://github.com/test/project');
+    expect(within(summary).getByRole('link', { name: /live site/i })).toHaveAttribute('href', 'https://test-project.com');
+    expect(screen.getAllByRole('link', { name: /^source/i }).map((a) => a.getAttribute('href'))).toEqual([
+      'https://github.com/test/project',
+      'https://github.com/test/project',
+    ]);
+    // A one-heading write-up has no contents rail, but still has its summary.
+    expect(within(summary).queryByRole('navigation', { name: 'On this page' })).toBeNull();
   });
 
   it('shows error message when markdown fails to load', async () => {

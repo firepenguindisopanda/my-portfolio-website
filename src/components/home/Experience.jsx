@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { workExperiences } from '../../data/experience';
+import { roleGroups } from '../../data/experience';
 import { CollapseIcon, ExpandIcon } from '../site/icons';
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
@@ -18,14 +18,7 @@ import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
  * drawn and every dot is lit.
  */
 
-const groupKey = (e) => (e.group ? `group:${e.group.id}` : `role:${e.title}|${e.organization}`);
-
-const groups = workExperiences.reduce((acc, e) => {
-  const last = acc[acc.length - 1];
-  if (last && last.key === groupKey(e)) last.parts.push(e);
-  else acc.push({ key: groupKey(e), id: e.id, title: e.group?.title || e.title, organization: e.organization, parts: [e] });
-  return acc;
-}, []);
+const groups = roleGroups;
 
 const year = (s) => {
   const m = String(s).match(/\d{4}/g);

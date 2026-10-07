@@ -44,6 +44,8 @@ POSES.cheer = { ...POSES.sit, ra: -138, la: 138, head: -6, blink: 1 };
 POSES.coverEyes = { ...POSES.sit, ra: -192, la: 192, duck: 8, blink: 1 };
 // Waking up: a big stretch with the eyes still shut.
 POSES.stretch = { ...POSES.sit, ra: -104, la: 104, head: 8, blink: 1, lift: -3 };
+// The 404: in the filing drawer, head on one side, looking for something that is not there.
+POSES.puzzled = { ...POSES.sit, ra: 10, la: -10, head: 11, tilt: 3, duck: 2, look: -0.8 };
 
 const set = (el, value) => el && el.setAttribute('transform', value);
 

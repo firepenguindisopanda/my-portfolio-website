@@ -1,5 +1,5 @@
 import React from 'react';
-import { LuArrowBigUp, LuArrowDown, LuArrowLeft, LuArrowRight, LuArrowUpRight, LuMinus, LuPlus } from 'react-icons/lu';
+import { LuArrowBigUp, LuArrowDown, LuArrowLeft, LuArrowRight, LuArrowUpRight, LuMinus, LuPlus, LuRotateCw } from 'react-icons/lu';
 
 /**
  * The site's icons, in one place: Lucide's line icons through react-icons, so
@@ -21,4 +21,6 @@ export const DownIcon = ({ className }) => <LuArrowDown className={cls(className
 export const ExpandIcon = ({ className }) => <LuPlus className={cls(className)} {...hidden} />;
 export const CollapseIcon = ({ className }) => <LuMinus className={cls(className)} {...hidden} />;
 /** The Shift key, where a shortcut is drawn. */
+/** Turns something over (the hero's file card). */
+export const TurnIcon = ({ className }) => <LuRotateCw className={cls(className)} {...hidden} />;
 export const ShiftIcon = (props) => <LuArrowBigUp {...hidden} {...props} />;

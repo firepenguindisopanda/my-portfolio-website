@@ -8,8 +8,8 @@ import React, { Suspense, lazy } from 'react';
 
 const load = () => import('./PandaScenes');
 
-const lazyScene = (name) => {
-  const Scene = lazy(() => load().then((m) => ({ default: m[name] })));
+const lazyScene = (name, from = load) => {
+  const Scene = lazy(() => from().then((m) => ({ default: m[name] })));
   const Loaded = () => (
     <Suspense fallback={null}>
       <Scene />
@@ -23,3 +23,5 @@ export const HeroPeek = lazyScene('HeroPeek');
 export const StoryClerk = lazyScene('StoryClerk');
 export const TryItNap = lazyScene('TryItNap');
 export const FooterNap = lazyScene('FooterNap');
+// Only the 404 needs this one, so it has a chunk of its own.
+export const DiggingPanda = lazyScene('DiggingPanda', () => import('./DiggingPanda'));

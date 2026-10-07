@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Grid, Paper, useTheme, Chip } from '@mui/material';
 import { alpha } from '@mui/material/styles';
+import CountUp from '../CountUp';
 import { TrendingUp as TrendingUpIcon, Speed as SpeedIcon, Assessment as AssessmentIcon, Security as SecurityIcon } from '@mui/icons-material';
 
 const MetricCard = ({ icon, label, value, subtext, color }) => {
@@ -17,7 +18,9 @@ const MetricCard = ({ icon, label, value, subtext, color }) => {
       }}
     >
       <Box sx={{ color, mb: 1 }}>{icon}</Box>
-      <Typography variant="h4" sx={{ fontWeight: 800, color }}>{value}</Typography>
+      <Typography variant="h4" sx={{ fontWeight: 800, color }}>
+        <CountUp value={value} />
+      </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{label}</Typography>
       {subtext && (
         <Typography variant="caption" color="text.secondary">{subtext}</Typography>

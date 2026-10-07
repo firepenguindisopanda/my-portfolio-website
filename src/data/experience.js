@@ -202,3 +202,17 @@ export const workExperiences = [
     ],
   },
 ];
+
+/**
+ * The roles as the Experience timeline lists them: consecutive stints with
+ * the same title at the same place, and periods that share a `group`, are one
+ * entry. The hero card's back counts these too, so the two never disagree.
+ */
+const groupKey = (e) => (e.group ? `group:${e.group.id}` : `role:${e.title}|${e.organization}`);
+
+export const roleGroups = workExperiences.reduce((acc, e) => {
+  const last = acc[acc.length - 1];
+  if (last && last.key === groupKey(e)) last.parts.push(e);
+  else acc.push({ key: groupKey(e), id: e.id, title: e.group?.title || e.title, organization: e.organization, parts: [e] });
+  return acc;
+}, []);

@@ -6,6 +6,7 @@ import CodeBlock from '../components/CodeBlock/CodeBlock';
 import EvidenceLine from '../components/Evidence/EvidenceLine';
 import LazySpaceEmbed from '../components/SpacesEmbed/LazySpaceEmbed';
 import CaseStudyFooter from '../components/CaseStudyFooter/CaseStudyFooter';
+import { DiggingPanda } from '../components/panda/LazyScenes';
 import { PROJECT_VISUALS } from '../components/ProjectVisuals';
 import { splitTitle } from '../components/home/links';
 import { BackIcon, ExternalIcon } from '../components/site/icons';
@@ -13,14 +14,17 @@ import useDocumentMeta from '../hooks/useDocumentMeta';
 import usePrefersReducedMotion from '../hooks/usePrefersReducedMotion';
 import useSectionSpy from '../hooks/useSectionSpy';
 import { projects } from '../data/projects';
-import { gsap, gsapEnabled, useGSAP } from '../utilities/gsapSetup';
+import { gsap, gsapEnabled, ScrollTrigger, useGSAP } from '../utilities/gsapSetup';
 import { useMotion } from '../motion/Motion';
 import { closeFile, fileTransitionsSupported, isFileTransition } from '../motion/fileOpen';
 
 /**
  * A case study, as a file: the cover sheet (what it is, how it knows, the spec
- * table and the screenshot clipped to it), then the write-up with a contents
- * rail that highlights the section you are reading.
+ * table and the screenshot clipped to it), then the write-up beside a sticky
+ * file summary (what it is, its stack and links, so they stay in reach while
+ * reading) and a contents rail that highlights the section you are reading.
+ * A red pencil line marks how far through the write-up the reader is: down
+ * the rail's margin, or across the top on screens too narrow for the rail.
  */
 
 /**
@@ -180,6 +184,25 @@ const ProjectDetail = () => {
   }, [markdownContent]);
   const activeHeading = useSectionSpy(headings.map((h) => h.id));
 
+  // How far through the write-up: 0 at its top, 1 once its end is on screen.
+  // Written to --read on the article, which both pencil lines read. Not an
+  // animation (it follows the scroll exactly), so it runs with motion off too.
+  const articleRef = useRef(null);
+  useEffect(() => {
+    const article = articleRef.current;
+    const main = article?.querySelector('.case-main');
+    if (!gsapEnabled || !main) return undefined;
+    article.style.setProperty('--read', '0');
+    const st = ScrollTrigger.create({
+      trigger: main,
+      start: 'top 70%',
+      end: 'bottom bottom',
+      onUpdate: (self) => article.style.setProperty('--read', self.progress.toFixed(4)),
+      onRefresh: (self) => article.style.setProperty('--read', self.progress.toFixed(4)),
+    });
+    return () => st.kill();
+  }, [projectId, loading]);
+
   // The screenshot is dropped onto the cover sheet, as the hero's photo is. It
   // is decoration arriving, never text waiting to be read.
   useGSAP(
@@ -197,14 +220,19 @@ const ProjectDetail = () => {
     return (
       <div className="cf pg">
         <header className="pg-head">
-          <div className="wrap">
-            <p className="sec-tab">Error 404</p>
-            <h1 className="pg-title">No case file by that name</h1>
-            <p className="lede">The link may be out of date. Every project is in the index on the home page.</p>
-            <div className="cta-row pg-cta">
-              <Link className="btn btn-primary" to="/#index">
-                See every project
-              </Link>
+          <div className="wrap nf-grid">
+            <div>
+              <p className="sec-tab">Error 404</p>
+              <h1 className="pg-title">No case file by that name</h1>
+              <p className="lede">The link may be out of date. Every project is in the index on the home page.</p>
+              <div className="cta-row pg-cta">
+                <Link className="btn btn-primary" to="/#index">
+                  See every project
+                </Link>
+              </div>
+            </div>
+            <div className="nf-stage">
+              <DiggingPanda />
             </div>
           </div>
         </header>
@@ -223,7 +251,8 @@ const ProjectDetail = () => {
   const backToIndex = () => (fileCloses ? closeFile({ projectId: project.id, go: toIndex, follow: false }) : toIndex());
 
   return (
-    <article className="cf pg case">
+    <article className="cf pg case" ref={articleRef}>
+      <span className="case-read" aria-hidden="true" />
       <header className="pg-head case-head" ref={headRef}>
         <div className="wrap">
           <div className="crumbs">
@@ -321,7 +350,7 @@ const ProjectDetail = () => {
         </div>
       )}
 
-      <div className={`wrap case-body${headings.length > 2 ? '' : ' no-toc'}`}>
+      <div className="wrap case-body">
         <div className="case-main">
           {loading ? (
             <p className="case-status" role="status">
@@ -341,26 +370,64 @@ const ProjectDetail = () => {
         </div>
 
         {/*
-          * Contents rail. Hidden on narrow screens rather than collapsed into an
-          * accordion: on a phone the heading list is the same scroll distance as
-          * the headings themselves, so it would cost space and earn nothing.
+          * The file summary and contents rail. Hidden on narrow screens rather
+          * than collapsed: on a phone the cover sheet above already holds the
+          * summary, and the heading list is the same scroll distance as the
+          * headings themselves, so it would cost space and earn nothing.
           */}
-        {headings.length > 2 && (
-          <aside className="toc-col">
-            <nav className="toc" aria-label="On this page">
-              <p className="toc-title">On this page</p>
-              <ol>
-                {headings.map((heading) => (
-                  <li key={heading.id}>
-                    <a href={`#${heading.id}`} aria-current={activeHeading === heading.id ? 'true' : undefined}>
-                      {heading.text}
+        <aside className="toc-col" aria-label="File summary and contents">
+          <div className="side">
+            <div className="file-sum">
+              <p className="toc-title">File summary</p>
+              <dl>
+                <div>
+                  <dt>File</dt>
+                  <dd>{project.category}</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{availabilityOf(project)}</dd>
+                </div>
+                <div>
+                  <dt>Stack</dt>
+                  <dd>{(project.primaryTech || project.technologies).slice(0, 4).join(', ')}</dd>
+                </div>
+              </dl>
+              {(project.liveUrl || project.githubUrl) && (
+                <p className="fs-links">
+                  {project.liveUrl && (
+                    <a href={project.liveUrl} {...EXT}>
+                      Live site
+                      <NewTab />
+                      <ExternalIcon />
                     </a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          </aside>
-        )}
+                  )}
+                  {project.githubUrl && (
+                    <a href={project.githubUrl} {...EXT}>
+                      Source
+                      <NewTab />
+                      <ExternalIcon />
+                    </a>
+                  )}
+                </p>
+              )}
+            </div>
+            {headings.length > 2 && (
+              <nav className="toc" aria-label="On this page">
+                <p className="toc-title">On this page</p>
+                <ol>
+                  {headings.map((heading) => (
+                    <li key={heading.id}>
+                      <a href={`#${heading.id}`} aria-current={activeHeading === heading.id ? 'true' : undefined}>
+                        {heading.text}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            )}
+          </div>
+        </aside>
       </div>
 
       {project.portfolioData && (

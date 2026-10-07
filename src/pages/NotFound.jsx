@@ -2,13 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { sections } from '../data/profile';
 import useDocumentMeta from '../hooks/useDocumentMeta';
+import { DiggingPanda } from '../components/panda/LazyScenes';
 
 /**
  * Catch-all route. Firebase Hosting rewrites every unknown path to index.html,
  * so without this a typo'd or stale URL rendered a blank page.
  *
- * In the case file it is an empty folder, stamped: nothing is filed under this
- * name, and here is where everything is.
+ * In the case file the panda is in the filing cabinet, digging through the
+ * drawer for a page that is not there (components/panda/DiggingPanda.jsx),
+ * and the page says where everything is.
  */
 const NotFound = () => {
   useDocumentMeta({
@@ -35,11 +37,8 @@ const NotFound = () => {
               </Link>
             </div>
           </div>
-          <div className="nf-folder" aria-hidden="true">
-            <span className="nf-tab">404</span>
-            <span className="nf-sheet">
-              <span className="nf-stamp">Not on file</span>
-            </span>
+          <div className="nf-stage">
+            <DiggingPanda />
           </div>
         </div>
       </header>

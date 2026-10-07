@@ -1,10 +1,12 @@
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { usePostHog } from '@posthog/react';
 import { projects as allProjects } from '../../data/projects';
 import { DATASETS } from '../../data/workedExample';
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { canHover, Flip, gsap, gsapEnabled, ScrollTrigger } from '../../utilities/gsapSetup';
 import { CaseStudyLink, OutLinks, splitTitle } from './links';
+import { projectUses } from '../../data/skillEvidence';
+import { onSkillPicked } from './indexFilter';
 
 /**
  * The full index: every featured project, flagships first, filterable by
@@ -19,6 +21,10 @@ import { CaseStudyLink, OutLinks, splitTitle } from './links';
  *     with the pointer's speed. A project without a screenshot shows its
  *     evidence line on a night card instead - never an invented picture.
  *     Mouse and trackpad only; on touch the row's links are right there.
+ *
+ * Skills (further down) can also filter it: picking a skill there shows the
+ * projects that use it, each marked with the reviewer's red bracket and a
+ * note, and brings the reader up here.
  */
 
 /** The eight projects to walk someone through first, in order. */
@@ -83,11 +89,11 @@ const DataTile = ({ project }) => {
   );
 };
 
-const Row = ({ project, rich, onPreview }) => {
+const Row = ({ project, rich, onPreview, cited }) => {
   const [title, sub] = splitTitle(project.title);
   return (
     <li
-      className={`ix-row${rich ? '' : ' compact'}`}
+      className={`ix-row${rich ? '' : ' compact'}${cited ? ' cited' : ''}`}
       data-cat={project.category}
       data-flip-id={project.id}
       onPointerEnter={onPreview ? (e) => onPreview.show(project, e) : undefined}
@@ -106,6 +112,11 @@ const Row = ({ project, rich, onPreview }) => {
           {sub && <span className="sub">{sub}</span>}
         </h4>
         {rich && <p className="ix-hl">{project.highlight}</p>}
+        {cited && (
+          <span className="ix-cite" aria-hidden="true">
+            uses {cited}
+          </span>
+        )}
       </div>
       <div className="ix-meta">
         <p className="ix-cat">{project.category}</p>
@@ -202,6 +213,8 @@ Preview.displayName = 'Preview';
 const ProjectIndex = () => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const [cat, setCat] = useState('all');
+  /** A skill sent from Skills, or null. Takes over from the category while set. */
+  const [skill, setSkill] = useState(null);
   const [previewProject, setPreviewProject] = useState(null);
   const listRef = useRef(null);
   const previewRef = useRef(null);
@@ -217,19 +230,47 @@ const ProjectIndex = () => {
     [preview]
   );
 
-  const visible = (p) => cat === 'all' || p.category === cat;
+  const visible = (p) => (skill ? projectUses(p, skill) : cat === 'all' || p.category === cat);
   const shownFlag = flagships.filter(visible);
   const shownOther = others.filter(visible);
   const count = shownFlag.length + shownOther.length;
 
-  const choose = (next, label) => {
-    if (next === cat) return;
+  const holdPlaces = () => {
     if (gsapEnabled && !prefersReducedMotion && listRef.current) {
       flipState.current = Flip.getState(listRef.current.querySelectorAll('.ix-row'));
     }
+  };
+
+  const choose = (next, label) => {
+    if (next === cat && !skill) return;
+    holdPlaces();
+    setSkill(null);
     setCat(next);
     posthog?.capture('index_filtered', { category: label });
   };
+
+  // A skill picked in Skills: show its projects, then bring the reader here,
+  // to the status line that says what is showing (focus follows for keyboards).
+  const statusRef = useRef(null);
+  const arrived = useRef(false);
+  useEffect(
+    () =>
+      onSkillPicked((picked) => {
+        holdPlaces();
+        setCat('all');
+        setSkill(picked);
+        arrived.current = true;
+      }),
+    // holdPlaces reads refs and the motion setting at call time.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [prefersReducedMotion]
+  );
+  useEffect(() => {
+    if (!arrived.current) return;
+    arrived.current = false;
+    document.getElementById('index')?.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+    statusRef.current?.focus({ preventScroll: true });
+  }, [skill, prefersReducedMotion]);
 
   useLayoutEffect(() => {
     const state = flipState.current;
@@ -245,7 +286,7 @@ const ProjectIndex = () => {
       onEnter: (els) => gsap.fromTo(els, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, delay: 0.12 }),
       onComplete: () => ScrollTrigger.refresh(),
     });
-  }, [cat, prefersReducedMotion]);
+  }, [cat, skill, prefersReducedMotion]);
 
   return (
     <section className="section index" id="index" aria-labelledby="index-title">
@@ -256,24 +297,35 @@ const ProjectIndex = () => {
           <p className="lede">Every featured project, flagships first. Filter by category, or point at a project for a closer look.</p>
         </div>
         <div className="filters" role="group" aria-label="Filter projects by category">
-          <button type="button" aria-pressed={cat === 'all'} onClick={() => choose('all', 'All')}>
+          <button type="button" aria-pressed={!skill && cat === 'all'} onClick={() => choose('all', 'All')}>
             All<span className="ct">{featured.length}</span>
           </button>
           {categories.map((c) => (
-            <button type="button" key={c} aria-pressed={cat === c} onClick={() => choose(c, c)}>
+            <button type="button" key={c} aria-pressed={!skill && cat === c} onClick={() => choose(c, c)}>
               {c}<span className="ct">{featured.filter((p) => p.category === c).length}</span>
             </button>
           ))}
         </div>
         <div className="ix-panel" ref={listRef}>
-          <p className="ix-status" aria-live="polite">
-            {cat === 'all' ? `Showing all ${count} projects.` : `Showing ${count} ${cat} project${count === 1 ? '' : 's'}.`}
-          </p>
+          <div className="ix-status-row">
+            <p className="ix-status" aria-live="polite" tabIndex={-1} ref={statusRef}>
+              {skill
+                ? `Showing ${count} project${count === 1 ? '' : 's'} that use${count === 1 ? 's' : ''} ${skill}.`
+                : cat === 'all'
+                  ? `Showing all ${count} projects.`
+                  : `Showing ${count} ${cat} project${count === 1 ? '' : 's'}.`}
+            </p>
+            {skill && (
+              <button type="button" className="ix-clear" onClick={() => choose('all', 'All')}>
+                Show all projects
+              </button>
+            )}
+          </div>
           {shownFlag.length > 0 && (
             <div className="ix-group">
               <h3 className="ix-group-title">Flagship work</h3>
               <ul className="ix-list">
-                {shownFlag.map((p) => <Row key={p.id} project={p} rich />)}
+                {shownFlag.map((p) => <Row key={p.id} project={p} rich cited={skill} />)}
               </ul>
             </div>
           )}
@@ -281,7 +333,7 @@ const ProjectIndex = () => {
             <div className="ix-group">
               <h3 className="ix-group-title">More projects</h3>
               <ul className="ix-list">
-                {shownOther.map((p) => <Row key={p.id} project={p} onPreview={previewHandlers} />)}
+                {shownOther.map((p) => <Row key={p.id} project={p} onPreview={previewHandlers} cited={skill} />)}
               </ul>
             </div>
           )}

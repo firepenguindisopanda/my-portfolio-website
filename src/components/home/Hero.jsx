@@ -1,12 +1,16 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { usePostHog } from '@posthog/react';
 import PROFILE_PHOTO from '../../assets/Nicholas_Smith_profile_pic.webp';
 import { profile } from '../../data/profile';
 import { projects } from '../../data/projects';
+import { roleGroups } from '../../data/experience';
+import { awards } from '../../data/certificates';
+import { clientFiles } from '../../data/clientWork';
+import CountUp from '../CountUp';
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { canHover, gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
 import { CaseStudyLink, EXT, NewTab, Arrow, splitTitle } from './links';
-import { DownIcon, ExternalIcon } from '../site/icons';
+import { DownIcon, ExternalIcon, TurnIcon } from '../site/icons';
 import { HeroPeek } from '../panda/LazyScenes';
 
 /**
@@ -18,16 +22,34 @@ import { HeroPeek } from '../panda/LazyScenes';
  * the work checks itself - each open the case study that substantiates it.
  * Pointing at one fills in its note number.
  *
- * Motion (only when on): a first-load settle under a second, and the file card
- * leaning toward the pointer. Nothing is hidden at rest - every tween is a
- * `from` a readable state.
+ * The card turns over: its back is the case summary, every figure counted
+ * from the site's own records (never typed in), so it cannot drift from the
+ * pages that back it up.
+ *
+ * Motion (only when on): a first-load settle under a second, the file card
+ * leaning toward the pointer, and the turn itself with the figures counting
+ * up. Nothing is hidden at rest - every tween is a `from` a readable state.
  */
+
+/** The back of the card. Labels say what was counted, so each figure can be checked on the page it comes from. */
+const summary = () => [
+  { label: 'Years building software', value: new Date().getFullYear() - profile.since, note: `since ${profile.since}` },
+  { label: 'Projects in the index', value: projects.filter((p) => p.featured).length, note: 'every one linked' },
+  { label: 'Written case studies', value: projects.filter((p) => p.markdown).length, note: 'method and numbers' },
+  { label: 'Roles', value: roleGroups.length, note: `and ${clientFiles.length} client files` },
+  { label: 'Competition placings', value: awards.filter((a) => /\d+(st|nd|rd|th) in /.test(a.title)).length, note: 'WiDS, Trinidad & Tobago' },
+];
 
 let introPlayed = false;
 
 const Hero = ({ onSeeWork }) => {
   const rootRef = useRef(null);
   const posthog = usePostHog();
+  const [turned, setTurned] = useState(false);
+  const turn = () => {
+    posthog?.capture('hero_card_turned', { to: turned ? 'front' : 'back' });
+    setTurned((t) => !t);
+  };
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const parts = profile.name.split(' ');
@@ -161,9 +183,10 @@ const Hero = ({ onSeeWork }) => {
 
           <div className="card-stage">
             <div className="card-tilt">
-              <figure className="filecard">
+              <figure className={`filecard${turned ? ' turned' : ''}`}>
                 <div className="fc-tab" aria-hidden="true">{tabLabel}</div>
-                <div className="sheet">
+                <div className="fc-flip">
+                <div className="sheet fc-face fc-front" aria-hidden={turned || undefined} inert={turned ? '' : undefined}>
                   <svg className="clip" viewBox="0 0 28 72" aria-hidden="true" focusable="false">
                     <path
                       d="M10 22 L10 54 A4 4 0 0 0 18 54 L18 12 A7 7 0 0 0 4 12 L4 58 A10 10 0 0 0 24 58 L24 20"
@@ -187,6 +210,26 @@ const Hero = ({ onSeeWork }) => {
                     <div><dt>Stack</dt><dd>{profile.skills.slice(0, 5).join(', ')}</dd></div>
                   </dl>
                 </div>
+                <div className="sheet fc-face fc-back" aria-hidden={!turned || undefined} inert={turned ? undefined : ''}>
+                  <p className="fc-back-title">Case summary</p>
+                  <dl className="fc-sum">
+                    {summary().map((row) => (
+                      <div key={row.label}>
+                        <dt>{row.label}</dt>
+                        <dd>
+                          <CountUp className="fc-num" value={row.value} start={turned} />
+                          <span className="fc-note">{row.note}</span>
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <p className="fc-src">Counted from this site&apos;s own records.</p>
+                </div>
+                </div>
+                <button type="button" className="fc-turn" aria-pressed={turned} onClick={turn}>
+                  <TurnIcon />
+                  {turned ? 'Back to the photo' : 'Turn the card over'}
+                </button>
                 <HeroPeek />
               </figure>
             </div>
