@@ -13,9 +13,10 @@ import { HeroPeek } from '../panda/LazyScenes';
  * The case file's cover: the name, the thesis, and a file card with the one
  * photograph on the page, clipped to a sheet.
  *
- * Below it, the thesis's evidence - three projects where the work checks
- * itself - set as highlighted excerpts. Pointing at one sweeps the highlighter
- * across it; each opens the case study that substantiates it.
+ * The thesis word is marked the way a reviewer marks a file: circled in red
+ * pencil and footnoted 1, 2, 3. Below it, those footnotes - three projects where
+ * the work checks itself - each open the case study that substantiates it.
+ * Pointing at one fills in its note number.
  *
  * Motion (only when on): a first-load settle under a second, and the file card
  * leaning toward the pointer. Nothing is hidden at rest - every tween is a
@@ -45,7 +46,7 @@ const Hero = ({ onSeeWork }) => {
           .timeline({ defaults: { ease: 'power3.out' } })
           .from('.card-tilt', { y: 26, rotation: -3, duration: 0.9 }, 0)
           .from('.name .ln', { yPercent: 10, duration: 0.7, stagger: 0.08 }, 0)
-          .from('.swash', { scaleX: 0, duration: 0.6, ease: 'power2.inOut' }, 0.3);
+          .fromTo('.pencil path', { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, stagger: 0.25, ease: 'power2.inOut' }, 0.35);
       }
 
       if (!canHover()) return undefined;
@@ -88,8 +89,10 @@ const Hero = ({ onSeeWork }) => {
               <span className="ln ln1">{first}</span>{' '}
               <span className="ln">
                 <span className="ln2">
-                  <span className="swash" aria-hidden="true" />
                   {last}
+                  <svg className="pencil pencil-under" viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true">
+                    <path pathLength="1" d="M2 6 C 40 3, 90 8, 140 4 S 190 5, 198 6" />
+                  </svg>
                 </span>
               </span>
             </h1>
@@ -97,7 +100,18 @@ const Hero = ({ onSeeWork }) => {
             <p className="loc">{profile.location}</p>
             <p className="thesis">
               {before}
-              <mark>verification</mark>
+              <span className="pencil-word">
+                verification
+                <svg className="pencil pencil-circle" viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true">
+                  <path
+                    pathLength="1"
+                    d="M150 6 C 100 -2, 22 4, 8 24 C -4 42, 50 58, 112 55 C 170 52, 202 40, 192 20 C 184 6, 140 2, 96 6"
+                  />
+                </svg>
+              </span>
+              <sup className="fn" aria-hidden="true">
+                1,2,3
+              </sup>
               {after}
             </p>
             <div className="cta-row">
@@ -182,10 +196,10 @@ const Hero = ({ onSeeWork }) => {
         <div className="evidence">
           <div className="ev-head">
             <h2 className="ev-title">{profile.heroLedgerLabel}</h2>
-            <span className="ev-title" aria-hidden="true">Highlighted excerpts</span>
+            <span className="ev-title" aria-hidden="true">Notes 1 to 3</span>
           </div>
           <ul className="ev-list">
-            {profile.heroLedger.map((e) => {
+            {profile.heroLedger.map((e, i) => {
               const p = projects.find((x) => x.id === e.id);
               return (
                 <li className="ev-row" key={e.id}>
@@ -194,10 +208,13 @@ const Hero = ({ onSeeWork }) => {
                     source="hero-evidence"
                     onClick={() => posthog?.capture('hero_ledger_clicked', { project_id: e.id })}
                   >
-                    <span className="ev-name">{e.name}</span>
-                    <span className="ev-claim">
-                      <span className="hl">{e.claim}</span>
+                    <span className="ev-name">
+                      <span className="ev-num" aria-hidden="true">
+                        {i + 1}
+                      </span>
+                      {e.name}
                     </span>
+                    <span className="ev-claim">{e.claim}</span>
                     <span className="ev-go">
                       Case study<span className="sr-only">: {splitTitle(p.title)[0]}</span>
                     </span>

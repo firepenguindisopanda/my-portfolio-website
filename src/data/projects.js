@@ -422,7 +422,7 @@ export const projects = [
     shortDescription: 'Starbucks offer targeting: customer segmentation (K-Means, k=4), a send-time model of offer completion rebuilt after finding leakage in the first version (0.994 AUC became an honest 0.865 on unseen customers, well calibrated), causal inference, and a rule-based recommender with +7.9% lift.',
     description: 'Comprehensive analysis of 17K customers, 10 offers, and 306K+ events from simulated Starbucks Rewards app data. Features EDA with hypothesis tests (Mann-Whitney U, Chi-squared, Cohen\'s d), feature engineering (55 customer + 75 interaction features), K-Means clustering (4 segments, mean stability ARI 0.76), a send-time offer completion model (one row per offer sent, history strictly before the send, customer-grouped CV, 0.865 AUC on held-out customers and 0.878 forward in time, with a leakage ladder showing how the first version reached 0.994), causal ATE analysis with bootstrap CIs and propensity score matching, and a rule-based recommendation system with +7.9% lift and A/B test simulation framework.',
     category: 'Data Science',
-    technologies: ['Python', 'XGBoost', 'scikit-learn', 'Pandas', 'NumPy', 'Matplotlib', 'Seaborn', 'Plotly', 'SHAP', 'SciPy'],
+    technologies: ['Python', 'scikit-learn', 'XGBoost', 'Pandas', 'NumPy', 'SciPy', 'Matplotlib', 'Seaborn', 'Plotly'],
     thumbnail: null,
     featured: true,
     githubUrl: 'https://github.com/firepenguindisopanda/starbuck-analysis-project',
