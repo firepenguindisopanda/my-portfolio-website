@@ -1,7 +1,7 @@
 /**
  * How the page tells the panda what is happening, without the page depending
  * on the panda: the story reports how far into the current case the reader is,
- * the Try it demos report when they are used and when they stamp a result.
+ * so the Four cases clerk can raise and press its stamp in step.
  * With no panda listening, an emit is a no-op.
  */
 const listeners = new Map();

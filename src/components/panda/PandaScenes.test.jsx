@@ -1,9 +1,8 @@
 import React, { createRef } from 'react';
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import PandaRig, { POSES } from './PandaRig';
 import { clerkPose } from './clerkPose';
-import { HOLD_MS } from './PandaScenes';
 import { emitPanda, onPanda } from './pandaBus';
 import TryIt from '../home/tryit/TryIt';
 
@@ -12,12 +11,12 @@ vi.mock('@posthog/react', () => ({ usePostHog: () => ({ capture: vi.fn() }) }));
 describe('the panda bus', () => {
   it('delivers to listeners of that event until they unsubscribe', () => {
     const seen = [];
-    const off = onPanda('demo', (d) => seen.push(d.demo));
-    emitPanda('demo', { demo: 'chimp' });
-    emitPanda('stamp', { tone: 'ok' });
+    const off = onPanda('case', (d) => seen.push(d.i));
+    emitPanda('case', { i: 0, p: 0.2 });
+    emitPanda('other', { i: 9 });
     off();
-    emitPanda('demo', { demo: 'timetable' });
-    expect(seen).toEqual(['chimp']);
+    emitPanda('case', { i: 1, p: 0.4 });
+    expect(seen).toEqual([0]);
   });
 
   it('is a no-op with nobody listening', () => {
@@ -61,7 +60,7 @@ describe('the Four cases clerk', () => {
   });
 });
 
-describe('the Try it panda (motion off, as under test)', () => {
+describe('the Try it panda', () => {
   const renderTryIt = async () => {
     const view = render(
       <MemoryRouter>
@@ -69,49 +68,31 @@ describe('the Try it panda (motion off, as under test)', () => {
       </MemoryRouter>
     );
     // The scenes arrive in their own chunk.
-    await waitFor(() => expect(view.container.querySelector('.pd-tryit .pd-tryit-rig')).not.toBeNull());
+    await waitFor(() => expect(view.container.querySelector('.pd-tryit-nap')).not.toBeNull());
     return view;
   };
   const chimp = () => screen.getByRole('article', { name: 'Chimp Test' });
   const square = (n) => [...chimp().querySelectorAll('.chimp-sq')].find((b) => b.textContent === String(n));
-  const rightArm = (container) => container.querySelector('.pd-tryit-rig > g > g > g:last-child').getAttribute('transform');
 
-  afterEach(() => vi.useRealTimers());
-
-  it('sits in the section, out of the accessibility tree', async () => {
+  it('sleeps on the demo grid, out of the accessibility tree', async () => {
     const { container } = await renderTryIt();
-    const panda = container.querySelector('.pd-tryit');
-    expect(container.querySelector('#try-it .wrap')).toContainElement(panda);
+    const panda = container.querySelector('.pd-tryit-nap');
+    expect(container.querySelector('#try-it .ex-grid')).toContainElement(panda);
     expect(panda).toHaveAttribute('aria-hidden', 'true');
-    expect(panda).not.toHaveClass('is-awake');
+    expect(panda.querySelector('img')).not.toBeNull();
+    expect(panda.querySelectorAll('.pd-zz path')).toHaveLength(3);
   });
 
-  it('wakes when a demo is first used', async () => {
+  it('is the still sleeping art, with no moving rig', async () => {
     const { container } = await renderTryIt();
-    fireEvent.click(square(1));
-    expect(container.querySelector('.pd-tryit')).toHaveClass('is-awake');
+    expect(container.querySelector('#try-it .pd-rig')).toBeNull();
   });
 
-  it('shows a miss with a still cover-eyes pose, then sits back up', async () => {
+  it('stays asleep and unchanged when the demos are used', async () => {
     const { container } = await renderTryIt();
-    vi.useFakeTimers();
+    const before = container.querySelector('.pd-tryit-nap').outerHTML;
     fireEvent.click(square(1));
     fireEvent.click(square(3));
-    expect(rightArm(container)).toContain(`rotate(${POSES.coverEyes.ra})`);
-    act(() => vi.advanceTimersByTime(HOLD_MS));
-    expect(rightArm(container)).toContain(`rotate(${POSES.sit.ra})`);
-  });
-
-  it('is told which sheet a stamp landed on', async () => {
-    await renderTryIt();
-    const stamps = [];
-    const off = onPanda('stamp', (d) => stamps.push(d));
-    fireEvent.click(square(1));
-    fireEvent.click(square(3));
-    off();
-    expect(stamps).toHaveLength(1);
-    expect(stamps[0].tone).toBe('flag');
-    expect(stamps[0].at.closest('.exhibit')).toBe(chimp());
-    expect(within(chimp()).getByText(/missed at 2/i)).toBe(stamps[0].at);
+    expect(container.querySelector('.pd-tryit-nap').outerHTML).toBe(before);
   });
 });

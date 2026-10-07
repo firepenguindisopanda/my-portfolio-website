@@ -21,5 +21,5 @@ const lazyScene = (name) => {
 
 export const HeroPeek = lazyScene('HeroPeek');
 export const StoryClerk = lazyScene('StoryClerk');
-export const TryItPanda = lazyScene('TryItPanda');
+export const TryItNap = lazyScene('TryItNap');
 export const FooterNap = lazyScene('FooterNap');

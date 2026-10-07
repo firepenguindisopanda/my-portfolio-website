@@ -1,8 +1,8 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PANDA_LYING from '../../assets/panda-struggle.svg';
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { canHover, gsap, gsapEnabled, ScrollTrigger } from '../../utilities/gsapSetup';
-import PandaRig, { INK, PandaHead, POSES } from './PandaRig';
+import PandaRig, { INK, PandaHead } from './PandaRig';
 import { clerkPose } from './clerkPose';
 import { onPanda } from './pandaBus';
 import '../../styles/panda.css';
@@ -17,14 +17,12 @@ import '../../styles/panda.css';
  *   StoryClerk  - sits by the Four cases stage and presses a rubber stamp at
  *                 each case's result, in step with the scroll (it reverses
  *                 when you scroll back). Only on the pinned stage.
- *   TryItPanda  - naps beside Try it until you use a demo, then hops onto
- *                 that demo's sheet, above where its stamp lands: cheers at a
- *                 clean result, covers its eyes at a miss.
+ *   TryItNap    - asleep on the top edge of a Try it sheet, the original
+ *                 art with its "z" marks. Still at all times.
  *   FooterNap   - asleep beside the motto, born to dilly dally.
  *
  * All decorative and hidden from assistive tech. With motion off nothing
- * moves: each scene holds a still pose, and the Try it panda still reacts by
- * switching straight to its cheer or cover-eyes pose for a moment.
+ * moves: each scene holds a still pose.
  */
 
 const PAPER = '#FFFFFF';
@@ -172,162 +170,25 @@ export const StoryClerk = () => {
 };
 
 /* ------------------------------------------------------------------ */
-/* Try it: naps until a demo is used, then hops onto that demo.       */
+/* Asleep: the original art and its "z" marks, beside Try it and in   */
+/* the footer.                                                         */
 /* ------------------------------------------------------------------ */
 
-/** How far in from a sheet's right edge the centre of its stamp lands. */
-const STAMP_IN = 76;
-/** How long a reaction pose is held with motion off. */
-export const HOLD_MS = 1400;
+const Zz = () => (
+  <svg className="pd-zz" viewBox="0 0 30 26" focusable="false">
+    <path d="M 4 18 h 6 l -6 6 h 6" />
+    <path d="M 13 9 h 7 l -7 7 h 7" />
+    <path d="M 22 1 h 6 l -6 6 h 6" />
+  </svg>
+);
 
-/**
- * Where the panda goes, in the Try it wrap's coordinates: on the top edge of
- * an exhibit's sheet, above where its stamp lands. Asleep it lies on the first
- * sheet (the gap above it is clear at every width, where the heading's text
- * is not); awake it sits a little lower, its feet over the edge.
- */
-const spotFor = (wrap, exhibit, el, awake) => {
-  const sheet = (exhibit || wrap.querySelector('.exhibit'))?.querySelector('.ex-sheet');
-  if (!sheet) return { x: 0, y: 0 };
-  const w = wrap.getBoundingClientRect();
-  const s = sheet.getBoundingClientRect();
-  return {
-    x: Math.round(s.right - w.left - STAMP_IN - el.offsetWidth / 2),
-    y: Math.round(s.top - w.top - el.offsetHeight + (awake ? 12 : 3)),
-  };
-};
-
-const CHEER_UP = { ...POSES.cheer, lift: -14 };
-const REACTIONS = {
-  // A happy double hop.
-  ok: {
-    steps: [[CHEER_UP, 0.2], [POSES.cheer, 0.16], [CHEER_UP, 0.2], [POSES.cheer, 0.16], [POSES.sit, 0.4]],
-    still: POSES.cheer,
-  },
-  // Can't look.
-  miss: {
-    steps: [[POSES.coverEyes, 0.3], [POSES.coverEyes, 1.1], [POSES.sit, 0.4]],
-    still: POSES.coverEyes,
-  },
-};
-
-export const TryItPanda = () => {
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const box = useRef(null);
-  const rig = useRef(null);
-  // The exhibit it sits on (null: still asleep on the first one) and whether
-  // it has woken. Refs, so a motion switch rebuilding the effect below leaves
-  // it where and how it was.
-  const perch = useRef(null);
-  const woke = useRef(false);
-  const [awake, setAwake] = useState(false);
-
-  // A layout effect, so it is in place before it is first painted.
-  useLayoutEffect(() => {
-    const el = box.current;
-    const wrap = el?.parentElement;
-    if (!wrap) return undefined;
-    const animate = gsapEnabled && !prefersReducedMotion;
-    const pose = { ...POSES.sit };
-    const apply = () => rig.current?.apply(pose);
-    let tl = null;
-    let back = 0;
-    let hopping = false;
-
-    const place = () => gsap.set(el, spotFor(wrap, perch.current, el, woke.current));
-    const stop = () => {
-      tl?.kill();
-      tl = null;
-      hopping = false;
-      clearTimeout(back);
-    };
-
-    /**
-     * Go to `exhibit` (if given) and react there. With motion on: `before`
-     * plays where it is, then the hop if it is not already there (or was cut
-     * off mid-hop by this reaction), then `after`. With motion off it is
-     * simply there, holding `still` for a moment.
-     */
-    const react = (exhibit, { before = [], after = [], still = POSES.sit }) => {
-      stop();
-      setAwake(true);
-      woke.current = true;
-      if (exhibit) perch.current = exhibit;
-      if (!animate) {
-        place();
-        Object.assign(pose, still);
-        apply();
-        if (still !== POSES.sit) {
-          back = setTimeout(() => {
-            Object.assign(pose, POSES.sit);
-            apply();
-          }, HOLD_MS);
-        }
-        return;
-      }
-      tl = gsap.timeline();
-      const poseTo = ([target, duration]) => tl.to(pose, { ...target, duration, ease: 'power2.inOut', onUpdate: apply });
-      before.forEach(poseTo);
-      const to = spotFor(wrap, perch.current, el, true);
-      const from = { x: gsap.getProperty(el, 'x'), y: gsap.getProperty(el, 'y') };
-      if (Math.abs(from.x - to.x) > 1 || Math.abs(from.y - to.y) > 1) {
-        hopping = true;
-        poseTo([POSES.stretch, 0.14]);
-        tl.to(el, { x: to.x, duration: 0.5, ease: 'power1.inOut' })
-          .to(el, { y: Math.min(from.y, to.y) - 36, duration: 0.22, ease: 'power2.out' }, '<')
-          .to(el, { y: to.y, duration: 0.28, ease: 'power2.in' }, '>')
-          // Landed: settle on the spot as it is now, in case the page moved mid-hop.
-          .call(() => {
-            hopping = false;
-            place();
-          });
-        poseTo([POSES.sit, 0.16]);
-      }
-      after.forEach(poseTo);
-    };
-
-    place();
-    // A motion switch in the middle of a reaction leaves it sitting.
-    apply();
-    // Demos change height as they are used; keep it on its spot (a hop in
-    // flight lands on the new spot instead).
-    const ro = new ResizeObserver(() => {
-      if (!hopping) place();
-    });
-    ro.observe(wrap);
-
-    const exhibitOf = (node) => {
-      const ex = node?.closest?.('.exhibit');
-      return ex && wrap.contains(ex) ? ex : null;
-    };
-    const offDemo = onPanda('demo', ({ demo }) => {
-      const exhibit = wrap.querySelector(`.ex-${demo}`);
-      if (!perch.current) {
-        // Wakes with a big stretch, then hops over to watch.
-        react(exhibit, { before: [[POSES.stretch, 0.45], [POSES.stretch, 0.3]] });
-      } else if (exhibit && exhibit !== perch.current) {
-        react(exhibit, {});
-      }
-    });
-    const offStamp = onPanda('stamp', ({ tone, at }) => {
-      const { steps, still } = tone === 'ok' ? REACTIONS.ok : REACTIONS.miss;
-      react(exhibitOf(at), { after: steps, still });
-    });
-    return () => {
-      offDemo();
-      offStamp();
-      ro.disconnect();
-      stop();
-    };
-  }, [prefersReducedMotion]);
-
-  return (
-    <div ref={box} className={`pd-tryit${awake ? ' is-awake' : ''}`} aria-hidden="true">
-      <img className="pd-tryit-nap" src={PANDA_LYING} alt="" loading="lazy" />
-      <PandaRig ref={rig} pose="sit" className="pd-rig pd-tryit-rig" />
-    </div>
-  );
-};
+/** Asleep on the top edge of a Try it sheet. Still: it never wakes or moves. */
+export const TryItNap = () => (
+  <span className="pd-tryit-nap" aria-hidden="true">
+    <img src={PANDA_LYING} alt="" loading="lazy" />
+    <Zz />
+  </span>
+);
 
 /* ------------------------------------------------------------------ */
 /* Footer: asleep beside the motto.                                    */
@@ -336,10 +197,6 @@ export const TryItPanda = () => {
 export const FooterNap = () => (
   <span className="pd-footer-nap" aria-hidden="true">
     <img src={PANDA_LYING} alt="" loading="lazy" />
-    <svg className="pd-zz" viewBox="0 0 30 26" focusable="false">
-      <path d="M 4 18 h 6 l -6 6 h 6" />
-      <path d="M 13 9 h 7 l -7 7 h 7" />
-      <path d="M 22 1 h 6 l -6 6 h 6" />
-    </svg>
+    <Zz />
   </span>
 );

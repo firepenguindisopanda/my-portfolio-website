@@ -21,14 +21,12 @@
 /* Try it: naps on the first sheet, then sits on the sheet of the demo in use.
    PandaScenes moves it; the rig sets its size. */
 .cf .tryit .wrap { position: relative; }
-.pd-tryit { position: absolute; z-index: 3; left: 0; top: 0; width: 84px; pointer-events: none; }
-/* The art declares a square size; its own shape keeps it sitting on the edge. */
-.pd-tryit-nap { position: absolute; right: -6px; bottom: 0; width: 108px; height: auto; aspect-ratio: 548 / 293; }
-.pd-tryit-rig { opacity: 0; transform: scaleX(-1); }
-.pd-tryit.is-awake .pd-tryit-nap { opacity: 0; }
-.pd-tryit.is-awake .pd-tryit-rig { opacity: 1; }
-html.motion-on .pd-tryit-nap, html.motion-on .pd-tryit-rig { transition: opacity .3s ease; }
-@media (max-width: 600px) { .pd-tryit { width: 68px; } .pd-tryit-nap { width: 88px; } }
+/* Asleep on the top edge of the right-hand Try it sheet, clear of the folder tabs (on the left). Never animated. */
+.pd-tryit-nap { position: absolute; z-index: 3; right: 44px; bottom: calc(100% - 4px); width: 108px; pointer-events: none; }
+.pd-tryit-nap img { display: block; width: 100%; height: auto; aspect-ratio: 548 / 293; }
+.pd-tryit-nap .pd-zz { stroke: var(--ink); }
+html.motion-on .pd-tryit-nap .pd-zz path { animation: none; }
+@media (max-width: 600px) { .pd-tryit-nap { right: 28px; width: 88px; } }
 
 /* Footer: asleep beside the motto. */
 .pd-footer-nap { position: relative; display: inline-block; width: 64px; margin-left: 12px; vertical-align: middle; }
