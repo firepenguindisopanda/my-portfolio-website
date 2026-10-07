@@ -14,6 +14,8 @@ import usePrefersReducedMotion from '../hooks/usePrefersReducedMotion';
 import useSectionSpy from '../hooks/useSectionSpy';
 import { projects } from '../data/projects';
 import { gsap, gsapEnabled, useGSAP } from '../utilities/gsapSetup';
+import { useMotion } from '../motion/Motion';
+import { closeFile, fileTransitionsSupported, isFileTransition } from '../motion/fileOpen';
 
 /**
  * A case study, as a file: the cover sheet (what it is, how it knows, the spec
@@ -100,6 +102,8 @@ const ProjectDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { motionOn } = useMotion();
+  const fileCloses = motionOn && fileTransitionsSupported();
   const headRef = useRef(null);
   const [markdownContent, setMarkdownContent] = useState('');
   const [loading, setLoading] = useState(true);
@@ -182,6 +186,8 @@ const ProjectDetail = () => {
     () => {
       // Not every case file has a screenshot.
       if (!gsapEnabled || prefersReducedMotion || !headRef.current?.querySelector('.case-shot')) return;
+      // Arriving through the file opening, the screenshot is already travelling into place.
+      if (isFileTransition()) return;
       gsap.from('.case-shot', { y: 28, rotation: 5, opacity: 0, duration: 0.8, ease: 'power3.out', delay: 0.1 });
     },
     { scope: headRef, dependencies: [projectId, prefersReducedMotion], revertOnUpdate: true }
@@ -211,7 +217,10 @@ const ProjectDetail = () => {
   const isFraud = project.id === 'fraud-detection';
   // Back goes back when there is somewhere on this site to go back to; a
   // reader who arrived straight from a link is sent home instead of away.
-  const goBack = () => (location.key && location.key !== 'default' ? navigate(-1) : navigate('/'));
+  const back = () => (location.key && location.key !== 'default' ? navigate(-1) : navigate('/'));
+  const goBack = () => (fileCloses ? closeFile({ projectId: project.id, go: back }) : back());
+  const toIndex = () => navigate('/', { state: { scrollTo: 'index' } });
+  const backToIndex = () => (fileCloses ? closeFile({ projectId: project.id, go: toIndex, follow: false }) : toIndex());
 
   return (
     <article className="cf pg case">
@@ -370,7 +379,7 @@ const ProjectDetail = () => {
 
       <div className="wrap case-foot">
         <CaseStudyFooter currentId={project.id} />
-        <button type="button" className="btn btn-ghost" onClick={() => navigate('/', { state: { scrollTo: 'index' } })}>
+        <button type="button" className="btn btn-ghost" onClick={backToIndex}>
           <BackIcon /> Back to all projects
         </button>
       </div>

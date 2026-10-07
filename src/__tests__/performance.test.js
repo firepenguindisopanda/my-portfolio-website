@@ -112,6 +112,16 @@ describe('bundle and loading', () => {
     expect(staticGraph('pages/Home.jsx')).toContain('components/panda/LazyScenes.jsx');
   });
 
+  it('fetches SplitText only when a heading is about to animate', () => {
+    // The ink headings split text with GSAP's SplitText. A visitor with motion
+    // off never needs it, so it is reached only through import(), which keeps
+    // it out of the eager bundle.
+    const staticImports = sourceText.filter(({ text }) => /from 'gsap\/SplitText'/.test(text)).map((f) => f.file);
+    expect(staticImports).toEqual([]);
+    // Not vacuous: the headings do load it, on demand.
+    expect(read('motion/useInkHeadings.js')).toMatch(/import\('gsap\/SplitText'\)/);
+  });
+
   it('does not import whole icon libraries', () => {
     sourceText.forEach(({ file, text }) => {
       const importsNamespace = /import \* as \w+ from '@mui\/icons-material'/.test(text);

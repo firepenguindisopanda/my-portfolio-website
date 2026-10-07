@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
+import { isFileTransition } from '../../motion/fileOpen';
 
 /**
  * Route transitions: a short rise-and-fade in. No scale - zooming the whole
@@ -24,6 +25,8 @@ const PageTransition = ({ children }) => {
   useGSAP(
     () => {
       if (!gsapEnabled || prefersReducedMotion) return;
+      // A case file opening or closing is its own route transition.
+      if (isFileTransition()) return;
 
       gsap.fromTo(
         ref.current,

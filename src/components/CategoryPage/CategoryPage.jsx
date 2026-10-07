@@ -6,6 +6,8 @@ import EvidenceLine from '../Evidence/EvidenceLine';
 import { PROJECT_VISUALS } from '../ProjectVisuals';
 import { Arrow, splitTitle } from '../home/links';
 import { BackIcon, NextIcon } from '../site/icons';
+import useOpenFile from '../../motion/useOpenFile';
+import useInkHeadings from '../../motion/useInkHeadings';
 
 /**
  * One layout for every deep-dive route (/fullstack, /ml, /desktop, /android):
@@ -51,13 +53,16 @@ export const ProjectMedia = ({ project, title }) => {
 const Row = ({ project, surface }) => {
   const posthog = usePostHog();
   const [title, sub] = splitTitle(project.title);
-  const viewed = () =>
+  const openFile = useOpenFile(`/projects/${project.id}`);
+  const viewed = (e) => {
     posthog?.capture('project_viewed', {
       project_id: project.id,
       project_title: project.title,
       category: project.category,
       surface,
     });
+    openFile(e);
+  };
 
   return (
     <li className="ix-row dd-row">
@@ -122,6 +127,7 @@ const Row = ({ project, surface }) => {
  */
 const CategoryPage = ({ eyebrow, title, description, categories, surface, emptyMessage }) => {
   const projects = useMemo(() => allProjects.filter((p) => categories.includes(p.category)), [categories]);
+  useInkHeadings();
 
   return (
     <div className="cf pg dd">

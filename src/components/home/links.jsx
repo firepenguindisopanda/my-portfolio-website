@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { usePostHog } from '@posthog/react';
 import { ExternalIcon } from '../site/icons';
+import useOpenFile from '../../motion/useOpenFile';
 
 /**
  * Links every section of the home page shares, so the analytics a link fires
@@ -32,10 +33,12 @@ const stashScroll = () => {
 
 export const CaseStudyLink = ({ project, source, className, onClick, children }) => {
   const posthog = usePostHog();
+  const to = `/projects/${project.id}`;
+  const openFile = useOpenFile(to);
   return (
     <Link
       className={className}
-      to={`/projects/${project.id}`}
+      to={to}
       onClick={(e) => {
         onClick?.(e);
         posthog?.capture('project_viewed', {
@@ -45,6 +48,7 @@ export const CaseStudyLink = ({ project, source, className, onClick, children })
           source,
         });
         stashScroll();
+        openFile(e);
       }}
     >
       {children ?? 'Case study'}

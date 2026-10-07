@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import useDocumentMeta from '../hooks/useDocumentMeta';
+import useInkHeadings from '../motion/useInkHeadings';
 import useScrollRestore from '../hooks/useScrollRestore';
 import { routeMeta } from '../data/routes';
 import Hero from '../components/home/Hero';
@@ -25,6 +26,7 @@ import Contact from '../components/home/Contact';
  */
 const Home = () => {
   useDocumentMeta(routeMeta('/'));
+  useInkHeadings();
   useScrollRestore('projectsScrollY');
   const location = useLocation();
 

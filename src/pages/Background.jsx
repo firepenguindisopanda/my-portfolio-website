@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import useDocumentMeta from '../hooks/useDocumentMeta';
+import useInkHeadings from '../motion/useInkHeadings';
 import { routeMeta } from '../data/routes';
 import { bio, notes, community, education } from '../data/background';
 import { awards, featuredCertificates, otherCertificates, totalCertificateCount } from '../data/certificates';
@@ -85,6 +86,7 @@ const PAGE_SECTIONS = [
 
 const Background = () => {
   useDocumentMeta(routeMeta('/background'));
+  useInkHeadings();
   const [showAll, setShowAll] = useState(false);
 
   return (

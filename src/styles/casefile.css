@@ -110,6 +110,8 @@ html.rail-on .site-header :focus-visible { outline-color: var(--hl); }
   line-height: .95; letter-spacing: -.01em; margin: 0; text-wrap: balance;
 }
 .lede { max-width: 60ch; margin: 18px 0 0; font-size: clamp(18px, 1.6vw, 21px); line-height: 1.5; text-wrap: pretty; }
+/* Ink headings (motion/useInkHeadings.js): each line rises out of its own slot; the slot leaves room for descenders. */
+.cf .ink-mask { padding-bottom: .08em; margin-bottom: -.08em; }
 
 /* ---------- buttons ---------- */
 .btn {
@@ -192,6 +194,30 @@ html.motion-on .motion-toggle .dot { background: var(--hl); box-shadow: 0 0 0 1.
   .nav-more-list a { color: inherit; }
 }
 @media (max-width: 420px) { .motion-toggle .mt-act { display: none; } .brand { font-size: 22px; } }
+
+/* ---------- route transition: the file opens (motion/fileOpen.js) ---------- */
+/* The header holds still while the page under it changes. */
+html[data-file-transition] .site-header { view-transition-name: site-header; }
+html.motion-on[data-file-transition]::view-transition-group(*) {
+  animation-duration: .62s; animation-timing-function: cubic-bezier(.22, .8, .18, 1);
+}
+html[data-file-transition]::view-transition-group(site-header) { z-index: 3; }
+html[data-file-transition]::view-transition-group(file-shot) { z-index: 2; }
+/* Opening: the list sinks back a little and the case file slides up over it. */
+html.motion-on[data-file-transition='open']::view-transition-old(root) { animation: ft-sink .22s cubic-bezier(.4, 0, 1, 1) both; }
+html.motion-on[data-file-transition='open']::view-transition-new(root) { animation: ft-rise .55s cubic-bezier(.22, .8, .18, 1) .16s both; }
+/* Closing: the case file slides away and the list comes forward again. */
+html.motion-on[data-file-transition='close']::view-transition-old(root) { animation: ft-drop .26s cubic-bezier(.4, 0, 1, 1) both; }
+html.motion-on[data-file-transition='close']::view-transition-new(root) { animation: ft-lift .5s cubic-bezier(.22, .8, .18, 1) .14s both; }
+/* The title's two photographs are different sizes of type: swap them early so they never read as a double image. */
+html.motion-on[data-file-transition]::view-transition-old(file-title) { animation: ft-fade-out .22s ease both; }
+html.motion-on[data-file-transition]::view-transition-new(file-title) { animation: ft-fade-in .3s ease .12s both; }
+@keyframes ft-sink { to { opacity: 0; transform: scale(.965); } }
+@keyframes ft-rise { from { opacity: 0; transform: translateY(56px); } }
+@keyframes ft-drop { to { opacity: 0; transform: translateY(56px); } }
+@keyframes ft-lift { from { opacity: 0; transform: scale(.965); } }
+@keyframes ft-fade-out { to { opacity: 0; } }
+@keyframes ft-fade-in { from { opacity: 0; } }
 
 /* ---------- chapter rail (home only) ---------- */
 .rail {
@@ -490,10 +516,19 @@ html.motion-on .cf .tl-dot { transition: background-color .3s ease; }
 .cf .sf-sheet {
   position: relative; flex: 1; display: flex; flex-direction: column; gap: 12px;
   padding: clamp(18px, 2.4vw, 26px); background: var(--paper-hi); border: 1.5px solid var(--ink);
+  /* Two more sheets in the file, under the top one. --stack (0 to 1) fans them out as the file lands. */
+  --stack: 1;
+  --s1: calc(5px * var(--stack)); --s2: calc(10px * var(--stack));
+  box-shadow: var(--s1) var(--s1) 0 -1.5px var(--paper-hi), var(--s1) var(--s1) 0 0 var(--rule), var(--s2) var(--s2) 0 -1.5px var(--paper-hi), var(--s2) var(--s2) 0 0 var(--rule);
 }
 .cf .sf-client { display: flex; align-items: center; gap: 10px; margin: 0; padding-right: 104px; }
 .cf .sf-k { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--graphite); }
-.cf .sf-redact { display: block; flex: 0 1 11em; height: 1.1em; background: var(--ink); transform-origin: left center; }
+.cf .sf-redact {
+  display: block; flex: 0 1 11em; height: 1.1em; transform-origin: left center;
+  /* A marker pass rather than a printed box: streaked, a little off square. */
+  background: repeating-linear-gradient(176deg, rgba(255, 255, 255, .05) 0 1px, transparent 1px 4px), var(--ink);
+  border-radius: 2px 4px 3px 1px; rotate: -.7deg;
+}
 .cf .sf-sector { margin: 0; padding-right: 96px; font: 500 12.5px/1.45 var(--mono); letter-spacing: .02em; color: var(--graphite); }
 .cf .sf-title { margin: 2px 0 0; font-family: var(--serif); font-weight: 400; font-size: clamp(26px, 2.4vw, 32px); line-height: 1.08; text-wrap: balance; }
 .cf .sf-meta { display: flex; flex-direction: column; gap: 2px; margin: 0; font: 500 12.5px/1.45 var(--mono); color: var(--graphite); }
@@ -512,19 +547,19 @@ html.motion-on .cf .tl-dot { transition: background-color .3s ease; }
 .cf .sf-more li { padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 16px; line-height: 1.5; }
 .cf .sf-note { margin: 2px 0 0; font-size: 16px; line-height: 1.5; }
 .cf .sf-closed .sf-sheet { background: var(--paper-lo); }
-.cf .sf-closed .sf-sector .sf-redact { width: min(16em, 100%); }
-/*
- * As each file scrolls in, the bar is drawn over the name and the stamp comes
- * down, tied to the scroll. A browser without scroll-driven animations runs
- * these with no duration, so it simply shows them in place.
- */
-html.motion-on .cf .sf-redact { animation: sf-redact linear both; animation-timeline: view(); animation-range: entry 30% cover 30%; }
-html.motion-on .cf .sf-stamp { animation: sf-stamp linear both; animation-timeline: view(); animation-range: entry 60% cover 38%; }
-@keyframes sf-redact { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes sf-stamp {
-  from { opacity: 0; transform: rotate(-8deg) scale(1.9); }
-  to { opacity: 1; transform: rotate(-8deg) scale(1); }
+.cf .sf-closed .sf-sector .sf-redact { width: min(16em, 100%); rotate: .5deg; }
+/* Stamp ink never takes evenly. */
+.cf .sf-stamp {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='70'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 2.05'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='70'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 2.05'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
 }
+/*
+ * The ring of ink thrown out when the stamp lands. Hidden at rest; with
+ * motion on, SealedFiles.jsx drops each file on the desk, draws the bar and
+ * brings the stamp down as the file scrolls in.
+ */
+.cf .sf-thud { position: absolute; inset: -7px; border: 2px solid var(--stamp); border-radius: 3px; opacity: 0; pointer-events: none; }
 
 /* skills + recognition */
 .cf .skills-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; margin-top: 8px; }
