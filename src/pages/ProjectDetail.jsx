@@ -35,6 +35,14 @@ import { closeFile, fileTransitionsSupported, isFileTransition } from '../motion
  */
 const InteractiveAnalysis = lazy(() => import('../components/MLCharts/InteractiveAnalysis'));
 
+/**
+ * The live ASR exhibit records audio and talks to the model server, so it too
+ * loads only on its own page. Without VITE_ASR_SPACE at build time it renders
+ * nothing, and the case study reads as it did before the demo existed.
+ */
+const AsrDemo = lazy(() => import('../components/AsrDemo/AsrDemo'));
+const ASR_SPACE = import.meta.env.VITE_ASR_SPACE;
+
 /** Heading id shared by the rendered h2 and the contents rail, so they cannot disagree. */
 const slugify = (text) =>
   text
@@ -334,6 +342,14 @@ const ProjectDetail = () => {
       {project.id === 'idea-sprint' && (
         <div className="wrap case-embed">
           <LazySpaceEmbed src="https://ai-robotix-nick-multi-agent-system.hf.space" height={450} />
+        </div>
+      )}
+
+      {project.demo === 'asr' && ASR_SPACE && (
+        <div className="wrap case-embed">
+          <Suspense fallback={null}>
+            <AsrDemo space={ASR_SPACE} modelLabel={project.demoModel} />
+          </Suspense>
         </div>
       )}
 

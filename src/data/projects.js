@@ -1,6 +1,5 @@
 import { DataScience, PostgresqlIcon, NodejsIcon, Python, Flask, Angular, MaterialUi, ReactIcon, FirebaseIcon, Windows, Javascript } from '../components/SvgIcons';
 import widsThumbnail from '../assets/wids_2023_datathon.webp';
-import caribbeanAsrThumbnail from '../assets/zindi_caribbean_voices_hackathon.webp';
 import pokemonDashboardProPic from '../assets/pokemon_dashboard_pro_pic.webp';
 import chimpShot from '../assets/screenshots/chimp-test-game.webp';
 import ideaSprintShot from '../assets/screenshots/idea-sprint.webp';
@@ -309,23 +308,28 @@ export const projects = [
   },
   {
     id: 'caribbean-asr-data-science',
-    highlight: 'Speech-recognition pipeline for Caribbean English: Wav2Vec-BERT encoders fine-tuned with CTC, then KenLM beam rescoring through pyctcdecode.',
-    primaryTech: ['PyTorch', 'Transformers', 'KenLM', 'torchaudio'],
-    title: 'Caribbean ASR Data Science',
-    shortDescription: 'ASR pipeline with Wav2Vec-BERT + CTC and KenLM tuned for Caribbean English.',
-    description: 'Reproducible ASR pipeline using SSL encoders (Wav2Vec / Wav2Vec-BERT), CTC fine-tuning, KenLM rescoring and pyctcdecode. Includes notebooks (Starter, Full Pipeline) and scripts for training and decoding.',
+    highlight: 'Whisper fine-tuned with LoRA on BBC Caribbean broadcasts reaches 0.0564 word error rate on held-out clips. Two runs meant to improve it made it measurably worse, and a one-hour pilot showed large-v3 already hears the speech better before any fine-tuning. Live on the page.',
+    primaryTech: ['PyTorch', 'Transformers', 'PEFT', 'Whisper'],
+    title: 'Caribbean Voices: Speech Recognition for Caribbean English',
+    shortDescription: 'Whisper fine-tuned with LoRA for Caribbean broadcast English: 0.0564 word error rate on held-out clips, with paired confidence intervals on every comparison, served live from a ZeroGPU Space.',
+    description: 'Caribbean Voices AI Hackathon (UWI AI Innovation Centre, on Zindi), revisited in 2026 after it closed. Whisper with LoRA adapters, trained on raw cased and punctuated transcripts with repeated boilerplate capped and a validation split grouped by transcript, which predicted the private leaderboard to within 0.002. whisper-medium reaches 0.0564 raw WER on 1,986 held-out clips. Error analysis puts 40% of what remains in formatting, and finds narrowband audio and extreme speaking rates matter while pitch does not. Continuing training made the model worse by 0.0071 (paired 95% CI 0.004 to 0.010) through overfitting. A duration-based length cap removes the beam-search loops without changing any validation output. A pre-registered pilot found zero-shot large-v3 already beats the fine-tuned model on recognition, which sets the next run. Served on a Hugging Face ZeroGPU Space after CPU serving measured about 13 seconds per clip; the competition data and fine-tuned weights stay private.',
     category: 'Data Science',
-    technologies: ['PyTorch', 'Transformers', 'KenLM', 'pyctcdecode', 'torchaudio', 'Librosa'],
-    thumbnail: caribbeanAsrThumbnail,
+    technologies: ['Python', 'PyTorch', 'Transformers', 'PEFT', 'Whisper', 'CTranslate2', 'Gradio', 'Hugging Face Spaces', 'FastAPI', 'Docker', 'librosa', 'jiwer', 'Kaggle'],
+    thumbnail: null,
     featured: true,
-    githubUrl: 'https://github.com/firepenguindisopanda/caribbean-asr',
-    liveUrl: null,
+    githubUrl: null,
+    liveUrl: 'https://huggingface.co/spaces/ai-robotix-nick/caribbean-asr',
     markdown: '/markdowns/caribbean-asr-data-science.md',
+    demo: 'asr',
+    demoModel: 'Whisper-medium fine-tuned with LoRA',
+    evidence: 'Every word error rate is corpus-level with a bootstrap interval, and every comparison is paired on the same held-out clips, which is how a run that looked like progress was shown to be 0.0071 worse.',
     techIcons: [ { Icon: DataScience, label: 'Data Science' }, { Icon: Python, label: 'Python' } ],
     tasks: [
-      'Fine-tune SSL models with CTC for Caribbean English',
-      'Train KenLM on normalized transcripts and add beam-rescoring with pyctcdecode',
-      'Augment data using Speed/Pitch perturb and synthetic TTS for robust inference'
+      'Fine-tuned Whisper with LoRA on raw transcripts, with a duplicate cap and a validation split grouped by transcript',
+      'Error analysis by formatting, audio channel, speaking rate and pitch, with confidence intervals',
+      'Paired comparisons that caught an overfitting run, and a length cap that removes beam-search loops',
+      'A pre-registered zero-shot pilot across model sizes before committing 20 GPU hours',
+      'Served live on a ZeroGPU Space, with private weights and a CPU fallback service in Docker',
     ],
   },
   {
