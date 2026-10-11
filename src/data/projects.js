@@ -307,14 +307,12 @@ export const projects = [
     techIcons: [ { Icon: ReactIcon, label: 'React' }, { Icon: FirebaseIcon, label: 'Firebase' } ],
   },
   {
-    // Draft: publish only after the competition closes on 4 Oct 2026 (its rules bar sharing
-    // information across accounts), then add the private leaderboard score and final rank.
     id: 'road-barbados-handwriting',
-    highlight: '44 recognisers vote on every line of colonial Barbados handwriting: fine-tuned TrOCR and Qwen2.5-VL models under a family-weighted consensus, from 0.841 to 0.910 on the public leaderboard.',
+    highlight: '44 recognisers vote on every line of colonial Barbados handwriting and score 0.906 on the private leaderboard. The entry I chose to be ranked on was a single model rebuildable from raw data, placed 238th at 0.893: reproducibility cost 0.0136.',
     primaryTech: ['PyTorch', 'Transformers', 'Qwen2.5-VL', 'TrOCR', 'QLoRA'],
     title: 'R.O.A.D. Barbados: Archive Handwriting Recognition',
     shortDescription: 'Transcribing handwritten deeds, wills and inventories from the Barbados archive for a Zindi competition. Fine-tuned TrOCR and Qwen2.5-VL models vote line by line through family-weighted minimum Bayes risk, and every gain was held to a noise floor measured for the leaderboard.',
-    description: 'Handwritten text recognition on 5,472 line images from colonial Barbados records (R.O.A.D. Programme, GovTech Barbados). Fine-tuned TrOCR base and large, then Qwen2-VL-2B and Qwen2.5-VL-7B with QLoRA, combined by family-weighted minimum Bayes risk with weights tuned by nested cross-validation, plus test-time augmentation and self-training. Error analysis found the remaining error dominated by case (label noise), punctuation and unseen names; seven further ideas were measured against pre-registered bars and closed.',
+    description: 'Handwritten text recognition on 5,472 line images from colonial Barbados records (R.O.A.D. Programme, GovTech Barbados). Fine-tuned TrOCR base and large, then Qwen2-VL-2B and Qwen2.5-VL-7B with QLoRA, combined by family-weighted minimum Bayes risk with weights tuned by nested cross-validation, plus test-time augmentation and self-training. Error analysis found the remaining error dominated by case (label noise), punctuation and unseen names; seven further ideas were measured against pre-registered bars and closed. The ensemble scored 0.906 privately, but because its earliest weights were gone it could not be rebuilt from code, so the selected entry was a single Qwen2.5-VL-7B trained from raw data in one notebook, whose saved weights reproduce its submission exactly: 0.893 private, rank 238 of 661 (provisional until 25 October 2026).',
     category: 'Data Science',
     technologies: ['PyTorch', 'Hugging Face Transformers', 'PEFT', 'bitsandbytes', 'TrOCR', 'Qwen2.5-VL', 'Qwen2-VL', 'Kraken', 'rapidfuzz', 'Kaggle'],
     thumbnail: null,
@@ -322,7 +320,7 @@ export const projects = [
     githubUrl: null,
     liveUrl: null,
     markdown: '/markdowns/road-barbados-handwriting.md',
-    evidence: 'No gain counted until it cleared a measured noise floor (about 1.5 thousandths on public ensemble deltas), and both final submissions rebuild byte for byte from 91 inputs checked by SHA-256.',
+    evidence: 'No gain counted until it cleared a measured noise floor (about 1.5 thousandths on public ensemble deltas), and the ranked submission is trained from raw data in one notebook, with its saved weights reproducing the submitted file exactly.',
     techIcons: [ { Icon: DataScience, label: 'Data Science' }, { Icon: Python, label: 'Python' } ],
     tasks: [
       'Recovered the exact competition metric and confirmed it against more than 20 leaderboard results',
@@ -330,7 +328,7 @@ export const projects = [
       'Family-weighted minimum Bayes risk over 44 systems, weights tuned by nested cross-validation',
       'Test-time augmentation and self-training on unlabelled test lines, stopped when the student matched its teacher',
       'Error analysis: case label noise, tall crops, and unseen names, each measured',
-      'Byte-for-byte reproducibility package for both final submissions',
+      'A reproducible final solution: raw data to submission in one notebook, rebuilt exactly from its saved weights',
     ],
   },
   {

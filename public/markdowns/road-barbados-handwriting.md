@@ -1,12 +1,17 @@
 # R.O.A.D. Barbados: Archive Handwriting Recognition
 
-> Colonial Barbados kept its deeds, wills and estate inventories by hand. This
-> entry reads them one line at a time: 44 recognisers vote on every line, and no
-> gain counted until it cleared a noise floor measured for this leaderboard.
+> Colonial Barbados kept its deeds, wills and estate inventories by hand. My best
+> entry read them with 44 recognisers voting on every line, and no gain counted
+> until it cleared a noise floor measured for this leaderboard. The entry I chose
+> to be ranked on was a single model I could rebuild from raw data, and that choice
+> cost 0.0136 on the private leaderboard.
 
-**Zindi competition, July to October 2026.** Best public leaderboard score
-**0.909772**. The private leaderboard, which decides the competition, is
-announced when it closes on 4 October 2026.
+**Zindi competition, July to October 2026.** Ranked **238th** of 661 active
+participants on a private score of **0.892733**, the reproducible single model. The
+44-system ensemble scored **0.906303** privately, which would have placed about
+170th, but it was not one of my two selected submissions (see *The final choice*).
+Scores and ranks can still change until 25 October 2026, while the winning
+solutions are reviewed.
 
 ## The problem
 
@@ -77,9 +82,33 @@ The best single system from each family:
 | TrOCR large | 0.857716 |
 | Qwen2.5-VL-7B, QLoRA | 0.908416 |
 
-The two final submissions are the 44-system ensemble and the strongest single 7B
-model. The second pick was made on expected value over the private 70%: a near
-duplicate of the first would add almost nothing if the first is wrong.
+## The final choice: reproducible over best
+
+Zindi asks the top ten for code that reproduces their leaderboard score, and moves
+a solution down to whatever its code does reproduce. The ensemble could not pass
+that test. It had been built over three months from 44 systems, and the first TrOCR
+base weights, which carry 23.9% of its vote weight, had not been kept, so those
+members could be replayed from their saved predictions but never retrained.
+
+So I picked my final two submissions to be rebuildable from raw data. One notebook
+trains a fresh Qwen2.5-VL-7B QLoRA adapter on the training rows only. It picks the
+checkpoint on held-out rows and then transcribes the test set, with no pseudo-labels
+and no earlier adapters, and every input checked by SHA-256. A second notebook refits
+the same recipe on all labelled rows. A third reloads the saved weights and
+reproduces the submitted file exactly: 0 of 1,374 lines differ.
+
+| Submission | Public | Private |
+|---|---|---|
+| 44-system ensemble, not selected | 0.909772 | 0.906303 |
+| Strongest single 7B from the ensemble's pool, not selected | 0.908416 | 0.904704 |
+| Clean single model, training rows only | 0.891274 | 0.886765 |
+| **Clean single model, refit on all labelled rows** | 0.894714 | **0.892733** |
+| Winner, for scale | 0.936088 | 0.933057 |
+
+Rebuilding from scratch cost 0.0136, about 68 places. The choice was made before
+the private scores were known, so that if code were requested, it would reproduce
+the score being ranked. In the end neither entry came near the top ten, so no code
+was requested.
 
 ## What this found
 
@@ -192,14 +221,18 @@ Each of these had a pass bar written down before it ran.
 - **Local training.** A GPU check before starting, a fallback ladder when memory
   runs out, GPU use logged through the run, and the final score recomputed in a
   fresh process.
-- **Reproducibility.** Both final submissions rebuild byte for byte on a CPU in
-  about 10 seconds from 91 inputs, each checked by SHA-256. A deliberately
-  tampered input was caught and named.
+- **Reproducibility.** The ensemble rebuilds byte for byte on a CPU in about 10
+  seconds from 91 saved inputs, each checked by SHA-256, and a deliberately
+  tampered input was caught and named. The selected single model goes further: it
+  is trained from raw data in one notebook, and reloading its weights reproduces
+  the submitted file exactly.
 
 ## Limitations
 
 - The public leaderboard is about 412 lines. Every conclusion above that rests on
-  it is stated with that noise floor in mind, and the private 70% decides.
+  it is stated with that noise floor in mind; the private 70% decided the ranking.
+- The rank and private scores are provisional until the winners' review ends on
+  25 October 2026.
 - The first TrOCR base weights were not kept. Their predictions were, so the
   ensemble still rebuilds exactly, but those members, which carry 23.9% of the
   vote weight, cannot be decoded again.
