@@ -2,14 +2,13 @@
 
 > Off-the-shelf speech recognition is known to struggle with Caribbean accents. Fine-tuning
 > Whisper on BBC Caribbean broadcasts brought the error rate down to about one word in
-> eighteen. Then two runs that should have improved it made it worse, and a one-hour pilot
+> twenty-three. Then two runs that should have improved it made it worse, and a one-hour pilot
 > showed where the next real gain is. You can try the model above.
 
 **Caribbean Voices AI Hackathon** (UWI AI Innovation Centre, on Zindi), revisited in 2026 after
-it closed in December 2025. The best model scores **0.0564 word error rate** on held-out clips,
-counting case and punctuation the way the competition does. The earlier, smaller model's local
-score predicted its private leaderboard score to within 0.002. The submissions came after the
-deadline, so they appear in no ranking.
+it closed in December 2025. The best model scores **0.0434 word error rate** on the private
+leaderboard (0.0435 public), counting case and punctuation the way the competition does. The
+submissions came after the deadline, so they are scored but appear in no ranking.
 
 ## The problem
 
@@ -33,8 +32,14 @@ insertions per reference word. Case and punctuation count, so "the U.S." and "th
 | First pipeline, partly normalised text | 0.1368 | private leaderboard |
 | whisper-small + LoRA, 500 steps, lowercase labels | 0.0956 | private leaderboard |
 | whisper-small + LoRA, 2,000 steps, raw labels, duplicate cap | 0.0731 | private leaderboard (validation said 0.0709) |
-| **whisper-medium + LoRA** | **0.0564** (95% CI 0.052 to 0.061) | 1,986 held-out clips |
+| whisper-medium + LoRA | 0.0478 | private leaderboard (validation said 0.0564) |
+| **the same model, decoded with a loop guard** | **0.0434** | private leaderboard |
 | Leaderboard winner, for scale | 0.0309 | private leaderboard |
+
+The validation score here comes from 1,986 held-out clips (medium: 0.0564, 95% CI 0.052 to
+0.061). It landed within 0.002 of the private leaderboard for the small model but was
+pessimistic for medium by 0.009, so it is used to compare runs with each other, not to forecast
+the leaderboard number.
 
 ## What this found
 
@@ -56,8 +61,10 @@ split is never capped, so its score stays honest.
 
 About 10% of the data is repeated boilerplate. A random split puts copies of the same jingle on
 both sides, and the model scores well on validation by remembering it. The split here assigns
-whole transcript groups to one side or the other. That validation score tracked the private
-leaderboard to within 0.002, which made it safe to iterate locally and submit rarely.
+whole transcript groups to one side or the other. For the small model that validation score
+landed within 0.002 of the private leaderboard, which made it safe to iterate locally and submit
+rarely. For medium it was pessimistic (0.0564 against 0.0478), but both put medium clearly
+ahead.
 
 ### 3. Where the remaining errors are
 
@@ -94,7 +101,7 @@ too: on two GPUs the gradient accumulation rounded down, doubling its effective 
 Both results are reported with paired intervals on the same clips, which is what showed the
 drop was real rather than noise.
 
-### 5. Two runaway loops, and a fix that costs nothing
+### 5. Two runaway loops cost 8% of the score
 
 Beam search sometimes gets stuck repeating a phrase, and two of the medium model's 8,510 test
 transcripts did, one repeating a single word dozens of times. Two guards now run on every
@@ -106,6 +113,18 @@ decode:
 
 The cap cuts exactly those two test transcripts and changes none of the 1,986 validation ones.
 Because the threshold comes from the training data, it involved no tuning on validation.
+
+On the private leaderboard, the same model's two loops were worth 0.0037:
+
+| Same medium model | Private WER |
+|---|---|
+| Plain decode | 0.0478 |
+| Length cap applied to the finished transcripts | 0.0441 |
+| Decoded again with the repeated-phrase block | **0.0434** |
+
+On validation the guards changed nothing, because no validation clip looped. Their value only
+showed on unseen data, which is the case for a guard that is cheap and cannot hurt a correct
+transcript.
 
 ### 6. A one-hour pilot found the next step
 
@@ -163,8 +182,9 @@ token. Only the serving code and the demo are public.
 
 ## Limitations
 
-- The medium model and the October runs were scored on validation only, not the leaderboard.
-  Validation predicted the small model's private score to within 0.002.
+- The October runs were scored on validation only. Validation was within 0.002 of the private
+  leaderboard for the small model but 0.009 pessimistic for medium, so its numbers compare runs
+  rather than forecast scores.
 - Clip groups follow transcripts, not speakers. Presenters recur, so speaker overlap between the
   splits may flatter the scores slightly.
 - The pilot chose among models on 500 clips of the same validation split that later runs will
