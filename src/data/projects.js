@@ -10,6 +10,7 @@ import biReportingShot from '../assets/screenshots/bi-automatic-reporting.webp';
 import fastapiMockerShot from '../assets/screenshots/fastapimocker.webp';
 import timetableBuilderShot from '../assets/screenshots/timetable-builder.webp';
 import linkTrackerShot from '../assets/screenshots/link-tracker.webp';
+import folioShot from '../assets/screenshots/folio.webp';
 
 export const projects = [
   {
@@ -70,6 +71,41 @@ export const projects = [
       'Grounding in a licensed 143-chunk corpus with sources and links, no vector store',
       'Durable runs with sequence-numbered events a reloaded page replays, a 24-case prompt-injection suite graded by string search, token budgets, retries and circuit breakers',
       'Next.js 16 and React 19 frontend that streams each stage live, exports Markdown, PDF and JSON; 34 Vitest test files and a Playwright suite',
+    ],
+  },
+  {
+    id: 'folio',
+    highlight: 'Chat with your PDFs, with a separate Postgres vector database for every user, created on first sign in, and retrieval built for the questions people ask long documents: what is this about, what is chapter 2 about, and the last chapter.',
+    primaryTech: ['Remix', 'Neon Postgres', 'pgvector', 'NVIDIA NIM'],
+    // The live landing page: the signed-in screens need a Google account.
+    screenshot: folioShot,
+    title: 'Folio: Chat With Your PDFs, One Vector Database Per User',
+    shortDescription: 'Upload a PDF and ask it anything. Every user gets their own Neon Postgres project with pgvector, answers stream with an optional view of the model\'s reasoning, and deleting a document or an account removes it from every system it touched.',
+    description: 'Started from Neon\'s open source vector-database-per-tenant example and rebuilt: NVIDIA NIM for chat and embeddings, UploadThing for files, saved chats, and a new interface. Each user gets a Neon project created through the Neon API on first sign in and migrated with pgvector; if anything fails after the project exists, it is deleted rather than left orphaned. Retrieval was shaped by a 2,184-chunk textbook, where six similar passages answer specific questions well and broad ones badly: an overview written on upload from the opening pages and eight evenly spaced samples goes into every prompt, follow-ups are searched together with the previous question, and chapter and section questions also search the tenant\'s chunks by their numbering (headings followed by a capitalised title, the passage before a chapter\'s contents for its objectives, a section\'s title read from the table of contents), so "what is chapter 2 about" lists every section and "the last chapter" resolves to chapter 26. Thinking is a per-message toggle whose reasoning streams separately and is saved with the answer. Embeddings are asymmetric (passage and query input types, sent by a custom LangChain class) and 1,024 wide to stay under pgvector\'s 2,000-dimension HNSW limit. Data lives in three places, so every deletion is idempotent with the main row removed last: a document takes its file, chunks, chats and messages with it, and an account takes the whole Neon project.',
+    category: 'Full Stack',
+    technologies: ['Remix', 'React 18', 'TypeScript', 'Tailwind CSS', 'Neon Postgres', 'pgvector', 'Drizzle ORM', 'NVIDIA NIM', 'Vercel AI SDK', 'LangChain', 'UploadThing', 'Upstash Redis', 'Docker', 'Railway'],
+    thumbnail: null,
+    featured: true,
+    githubUrl: 'https://github.com/firepenguindisopanda/folio',
+    liveUrl: 'https://folio-production-7bee.up.railway.app/',
+    markdown: '/markdowns/folio.md',
+    evidence: 'Deleting an account removes every PDF, the user\'s own Neon project and every row they own, each step safe to retry, checked end to end against a throwaway tenant until Neon reported the project gone.',
+    techIcons: [
+      { Icon: DataScience, label: 'AI' },
+      { Icon: PostgresqlIcon, label: 'PostgreSQL' },
+    ],
+    tasks: [
+      'A Neon project per user, created through the Neon API on first sign in, migrated with pgvector, named after the public user id, and deleted again if provisioning fails part way',
+      'Per-tenant migrations: one command walks every tenant database and migrates it, and new tenants are migrated when they are created',
+      'A document overview written on upload from the opening 12,000 characters plus eight evenly spaced samples, included in every prompt so broad questions get real answers',
+      'Follow-up questions searched on their own and together with the previous question, with the results merged',
+      'Chapter and section lookup by numbering, which similarity search misses: contents lists scored by numbered headings, objectives from the passage before, section starts found from titles in the table of contents, and "last" and "next" chapter resolved',
+      'Thinking mode per message: reasoning streamed separately through the AI SDK, shown live in a collapsible panel, saved with the answer, and a clear message if the model never finishes thinking',
+      'A custom embeddings class for NVIDIA\'s asymmetric retrieval model (passage and query input types), batched and retried, at 1,024 dimensions to keep an HNSW index',
+      'Idempotent deletion across Postgres, the tenant database and UploadThing, with every foreign key cascading and the main row removed last, so a failed deletion can simply be retried',
+      'Upload guards: failed processing removes its chunks and file, only files the same user uploaded are accepted, and the three-document limit is re-checked inside the transaction',
+      '50 messages a day per user in UTC-aligned windows and 10 a minute, with usage shown in the UI and a rejected message put back in the box',
+      'Saved chats with automatic titles, rename and delete, answer ratings, copy and regenerate, a collapsible sidebar, light and dark themes and a mobile layout',
     ],
   },
   {
