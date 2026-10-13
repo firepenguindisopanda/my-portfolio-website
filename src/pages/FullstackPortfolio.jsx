@@ -12,7 +12,7 @@ const FullstackPortfolio = () => {
     <CategoryPage
       eyebrow="Deep dive"
       title="Full-stack web"
-      description="Systems with a server, a database and something at stake. React, Next.js and Angular on the front; FastAPI, NestJS and Flask behind them; PostgreSQL, Redis and Supabase underneath."
+      description="Web apps with a server and a database behind them. Frontends in React, Next.js and Angular; backends in FastAPI, NestJS and Flask; data in PostgreSQL, Redis and Supabase."
       categories={CATEGORIES}
       surface="fullstack"
     />

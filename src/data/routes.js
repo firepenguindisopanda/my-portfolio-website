@@ -41,7 +41,7 @@ export const staticRoutes = [
     path: '/fullstack',
     title: 'Full-Stack Web Development',
     description:
-      'Full-stack projects across React, Next.js, FastAPI, NestJS and PostgreSQL, from multi-agent AI systems to cache-aware crawlers.',
+      'Full-stack projects built with React, Next.js, FastAPI, NestJS and PostgreSQL, including multi-agent AI systems and a cache-aware crawler.',
     changefreq: 'monthly',
     priority: '0.8',
   },
@@ -57,14 +57,14 @@ export const staticRoutes = [
     path: '/desktop',
     title: 'Desktop Tools',
     description:
-      'Native desktop tools for work that should never leave the machine: a Rust and Tauri PDF utility, and a .NET, WPF and browser-extension tool that turns 100+ open tabs into a queue that shrinks.',
+      'Desktop tools that keep your files on your own machine: a PDF utility in Rust and Tauri, and a .NET and WPF app with a browser extension that turns 100+ open tabs into a reading queue.',
     changefreq: 'monthly',
     priority: '0.7',
   },
   {
     path: '/android',
     title: 'Android Development',
-    description: 'Mobile application work built with modern Android technologies.',
+    description: 'Android apps I have built.',
     changefreq: 'yearly',
     priority: '0.4',
   },

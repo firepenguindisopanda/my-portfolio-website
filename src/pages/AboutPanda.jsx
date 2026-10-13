@@ -83,8 +83,7 @@ const AboutPanda = () => {
               <mark>&ldquo;{profile.personal.motto}&rdquo;</mark>
             </p>
             <p className="lede panda-line">
-              The story behind the panda, the philosophy, and the journey. Personal insights, life lessons, and the
-              developer&apos;s journey. Watch this space.
+              Where the panda came from and why it stuck. I&apos;m still writing this page.
             </p>
           </div>
 

@@ -1,13 +1,14 @@
 # WiDS 2024: Metastatic Breast Cancer Diagnosis
 
-> A model that scores 0.80 AUC at predicting timely breast cancer diagnosis turns
-> out to be mostly a clock. Finding that out, and what it does to the equity
-> question the datathon was asking, is the part of this project worth reading.
+> A model that scores 0.80 AUC at predicting timely breast cancer diagnosis turned
+> out to be mostly measuring when the patient was screened. This write-up covers
+> how I found that, and what it means for the equity question the datathon was
+> asking.
 
 **WiDS Datathon 2024, Challenge 1, revisited in 2026.** Private leaderboard AUC
 **0.792**, public 0.801. The submissions were made after the competition closed,
-so they appear in no ranking. The rebuild took the winning team's published
-write-up as its starting point, then went on to ask what the model had learned.
+so they appear in no ranking. I rebuilt the solution starting from the winning
+team's published write-up, then looked at what the model had learned.
 
 ## The problem
 
@@ -51,23 +52,23 @@ Selected members of the model zoo, out of fold:
 | LightGBM | boosted trees | 0.7888 |
 | Gaussian naive Bayes | probabilistic | 0.7831 |
 
-The spread from best to worst is only 0.021. What made the zoo worth building is
-that its members disagree: the mean pairwise rank correlation of their
-predictions is 0.78, against more than 0.98 for the first version's fourteen
-boosted trees, whose average bought almost nothing.
+The spread from best to worst is 0.021. The zoo was useful because its members
+disagree: the mean pairwise rank correlation of their predictions is 0.78,
+against more than 0.98 for the first version's fourteen boosted trees, so
+averaging those fourteen added almost nothing.
 
 ## What this found
 
-### 1. The model is mostly a clock
+### 1. The model mostly tracks when patients were screened
 
 The single strongest column is which version of the diagnosis code a patient's
 record uses. Patients coded in ICD-10 were diagnosed within 90 days 78.4% of the
 time; patients coded in ICD-9, 9.5%. That flag alone scores 0.762 AUC. The US
 retired ICD-9 in October 2015, so the flag mostly records **when** a patient was
-screened, not anything about the patient.
+screened and says little about the patient.
 
-The model knows it. The flag carries 34.5% of the model's split gain, and
-shuffling it costs 0.030 AUC, seven times more than any other feature:
+The model relies on it heavily. The flag carries 34.5% of the model's split gain,
+and shuffling it costs 0.030 AUC, seven times more than any other feature:
 
 | Feature | AUC lost when shuffled |
 |---|---|
@@ -80,13 +81,14 @@ shuffling it costs 0.030 AUC, seven times more than any other feature:
 | Payer type missing | 0.0014 |
 | Race | 0.0011 |
 
-Decomposing the AUC by pair makes it plain. An AUC is the share of (diagnosed on
-time, diagnosed late) pairs the model ranks correctly. 53.9% of those pairs set
-an ICD-10 patient diagnosed on time against an ICD-9 patient diagnosed late, and
-the model ranks every one of them correctly: that alone is 0.539 of the total
-0.806. (The 1.6% of pairs the other way round, it ranks wrongly every time.) Within the ICD-10 era it ranks pairs
-correctly 60.2% of the time, and within ICD-9, 56.8%. Once the era is known, the
-model is only modestly better than chance.
+Breaking the AUC down by pair shows where it comes from. An AUC is the share of
+(diagnosed on time, diagnosed late) pairs the model ranks correctly. In 53.9% of
+those pairs, an ICD-10 patient diagnosed on time is set against an ICD-9 patient
+diagnosed late, and the model ranks every one of them correctly, which alone
+accounts for 0.539 of the total 0.806. It ranks every one of the 1.6% of pairs
+the other way round wrongly. Within the ICD-10 era it ranks pairs correctly 60.2%
+of the time, and within ICD-9, 56.8%, so once the era is known the model is only
+modestly better than chance.
 
 ### 2. The crude comparisons understate the disparity
 
@@ -103,12 +105,12 @@ The gap for Black patients widens by more than two thirds once the era is held
 fixed, a gap for Hispanic patients appears, and the Medicaid difference changes
 sign. After adjusting for era, age, missing BMI, area socioeconomic measures and
 metastatic site, Black patients have an odds ratio of **0.697** (95% CI 0.585 to
-0.830, p = 5e-5) for a diagnosis within 90 days: the only demographic effect that
-survives every specification, and adjustment makes it stronger.
+0.830, p = 5e-5) for a diagnosis within 90 days. It is the only demographic
+effect that holds in every specification, and adjustment makes it stronger.
 
-The caveat that limits all of it: race is missing for 49.5% of patients, and
-whether it is missing is itself associated with the outcome, so every race
-estimate is conditional on race having been recorded.
+Race is missing for 49.5% of patients, and whether it is missing is itself
+associated with the outcome, so every race estimate is conditional on race having
+been recorded. That limits everything in this section.
 
 ### 3. The model is least accurate for the group with the widest gap
 
@@ -123,27 +125,27 @@ Within the ICD-10 era, AUC by recorded race:
 | Asian | 286 | 0.641 | 0.562 to 0.718 |
 | Hispanic | 665 | 0.647 | 0.598 to 0.694 |
 
-For Black patients the model is barely above chance. A leaderboard AUC of 0.8
-says nothing about that, which is why this table belongs next to the score.
+For Black patients the model is barely above chance, and a leaderboard AUC of 0.8
+does not show that. I think this table should be reported alongside the score.
 
-### 4. The environmental data is real but weak
+### 4. The environmental data has real but weak effects
 
 After a false discovery rate correction, 28 of the 69 numeric zip code and air
 quality columns differ significantly between the two outcomes, but the largest
 effect size among them is 0.116 (Cohen's d), below the 0.2 conventionally called
-small. An unknown payer type matters more: an odds ratio of 1.44 (95% CI 1.24 to
-1.66) in the adjusted model.
+small. An unknown payer type matters more, with an odds ratio of 1.44 (95% CI 1.24
+to 1.66) in the adjusted model.
 
 ### 5. Pruning the ensemble had been fitting noise
 
 The first leaderboard submission pruned a 25-model ensemble down to 4 members, on
 gains of about 0.00007 per step against a standard error of 0.0037. Its nested
-estimate was 0.8077; the private leaderboard gave 0.792. The post-mortem changed
-the rule: the ensemble size is now chosen on held-out rows with a one standard
-error rule that leans towards keeping members, and it drops one model instead of
-twenty-one. The same discipline had already picked the combiner: a plain average
-beat fitted weights on the nested estimate (0.80599 against 0.80552), although the
-fitted weights looked better in sample (0.80729).
+estimate was 0.8077, and the private leaderboard gave 0.792. After that I changed
+the rule. The ensemble size is now chosen on held-out rows with a one standard
+error rule that leans towards keeping members, and it drops one model where the
+old rule dropped twenty-one. The combiner had already been chosen the same way: a
+plain average beat fitted weights on the nested estimate (0.80599 against
+0.80552), although the fitted weights looked better in sample (0.80729).
 
 ## Method
 
@@ -156,10 +158,10 @@ fitted weights looked better in sample (0.80729).
   row is encoded with its own label.
 - **Features.** 46 engineered features (123 columns in all), then forward
   selection for the tree models and backward elimination for the linear ones.
-- **Trusting cross-validation.** An adversarial classifier trying to tell train
-  from test scored 0.494 AUC: the two are indistinguishable, so cross-validation
-  was trusted over a public leaderboard built on half the test rows.
-- **Honest ensemble scores.** Ensemble weights and pruning are re-fitted inside
+- **Trusting cross-validation.** An adversarial classifier trained to tell train
+  from test scored 0.494 AUC, so the two are indistinguishable, and I trusted
+  cross-validation over a public leaderboard built on half the test rows.
+- **Nested ensemble scores.** Ensemble weights and pruning are re-fitted inside
   their own folds, and that nested number is the one quoted.
 
 ## Limitations

@@ -173,7 +173,7 @@ const D3 = { x: 404, w: 212, y: 150, rh: 25 };
 const vizPlan = () => {
   let g = '';
   [['brief', 70], ['plan', L3.x + L3.w / 2], ['spec', D3.x + D3.w / 2]].forEach(([nm, x], k) => {
-    g += `<g class="c3-phase">${tx(x, 60, nm, { size: 10.5, anchor: 'middle', fill: C.moon, weight: 600 })}${tx(x, 76, ['one line in', 'model writes, code checks', 'written once, then checked'][k], { size: 10, anchor: 'middle' })}</g>`;
+    g += `<g class="c3-phase">${tx(x, 60, nm, { size: 10.5, anchor: 'middle', fill: C.moon, weight: 600 })}${tx(x, 76, ['one line in', 'drafted, then checked by rules', 'written once, then checked'][k], { size: 10, anchor: 'middle' })}</g>`;
   });
   // The brief: a one-line idea.
   g += `<g class="c3-brief"><rect x="22" y="112" width="96" height="64" fill="${C.paperHi}" stroke="${C.paperRule}"/>` +
@@ -453,7 +453,7 @@ export const buildChapters = ({ projects, worked, linkTrackerImage }) => {
   const tabCount = pick(/(\d+\+)\s+(?:hoarded\s+)?browser tabs/i, pLT.highlight, '100+');
   const fraudIntro =
     `A classifier that always answers "not fraud" scores ${accPct}% accuracy on this data and catches ${caught} of the ${frauds} frauds in the test split. ` +
-    'So the threshold that raises an alert is chosen by minimising cost instead.';
+    'I chose the alert threshold by minimising the cost of mistakes.';
 
   return [
     {
@@ -484,7 +484,7 @@ export const buildChapters = ({ projects, worked, linkTrackerImage }) => {
     {
       project: pIS,
       short: 'Specs',
-      title: 'The model proposes, code decides',
+      title: 'A design plan that code checks before anything is written',
       body: [pIS.highlight],
       steps: ['The model writes the plan in seven typed fields', 'Code checks it and sends findings back by field', 'One writer writes the spec, checked against the plan'],
       bounds: [0.3, 0.56],
@@ -494,7 +494,7 @@ export const buildChapters = ({ projects, worked, linkTrackerImage }) => {
     {
       project: pLT,
       short: 'Tabs',
-      title: `${tabCount} tabs into a queue that shrinks`,
+      title: `${tabCount} tabs turned into a reading queue`,
       body: [pLT.highlight],
       steps: ['Saved tabs arrive as one pile of links', 'Every link gets a decision', 'The queue gets shorter, in one local SQLite file'],
       bounds: [0.1, 0.58],

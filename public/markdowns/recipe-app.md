@@ -2,7 +2,7 @@
 
 ## Overview
 
-A full-stack recipe management application built with Flask and Jinja for quick recipe discovery and user management.
+A full-stack recipe app built with Flask and Jinja. Users can find recipes quickly and manage their accounts.
 
 **Repository:** https://github.com/firepenguindisopanda/recipe-board
 
@@ -19,15 +19,15 @@ A full-stack recipe management application built with Flask and Jinja for quick 
 
 - User sign-in and auth
 - Recipe creation, listing, and favorites
-- Hosted using free-tier deployments for demonstration
+- Hosted on free-tier services as a demo
 
 ---
 
 ## Notes
 
-- Seed the database with sample recipes to explore UI features quickly
+- Seed the database with sample recipes to try the UI quickly
 - Use Flask CLI to run local servers and migrate the DB
 
 ---
 
-*An approachable full-stack project showcasing flask templating, routing, and deployment.*
+*A small full-stack project covering Flask templating, routing and deployment.*

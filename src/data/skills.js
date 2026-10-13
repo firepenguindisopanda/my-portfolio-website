@@ -19,7 +19,7 @@ export const skillGroups = [
     id: 'backend',
     title: 'Backend and databases',
     caption: 'Services & data',
-    skills: ['Node.js (Express, NestJS)', 'Python (FastAPI, Flask)', 'C# (.NET, WPF)', 'Java (Spring Boot)', 'PostgreSQL', 'MySQL', 'MongoDB', 'SQLite', 'Neo4j', 'Redis', 'Supabase', 'NeonDB', 'Firebase'],
+    skills: ['Node.js (Express, NestJS)', 'Python (FastAPI, Flask)', 'C# (.NET, WPF)', 'Java (Spring Boot)', 'PostgreSQL', 'MySQL', 'MongoDB', 'SQLite', 'Neo4j', 'Pinecone', 'Redis', 'Supabase', 'NeonDB', 'Firebase'],
   },
   {
     id: 'platform',

@@ -2,11 +2,7 @@
 
 ## Overview
 
-A comprehensive game rental management system built with the MERN stack (MongoDB, Express, React, Next.js) and Redis for caching. This platform enables peer-to-peer game rentals with features like JWT authentication, role-based access control, real-time availability tracking, and automated late fee calculations.
-
-**Live Demo:** [deployment URL]  
-**Frontend Repository:** [GitHub link]  
-**Backend Repository:** [GitHub link]
+A game rental system built on the MERN stack (MongoDB, Express, React, Next.js) with Redis for caching. Customers rent games to each other (peer-to-peer), and the platform handles JWT authentication, role-based access control, real-time availability tracking and automatic late fee calculation.
 
 ---
 
@@ -16,19 +12,19 @@ A comprehensive game rental management system built with the MERN stack (MongoDB
 - **Node.js & Express.js**: RESTful API server
 - **MongoDB & Mongoose**: Document database with schema validation
 - **Redis**: Session management and response caching
-- **JWT (jsonwebtoken)**: Secure authentication with refresh tokens
+- **JWT (jsonwebtoken)**: Authentication with refresh tokens
 - **bcryptjs**: Password hashing
 - **Joi**: Request validation
 - **Swagger/OpenAPI**: API documentation
 
 ### Frontend
 - **Next.js 14** (App Router): React framework with server-side rendering
-- **TypeScript**: Type-safe development
+- **TypeScript**: Type checking
 - **Tailwind CSS**: Utility-first styling
 - **Axios**: HTTP client with interceptors
 
 ### External APIs
-- **RAWG Video Games Database**: Game catalog integration with 200+ games
+- **RAWG Video Games Database**: Source of the game catalog, 200+ games
 
 ---
 
@@ -37,33 +33,33 @@ A comprehensive game rental management system built with the MERN stack (MongoDB
 ### Authentication & Authorization
 - JWT-based authentication with access and refresh tokens
 - Role-based access control (Customer vs Staff)
-- Secure password hashing with bcrypt
+- Password hashing with bcrypt
 - Redis-backed session management and token blacklisting
 
 ### Game Catalog Management
-- Integration with RAWG API for rich game metadata
+- Game metadata pulled from the RAWG API
 - 200+ games seeded with 20+ data points per game (ratings, platforms, genres, screenshots, etc.)
-- Advanced filtering by platform, genre, search terms
-- Aggregated availability and pricing information
+- Filtering by platform, genre and search terms
+- Availability and pricing aggregated per game
 
 ### Rental System
 - **Listing Management:** Users can list their games for rent with custom pricing
 - **Rental Lifecycle:** Create rentals, track due dates, process returns
-- **Late Fee Calculation:** Automated 10% daily late fees after due date
+- **Late Fee Calculation:** 10% of the rental price for each day past the due date, calculated automatically on return
 - **Collateral Limits:** Customer-specific rental limits to manage risk
 - **Status Tracking:** Real-time rental status (ongoing, overdue, returned)
 
 ### Admin Dashboard
-- Staff-only access to manage platform operations
-- View all listings with advanced filtering
+- Staff-only pages for running the platform
+- View all listings, with filters
 - Process rentals and returns
 - Create rentals on behalf of customers
 - View active, overdue, and historical rentals
 
 ### Caching & Performance
 - Redis caching for frequently accessed game data
-- Reduced database load and improved response times
-- Cache invalidation strategies for data consistency
+- Fewer database reads and faster responses for cached data
+- Cache invalidation to keep cached data consistent with the database
 
 ---
 
@@ -116,7 +112,7 @@ Tracks rental transactions:
 ### Payment Model (Discriminator Pattern)
 Base payment ledger with discriminators:
 - **RentalPayment:** Links to rental, tracks rental fees and late charges
-- Fictional implementation (ready for Stripe/payment gateway integration)
+- Payments are simulated for now; the model is set up for a Stripe or other payment gateway integration
 
 ---
 
@@ -125,10 +121,10 @@ Base payment ledger with discriminators:
 ### Discriminator Inheritance
 Uses Mongoose discriminators for polymorphic data models:
 - **User, extended by Customer and Staff:** Shared authentication, specialized fields
-- **Payment, extended by RentalPayment:** Extensible for future payment types
+- **Payment, extended by RentalPayment:** Other payment types can be added later
 
 ### Service Layer Pattern
-Business logic separated from routes:
+Business logic lives in services, separate from the routes:
 - `authService.js`: User registration, login, token refresh
 - `rawgService.js`: RAWG API integration, game syncing
 - `rentalService.js`: Rental creation, return processing, late fee calculations
@@ -233,10 +229,10 @@ http://localhost:3003/api/docs
 
 ### Challenge 1: Managing Game Availability
 **Problem:** Multiple copies of the same game needed independent availability tracking.  
-**Solution:** Separated Game (catalog entry) from Listing (specific copy). Each game can have multiple listings with different owners, conditions, and prices. Aggregation pipeline calculates `availableListings` count and `minPrice` in real-time.
+**Solution:** Separated Game (catalog entry) from Listing (specific copy). Each game can have several listings with different owners, conditions and prices. An aggregation pipeline calculates the `availableListings` count and `minPrice` in real time.
 
 ### Challenge 2: Late Fee Calculation
-**Problem:** Late fees needed to compound daily while preventing double-charging.  
+**Problem:** A late fee is charged for each day past the due date, at a flat 10% of the rental price per day, and a renter must never be charged twice.  
 **Solution:** Store `amountCharged` (original fee) and `lateFeesAccrued` separately. Calculate late fees on return using `(daysLate × 10% × pricePerPeriod)`. Rental status tracks 'ongoing' vs 'returned' to prevent re-processing.
 
 ### Challenge 3: Role-Based Access
@@ -244,8 +240,8 @@ http://localhost:3003/api/docs
 **Solution:** Mongoose discriminators for User model with userType field. Middleware `requireRole(['Customer', 'Staff'])` protects routes. Frontend guards admin pages with useAuth context checks.
 
 ### Challenge 4: Token Security
-**Problem:** JWTs need refresh mechanism without compromising security.  
-**Solution:** Dual-token system (short-lived access token + long-lived refresh token). Axios interceptors auto-refresh expired tokens. Redis blacklist for logged-out tokens.
+**Problem:** JWTs needed a way to be refreshed without weakening security.  
+**Solution:** Two tokens: a short-lived access token and a long-lived refresh token. Axios interceptors refresh expired tokens automatically, and logged-out tokens go on a Redis blacklist.
 
 ---
 
@@ -273,11 +269,11 @@ http://localhost:3003/api/docs
 
 ## Lessons Learned
 
-1. **Discriminators are powerful:** Mongoose discriminators enabled clean polymorphic models without complex joins
-2. **Service layer clarity:** Separating business logic from routes made testing and debugging significantly easier
-3. **Redis caching ROI:** 5x improvement in response times for frequently accessed game data
-4. **TypeScript benefits:** Frontend type safety caught numerous bugs during development
-5. **Seed data importance:** 200 seeded games provided realistic testing scenarios vs minimal datasets
+1. **Discriminators:** Mongoose discriminators gave clean polymorphic models without complex joins
+2. **Service layer:** Separating business logic from routes made testing and debugging much easier
+3. **Redis caching:** 5x improvement in response times for frequently accessed game data
+4. **TypeScript:** Type checking on the frontend caught many bugs during development
+5. **Seed data:** 200 seeded games gave more realistic test scenarios than a minimal dataset would
 
 ---
 
@@ -288,7 +284,3 @@ http://localhost:3003/api/docs
 **GitHub:** [\[GitHub Profile\]](https://github.com/firepenguindisopanda?tab=repositories)  
 **LinkedIn:** [[LinkedIn](https://www.linkedin.com/in/nicholas-smith-933125148/)]  
 **Portfolio:** [\[Portfolio URL\]](https://portfolio-website-11217.web.app/)
-
----
-
-*Built with modern web technologies*

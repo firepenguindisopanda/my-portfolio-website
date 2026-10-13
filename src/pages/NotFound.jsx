@@ -15,7 +15,7 @@ import { DiggingPanda } from '../components/panda/LazyScenes';
 const NotFound = () => {
   useDocumentMeta({
     title: 'Page not found',
-    description: "That page doesn't exist. Everything worth seeing is on the home page.",
+    description: "That page doesn't exist. All the projects are on the home page.",
   });
 
   return (
@@ -26,7 +26,7 @@ const NotFound = () => {
             <p className="sec-tab">Error 404</p>
             <h1 className="pg-title">This page doesn&apos;t exist</h1>
             <p className="lede">
-              The link may be out of date, or the page may have moved. Everything worth seeing is on the home page.
+              The link may be out of date, or the page may have moved. All the projects are on the home page.
             </p>
             <div className="cta-row pg-cta">
               <Link className="btn btn-primary" to="/">

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This site, designed as a case file. Employers and clients skim a portfolio in well under two minutes, so the work has to be findable in seconds and still be worth staying for. The design answers both: an archive of case files on cool paper, where a highlighter marks what was verified and a stamp red marks what was flagged, and a night stage where the main projects play out as stories.
+I designed this site as a case file. Employers and clients skim a portfolio in well under two minutes, so I wanted the work to be findable in seconds, with enough depth for anyone who stays longer. It has two parts: an archive of case files on cool paper, where a highlighter marks what was verified and a stamp red marks what was flagged, and a night stage where the main projects play out as stories.
 
 **Live Site:** https://nicksmith.is-a.dev/
 **Repository:** https://github.com/firepenguindisopanda/react-portfolio-website
@@ -24,8 +24,8 @@ This site, designed as a case file. Employers and clients skim a portfolio in we
 ## What is on the page
 
 - **The cover**: name, role and the thesis, with three evidence rows that each open the case study behind them.
-- **Four cases**: four projects told as stories on one stage that stays in place while you scroll: each figure plays against the scroll, holds on its result, and the next case takes its place: timetable PDFs cross-checked into a confirmed session, a fraud threshold chosen by cost, a design plan checked in code before a spec is written from it, a queue of saved tabs getting shorter. Every figure is drawn from the project's real data.
-- **Try it**: three projects small enough to use on the page: the Chimp Test, Link Tracker's keyboard triage (Q, R, D and X, as in the real app) and the timetable builder's drag, with clashes marked. They run on example data and work by keyboard and touch.
+- **Four cases**: four projects told as stories on one stage that stays in place while you scroll. Each figure plays as you scroll, holds on its result, and is then replaced by the next case. The four are timetable PDFs cross-checked into a confirmed session, a fraud threshold chosen by cost, a design plan checked in code before a spec is written from it, and a queue of saved tabs getting shorter. Every figure is drawn from the project's real data.
+- **Try it**: three projects small enough to use on the page. They are the Chimp Test, Link Tracker's keyboard triage (Q, R, D and X, as in the real app) and the timetable builder's drag, with clashes marked. They run on example data and work by keyboard and touch.
 - **The index**: every featured project, filterable by category. Pointing at a row in "More projects" floats its screenshot beside the cursor.
 - Experience, skills, placings and contact, then a case study like this one for every project.
 
@@ -35,15 +35,15 @@ This site, designed as a case file. Employers and clients skim a portfolio in we
 
 Everything that moves follows the visitor's reduced-motion setting by default. Windows turns that setting on whenever "Show animations" is off, often for reasons that have nothing to do with websites, so the header has a Motion switch that overrides it and is remembered. With motion off every figure is drawn in its finished state and nothing on the page is lost.
 
-One rule came from a real bug: the reduced-motion override is keyed on the switch's `html.motion-off` class, never on a global rule. A global `transition-duration` turns every GSAP style write into a CSS transition that GSAP then reads back mid-flight, and a delayed entrance once recorded its hidden start state as its destination, leaving the hero invisible.
+I keyed the reduced-motion override on the switch's `html.motion-off` class after a bug caused by a global rule. A global `transition-duration` turns every GSAP style write into a CSS transition that GSAP then reads back partway through, and a delayed entrance once recorded its hidden start state as its destination, which left the hero invisible.
 
 ---
 
-## How it checks itself
+## Automated checks
 
 - Tests that read the source fail if a GSAP tween starts without a reduced-motion guard, if a CSS transition is not keyed to the Motion switch, or if a gradient or shadow appears outside the stylesheets.
 - The Material UI theme mirrors the stylesheet's colour tokens, and a test fails if the two drift apart. Another checks the text colour pairs against WCAG AA contrast.
-- Every route is code-split, and the charting and component libraries load only on the three case studies that use them. A test walks each page's imports and fails if Material UI creeps back onto any other page.
+- Every route is code-split, and the charting and component libraries load only on the three case studies that use them. A test walks each page's imports and fails if Material UI turns up on any other page.
 
 ---
 

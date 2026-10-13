@@ -360,7 +360,7 @@ const ProjectDetail = () => {
           <figure className="case-figure">
             <HowItWorks ratio="16 / 9" />
             <figcaption>
-              How it works, drawn: one keystroke saves a window of tabs, each link gets a decision, and the queue shrinks.
+              How it works, drawn: one keystroke saves a window of tabs, each link gets a decision, and the queue gets shorter.
             </figcaption>
           </figure>
         </div>

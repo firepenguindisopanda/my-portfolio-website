@@ -87,11 +87,11 @@ export const workExperiences = [
     items: [
       {
         type: 'task',
-        text: 'Delivered practical sessions on software engineering concepts and coding best practices.',
+        text: 'Ran practical sessions on software engineering concepts and good coding practice.',
       },
       {
         type: 'task',
-        text: 'Mentored Students on projects, emphasizing version control, design patterns, CI/CD and modern development methodologies.',
+        text: 'Mentored students on their projects, with a focus on version control, design patterns and CI/CD.',
       },
     ],
   },
@@ -105,19 +105,19 @@ export const workExperiences = [
     items: [
       {
         type: 'task',
-        text: 'Maintained and improved a Nuxt js application that uses Firebase services, implementing Cloud Functions for server-side logic and data workflows.',
+        text: 'Maintained and extended a Nuxt.js app built on Firebase, writing Cloud Functions for its server-side logic and data workflows.',
       },
       {
         type: 'task',
-        text: 'Architected and refactored user facing features such as form creation, editing and management, ensuring seamless integration between front end components and backend APIs.',
+        text: 'Designed and refactored the form features (creating, editing and managing forms) and connected them to the backend APIs.',
       },
       {
         type: 'task',
-        text: 'Built and consumed RESTful APIs via cloud functions to handle account management and pdf report generations.',
+        text: 'Built REST APIs on Cloud Functions for account management and PDF report generation, and wired them into the app.',
       },
       {
         type: 'task',
-        text: 'Optimized UX across devices and browsers by enforcing responsive design principles and maintaining brand consistency throughout the application.',
+        text: 'Made the app work well across devices and browsers with responsive layouts, and kept it consistent with the brand.',
       },
     ],
   },
@@ -131,11 +131,11 @@ export const workExperiences = [
     achievements: ['99.59% Performance', 'System Design', 'Optimization'],
     items: [
       { type: 'task', text: 'Created various software design artefacts.' },
-      { type: 'task', text: 'Ensured the frontend and backend were connected and working as expected.' },
-      { type: 'task', text: 'Improved Design of Frontend components to display data in a more user-friendly and accessible manner.' },
-      { type: 'achievement', text: 'Optimized PDF parsing functionality, reducing processing time and achieving a 99.59% performance improvement.' },
-      { type: 'task', text: 'Improved the backend to handle errors and exceptions.' },
-      { type: 'task', text: 'Conducted thorough performance analysis and profiling to identify bottlenecks and implement effective optimization strategies.' },
+      { type: 'task', text: 'Connected the frontend to the backend and tested that they worked together.' },
+      { type: 'task', text: 'Redesigned frontend components so the data was easier to read and more accessible.' },
+      { type: 'achievement', text: 'Cut PDF parsing time by 99.59% after profiling the parser.' },
+      { type: 'task', text: 'Added error and exception handling to the backend.' },
+      { type: 'task', text: 'Profiled the system to find its bottlenecks, then fixed them.' },
     ],
   },
   {
@@ -162,13 +162,13 @@ export const workExperiences = [
     type: 'Development',
     achievements: ['Migration', 'CI/CD', 'Production Deploy'],
     items: [
-      { type: 'task', text: 'Performed migration and dependencies updates' },
-      { type: 'task', text: 'Deployed updates to staging and production environments' },
+      { type: 'task', text: 'Migrated the app and updated its dependencies.' },
+      { type: 'task', text: 'Deployed updates to staging and production.' },
       { type: 'task', text: 'Created various software design artefacts.' },
       { type: 'task', text: 'Implemented the system according to the design artefacts and requirements.' },
       { type: 'task', text: 'Performed unit testing.' },
       { type: 'task', text: 'Delivered a prototype deployment of the system.' },
-      { type: 'task', text: 'Updated routes and controllers for the backend to successfully handle errors and exceptions.' },
+      { type: 'task', text: 'Updated the backend routes and controllers to handle errors and exceptions.' },
     ],
   },
   {
@@ -180,10 +180,10 @@ export const workExperiences = [
     type: 'Internship',
     achievements: ['Web3/Blockchain', 'CI/CD Pipeline', 'Angular'],
     items: [
-      { type: 'task', text: 'Created scripts to automatically deploy applications using Jenkins CI / CD pipeline.' },
+      { type: 'task', text: 'Wrote scripts to deploy applications automatically through a Jenkins CI/CD pipeline.' },
       { type: 'task', text: 'Updated the Flask API with new functions and routes to send data to the frontend applications.' },
-      { type: 'achievement', text: 'Created 5 Angular Blockchain Web3 Applications and connected them to the Flask API and the Blockchain.' },
-      { type: 'task', text: 'Created Unit Test for the 5 Angular Blockchain Web3 Applications to automatically run on the Jenkins Server before deploying.' },
+      { type: 'achievement', text: 'Built 5 Angular Web3 applications and connected them to the Flask API and the blockchain.' },
+      { type: 'task', text: 'Wrote unit tests for the 5 Web3 applications that run on the Jenkins server before each deploy.' },
     ],
   },
   {
@@ -195,10 +195,10 @@ export const workExperiences = [
     type: 'Development',
     achievements: ['Angular Migration', 'Search Feature', 'CI/CD'],
     items: [
-      { type: 'task', text: 'Updated existing Angular Applications to the latest version, fixing errors that occurred.' },
-      { type: 'task', text: 'Updated existing search feature to autocomplete search.' },
-      { type: 'task', text: 'Identified and fixed bugs with the existing application. The fix contributed to the overall user experience of the application.' },
-      { type: 'task', text: 'Changed CircleCI workflow to Github Actions.' },
+      { type: 'task', text: 'Upgraded existing Angular applications to the latest version and fixed the errors the upgrade caused.' },
+      { type: 'task', text: 'Changed the existing search to autocomplete.' },
+      { type: 'task', text: 'Found and fixed bugs in the existing application.' },
+      { type: 'task', text: 'Moved the CircleCI workflow to GitHub Actions.' },
     ],
   },
 ];

@@ -2,7 +2,7 @@
 
 ## Overview
 
-An AI-powered chatbot built for the University of the West Indies (UWI) using vector databases to provide context-aware answers from internal documents and course materials.
+A chatbot for the University of the West Indies (UWI) that answers questions from internal documents and course materials. It uses a vector database to find the passages relevant to each question.
 
 **Repository:** https://github.com/firepenguindisopanda/experiment-uwi-dcit-chatbot
 
@@ -22,7 +22,7 @@ An AI-powered chatbot built for the University of the West Indies (UWI) using ve
 - Document ingestion and indexing into vector DB
 - Semantic question answering with context-limited retrieval
 - Multi-session chat with memory and conversation history
-- Designed for education use cases and knowledge retrieval
+- Aimed at education use and knowledge retrieval
 
 ---
 
@@ -34,4 +34,4 @@ An AI-powered chatbot built for the University of the West Indies (UWI) using ve
 
 ---
 
-*Built to improve student access to structured course resources.*
+*Built so students can get to structured course resources more easily.*

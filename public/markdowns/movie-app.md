@@ -2,7 +2,7 @@
 
 ## Overview
 
-Interactive movie discovery platform built with Angular, featuring movie browsing, detailed views, user comments, and Supabase-powered persistence.
+An Angular app for browsing movies. Each movie has a detail view where users can leave comments, which are stored in Supabase.
 
 **Live Demo:** https://movie-game-viewer.pages.dev/
 **Repository:** https://github.com/firepenguindisopanda/DCIT-Movie-App
@@ -24,12 +24,12 @@ Interactive movie discovery platform built with Angular, featuring movie browsin
 
 - Browse a curated collection of movies with metadata from TMDB and RAWG APIs
 - View detailed information for individual movies
-- User comments system with Supabase persistence
-- Comment deletion with instant UI updates
+- User comments stored in Supabase
+- Comment deletion that updates the UI straight away
 - CI/CD pipeline via GitHub Actions with automated Cloudflare Pages deployment
 - E2E testing with Cypress
-- Supabase database with versioned schemas and real-time capabilities
-- Environment-specific configuration with secure API key injection
+- Supabase database with versioned schemas and real-time support
+- Per-environment configuration, with API keys injected at build time
 
 ---
 
@@ -44,8 +44,8 @@ Interactive movie discovery platform built with Angular, featuring movie browsin
 
 ## Deployment
 
-The app is deployed on Cloudflare Pages via GitHub Actions CI/CD. API keys are injected as GitHub secrets during the build pipeline using a custom replacement script.
+The app is deployed on Cloudflare Pages via GitHub Actions CI/CD. API keys are stored as GitHub secrets and injected during the build by a custom replacement script.
 
 ---
 
-This project demonstrates a modern Angular single-page application with Supabase backend integration, CI/CD automation, and production deployment on Cloudflare's edge network.
+It is an Angular single-page app with a Supabase backend, automated CI/CD and production hosting on Cloudflare's edge network.

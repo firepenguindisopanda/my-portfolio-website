@@ -2,9 +2,9 @@
 
 ## Problem Statement
 
-The WiDS Datathon 2023 challenged participants to forecast the 14-day average temperature (mean of daily max and min) across US locations. This is a **sub-seasonal forecasting** problem: predicting weather 2 weeks ahead, which sits between short-term weather forecasts and long-term climate predictions.
+The WiDS Datathon 2023 asked participants to forecast the 14-day average temperature (mean of daily max and min) across US locations. This is **sub-seasonal forecasting**: predicting weather 2 weeks ahead, which falls between short-term weather forecasts and long-term climate predictions.
 
-Accurate sub-seasonal forecasts are critical for agriculture, energy planning, and disaster preparedness.
+Forecasts at this range are used in agriculture, energy planning and disaster preparedness.
 
 ## Dataset
 
@@ -29,19 +29,19 @@ Accurate sub-seasonal forecasts are critical for agriculture, energy planning, a
 
 ![Target Distribution](/portfolio_data/wids/plots/target_distribution.webp)
 
-The target variable shows a roughly bimodal distribution reflecting seasonal temperature variation across the US, ranging from -20°C to 37°C.
+The target is roughly bimodal, following seasonal temperature variation across the US, and ranges from -20°C to 37°C.
 
 ### Spatial Patterns
 
 ![Spatial Temperature Map](/portfolio_data/wids/plots/spatial_temperature_map.webp)
 
-Temperature patterns clearly follow geographic location, with warmer regions in the south and cooler regions in the north and at higher elevations.
+Temperature follows geography: warmer in the south, cooler in the north and at higher elevations.
 
 ### Feature Correlations
 
 ![Correlation Heatmap](/portfolio_data/wids/plots/correlation_heatmap.webp)
 
-NMME model forecasts show the strongest correlation with the target, as expected since they are physics-based predictions of the same quantity.
+NMME model forecasts correlate most strongly with the target, which is expected because they are physics-based predictions of the same quantity.
 
 ## Feature Engineering
 
@@ -61,12 +61,12 @@ NMME model forecasts show the strongest correlation with the target, as expected
 
 ## Model: LightGBM
 
-### Why LightGBM?
+### Why LightGBM
 
-- **Best-in-class for tabular data**: consistently outperforms other algorithms on structured datasets
-- **Fast training**: handles 375K samples efficiently with histogram-based splitting
-- **Built-in feature importance**: provides interpretable feature rankings
-- **Handles mixed feature types**: no need for extensive preprocessing
+- **Strong on tabular data**: gradient-boosted trees tend to do well on structured datasets
+- **Fast training**: histogram-based splitting keeps training on 375K samples quick
+- **Built-in feature importance**: gives feature rankings I can read and check
+- **Handles mixed feature types**: little preprocessing needed
 
 ### Training Setup
 
@@ -85,33 +85,33 @@ NMME model forecasts show the strongest correlation with the target, as expected
 | MAE | 0.264 | 2.753 | **90.4%** |
 | R² | 0.999 | 0.880 | - |
 
-The LightGBM model achieves a **90% reduction in RMSE** compared to the physics-based NMME ensemble baseline.
+LightGBM cut RMSE by **90%** compared with the physics-based NMME ensemble baseline.
 
 ### Feature Importance
 
 ![Feature Importance](/portfolio_data/wids/plots/feature_importance.webp)
 
-The top features are dominated by NMME model forecasts, confirming that physics-based predictions remain the strongest signal. However, the model also leverages atmospheric variables and temporal patterns for refinement.
+NMME model forecasts make up most of the top features, so the physics-based predictions are still the strongest signal. The model also uses atmospheric variables and temporal patterns to refine them.
 
 ### Prediction Quality
 
 ![Predicted vs Actual](/portfolio_data/wids/plots/prediction_vs_actual.webp)
 
-Predictions cluster tightly around the diagonal, indicating high accuracy across the full temperature range.
+Predictions sit close to the diagonal across the full temperature range.
 
 ### Residual Analysis
 
 ![Model Residuals](/portfolio_data/wids/plots/model_residuals.webp)
 
-Residuals are approximately normally distributed with a slight bias at temperature extremes, which is expected given the limited training period (2 years).
+Residuals are approximately normal, with a slight bias at the temperature extremes. With only 2 years of training data, that is what I expected.
 
 ## Key Insights
 
-1. **NMME forecasts are strong but imperfect**: The ensemble mean achieves R²=0.88, but there's significant room for improvement through ML-based correction
-2. **Model disagreement is informative**: The spread between NMME models is itself a predictive feature
-3. **Seasonal patterns dominate**: Month/season features rank high in importance
-4. **Geography matters**: Elevation and climate region interactions improve predictions
-5. **Two years of data is limiting**: A longer training period would likely improve extreme temperature predictions
+1. **NMME forecasts leave room for correction**: The ensemble mean reaches R²=0.88, which leaves significant room for an ML-based correction
+2. **Model disagreement is a useful feature**: The spread between NMME models has predictive value of its own
+3. **Seasonal features rank high**: Month/season features are near the top of the importance ranking
+4. **Geography helps**: Elevation and climate region interactions improve predictions
+5. **Two years of data is a limit**: A longer training period would likely improve predictions at the extremes
 
 ## Technical Details
 

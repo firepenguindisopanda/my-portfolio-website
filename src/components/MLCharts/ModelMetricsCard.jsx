@@ -65,7 +65,7 @@ const ModelMetricsCard = ({ dataPath }) => {
           {' '}{data.n_positive_test} fraud cases in the held-out split). Imbalance {data.imbalance_ratio} ({data.fraud_pct}% fraud).
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontStyle: 'italic' }}>
-          Average precision is the headline metric, not accuracy: below a 1% base rate a model that
+          I report average precision instead of accuracy, because below a 1% base rate a model that
           never predicts fraud still scores {(dummy.accuracy * 100).toFixed(2)}% accuracy and catches none of it.
         </Typography>
         <Grid container spacing={3} sx={{ mb: 3 }}>

@@ -2,7 +2,7 @@
 
 ## Overview
 
-A production-grade, cache-aware web crawler that systematically indexes web pages across the University of the West Indies' multi-campus domains. It extracts rich page metadata, classifies content by campus/category/type using rule-based URL pattern matching, and presents everything in a searchable, filterable web directory with inline editing and automated crawl scheduling.
+A cache-aware web crawler that indexes pages across the University of the West Indies' multi-campus domains. It extracts page metadata, classifies each page by campus, category and type with rule-based URL pattern matching, and lists the results in a searchable, filterable web directory with inline editing and scheduled crawls.
 
 **Live Demo:** https://uwi-scraper.fastapicloud.dev/
 **Repository:** https://github.com/firepenguindisopanda
@@ -27,7 +27,7 @@ A production-grade, cache-aware web crawler that systematically indexes web page
 ## Key Features
 
 - **Polite, Cache-Aware Crawling**: respects robots.txt with Crawl-Delay, uses ETag/If-Modified-Since conditional requests, Upstash Redis caching, async semaphore throttling (3 concurrent requests per domain), retries on transient errors, and 2MB page size limits
-- **Rich Metadata Extraction**: page titles, meta descriptions, body text, links with anchor text, and external resources (CSS, JS, images, fonts, documents)
+- **Metadata Extraction**: page titles, meta descriptions, body text, links with anchor text, and external resources (CSS, JS, images, fonts, documents)
 - **Rule-Based URL Classification**: detects 7 campuses (Mona, St. Augustine, Cave Hill, Five Islands, Global, Open, UWI Global), 10 content categories (portal, admissions, academic, library, student services, administration, research, news/events, careers, about), and link types (PDF, document, portal, video)
 - **Browsable Link Catalog**: paginated grid view (24 per page), faceted filtering by campus/category/domain/status, detail pages with related links
 - **PostgreSQL Full-Text Search**: tsvector indexing with ts_rank relevance ordering
@@ -39,7 +39,7 @@ A production-grade, cache-aware web crawler that systematically indexes web page
 
 ## Architecture
 
-The system follows a modular FastAPI structure:
+The code is split into FastAPI modules:
 
 - `app/modules/scraper/`: Core crawler engine with polite crawling, HTML parsing, URL classification, and robots.txt checking
 - `app/modules/pages/`: Page catalog routers and service layer
@@ -50,7 +50,7 @@ The system follows a modular FastAPI structure:
 - `app/modules/resources/`: External page resource management
 - `app/core/`: Authentication, caching, session management, structured logging
 
-Data flows: Crawler to Parser to Classifier to Database to Catalog UI (server-rendered Jinja2 templates with HTMX interactivity).
+Data flows from the crawler to the parser, classifier, database and catalog UI (server-rendered Jinja2 templates with HTMX for interactivity).
 
 ---
 
@@ -66,4 +66,4 @@ Data flows: Crawler to Parser to Classifier to Database to Catalog UI (server-re
 
 ## Deployment
 
-Deployed via `fastapi-cloud-cli` on a cloud FastAPI hosting platform with Neon PostgreSQL and Upstash Redis.
+Deployed with `fastapi-cloud-cli` to a cloud FastAPI hosting platform, with Neon PostgreSQL and Upstash Redis.

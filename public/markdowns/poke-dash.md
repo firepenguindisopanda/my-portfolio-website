@@ -2,7 +2,7 @@
 
 ## Overview
 
-Poke-Dash is a full-stack Pokemon management platform that combines classic collection mechanics with modern machine learning analytics. Users can browse the complete Pokedex (801 Pokemon across 8 generations), hunt wild Pokemon in an interactive arena, test their knowledge with trivia quizzes, chat in real time, and explore advanced ML-powered insights, all within a single Flask application.
+Poke-Dash is a full-stack Pokemon app that pairs the usual collecting game with machine learning analysis of the stats. Users can browse the complete Pokedex (801 Pokemon across 8 generations), hunt wild Pokemon in an arena, answer trivia quizzes, chat in real time and try a set of ML tools, all in a single Flask application.
 
 **Live Demo:** https://pokemon-dashboard.onrender.com/
 **Repository:** https://github.com/firepenguindisopanda/Pokemon-Dashboard
@@ -42,16 +42,16 @@ The application follows Flask's application factory pattern with blueprint-based
 
 ### 1. Authentication System
 
-- **JWT dual-token architecture**: short-lived access tokens (15 min) with refresh tokens (7 days) for secure session management
-- **Silent token refresh**: expired access tokens are automatically refreshed using the refresh token cookie, transparent to the user
-- **DB-failure resilience**: if the database is unreachable, the system falls back to JWT claims to construct a minimal user object, preventing crashes
+- **JWT access and refresh tokens**: short-lived access tokens (15 min) and refresh tokens (7 days) for sessions
+- **Silent token refresh**: an expired access token is refreshed from the refresh token cookie without the user noticing
+- **Database fallback**: if the database is unreachable, the app builds a minimal user object from the JWT claims so the request does not crash
 - **CSRF protection** configurable via settings
 
 ### 2. Pokedex Browsing & Collection
 
 - Browse all 801 Pokemon ordered by Pokedex number
 - Search by name (case-insensitive partial match)
-- Filter by generation (1-8)
+- Filter by generation (1 to 8)
 - Detailed view with stats, type(s), abilities, classification, capture rate, height/weight
 - Capture Pokemon with custom nicknames (one per species per user)
 - Rename or release captured Pokemon
@@ -59,10 +59,10 @@ The application follows Flask's application factory pattern with blueprint-based
 
 ### 3. Wild Pokemon Arena
 
-The arena provides an interactive battle-like encounter system:
+The arena works like a short battle:
 
-- **Encounter**: a random wild Pokemon (not already owned) is selected with its full stats
-- **Attack**: deal 10-29 random damage per attack, reducing the Pokemon's HP
+- **Encounter**: a random wild Pokemon the user does not already own is picked, with its full stats
+- **Attack**: each attack deals 10 to 29 random damage, reducing the Pokemon's HP
 - **Catch mechanics**: capture chance scales with HP ratio and capture rate:
 
   ```
@@ -72,7 +72,7 @@ The arena provides an interactive battle-like encounter system:
 - **Pokeball cost**: each throw consumes one pokeball
 - **Faint protection**: cannot catch a fainted Pokemon (HP = 0)
 - **Run away**: abandon the encounter
-- All state managed via server-side sessions
+- All arena state is kept in server-side sessions
 
 ### 4. Pokemon Trivia Quiz
 
@@ -81,7 +81,7 @@ The arena provides an interactive battle-like encounter system:
   - **Type questions**: "What is Charizard's primary type?"
   - **Generation questions**: "Which generation does Mewtwo belong to?"
 - Each correct answer awards 1 pokeball
-- Sprites displayed alongside questions for visual engagement
+- Sprites shown next to the questions
 - Session-based tracking of correct answers per round
 
 ### 5. Real-Time Chat
@@ -93,7 +93,7 @@ The arena provides an interactive battle-like encounter system:
 
 ### 6. Analytics Dashboard
 
-An async-initialized analytics engine powers a rich dashboard:
+The dashboard is fed by an analytics engine that starts up asynchronously:
 
 - **Descriptive statistics**: total Pokemon count, legendary rate, average stats, strongest/fastest/rarest Pokemon lists
 - **Type distribution**: doughnut chart showing Pokemon count by primary type
@@ -101,12 +101,12 @@ An async-initialized analytics engine powers a rich dashboard:
 - **Average stats radar**: HP, Attack, Defense, Sp. Atk, Sp. Def, Speed compared against max (255)
 - **Legendary vs non-legendary comparison**: side-by-side bar chart
 - **Filter chips**: toggle between All, Gen 1, Gen 2, Legendary, Non-Legendary views
-- **Async loading**: page renders instantly; data loads via polling once models are trained
+- **Async loading**: the page renders straight away and polls for data until the models are trained
 - Dark/light theme toggle
 
 ### 7. ML Playground
 
-The ML engine (`PokemonAnalytics` class in `lib.py`) trains and serves multiple models:
+The ML engine (`PokemonAnalytics` class in `lib.py`) trains and serves several models:
 
 #### Legendary Classification
 - **Algorithm**: Random Forest with GridSearchCV hyperparameter tuning
@@ -133,7 +133,7 @@ The ML engine (`PokemonAnalytics` class in `lib.py`) trains and serves multiple 
 - Both use StandardScaler normalization before cosine similarity computation
 
 #### Team Recommendation Engine
-A sophisticated recommendation system that constructs balanced 6-Pokemon teams:
+Builds balanced 6-Pokemon teams from these settings:
 
 | Parameter | Options |
 |-----------|---------|
@@ -146,13 +146,13 @@ A sophisticated recommendation system that constructs balanced 6-Pokemon teams:
 
 - Role-specific scoring using weighted stat combinations
 - Type coverage analysis
-- Synergy score (0-1) measuring how well the team fits the chosen playstyle
+- Synergy score (0 to 1) measuring how well the team fits the chosen playstyle
 - Team strength/weakness analysis
 
 #### Build Optimizer
-- Uses scipy's L-BFGS-B minimization to find the optimal stat distribution maximizing predicted base_total
-- Bounded optimization across all 13 features (HP 1-255, Attack 1-255, etc.)
-- Returns a complete optimal Pokemon build specification
+- Uses scipy's L-BFGS-B minimization to find the stat distribution that maximizes predicted base_total
+- Bounded optimization across all 13 features (HP 1 to 255, Attack 1 to 255, etc.)
+- Returns the complete optimal build as a full stat specification
 
 ### 8. Database & Models
 
@@ -191,13 +191,13 @@ A sophisticated recommendation system that constructs balanced 6-Pokemon teams:
 
 ---
 
-## Why This Project Stands Out
+## What the Project Covers
 
-This project demonstrates full-stack competency across the entire web development spectrum:
+The project touches most layers of a web application:
 
-1. **Backend engineering**: Flask factory pattern, blueprint modularity, SQLAlchemy ORM, JWT security
+1. **Backend**: Flask factory pattern, blueprint modularity, SQLAlchemy ORM, JWT security
 2. **Real-time systems**: WebSocket-based chat with Flask-SocketIO
-3. **Machine learning**: End-to-end ML pipeline from data cleaning to production model serving with caching
-4. **UI/UX**: Server-rendered templates with modern CSS framework and interactive Chart.js visualizations
+3. **Machine learning**: An ML pipeline running from data cleaning to model serving in production, with caching
+4. **UI/UX**: Server-rendered templates styled with Materialize CSS, and interactive Chart.js visualizations
 5. **DevOps**: Deployed on Render with environment-based configuration and automated DB initialization
 6. **Data engineering**: CSV parsing, data cleaning, feature engineering, model persistence

@@ -15,7 +15,7 @@ const MLPortfolio = () => {
     <CategoryPage
       eyebrow="Deep dive"
       title="Machine learning & data science"
-      description="Forecasting, fraud detection, customer segmentation, speech recognition and handwriting recognition. Each one is scored against a baseline worth beating, and reports what it could not do as plainly as what it could."
+      description="Forecasting, fraud detection, customer segmentation, speech recognition and handwriting recognition. Each project is compared against a baseline, and each write-up lists its limitations."
       categories={CATEGORIES}
       surface="ml"
     />

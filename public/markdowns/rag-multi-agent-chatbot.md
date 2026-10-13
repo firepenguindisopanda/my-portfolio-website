@@ -2,7 +2,7 @@
 
 ## Overview
 
-An advanced RAG (Retrieval-Augmented Generation) multi-agent AI system designed to assemble a software team of specialist agents (Product Owner, Analyst, Architect, Developer, Tester, Designer, Reviewer, Tech Writer) that collaborates to analyze documents, produce designs, code, and documentation.
+A RAG (retrieval-augmented generation) system that runs a software team of specialist agents: Product Owner, Analyst, Architect, Developer, Tester, Designer, Reviewer and Tech Writer. Working together, they analyse documents and produce designs, code and documentation.
 
 **Live Demo:** https://multi-agent-software-team.streamlit.app/
 **Repository:** https://github.com/firepenguindisopanda/rag-chatbot-multi-agent-software-team
@@ -22,11 +22,11 @@ An advanced RAG (Retrieval-Augmented Generation) multi-agent AI system designed 
 
 ## Key Features
 
-- Multi-agent orchestration where different agents specialize and collaborate
+- An orchestrator that splits work across specialist agents and passes results between them
 - Document ingestion and semantic search using FAISS
 - PDF/CSV upload and automated analysis
 - Code generation and automated testing scaffolding
-- Real-time prompting and step-by-step solution construction
+- Live prompting, with solutions built up step by step
 
 ---
 
@@ -39,18 +39,18 @@ An advanced RAG (Retrieval-Augmented Generation) multi-agent AI system designed 
 
 ---
 
-## Architecture 
+## Architecture
 
-The system orchestrates tasks across a set of domain-specific agents that communicate via a coordinating orchestrator and a shared vector store. The Flow uses LangChain/LangGraph constructs for subtask delegation and context passing.
+A coordinating orchestrator hands tasks to a set of domain-specific agents, which share context through the orchestrator and a common vector store. Subtask delegation and context passing use LangChain/LangGraph constructs.
 
 ---
 
 ## Future Work
 
 - Multi-user collaboration and real-time synchronization
-- Enhanced monitoring and agent performance analytics
+- Better monitoring and agent performance analytics
 - UI improvements for agent customization and debugging
 
 ---
 
-Built with AI-first design and modular microservices.
+The code is organised as modular services.

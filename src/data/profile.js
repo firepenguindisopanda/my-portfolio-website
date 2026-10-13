@@ -24,7 +24,7 @@ export const profile = {
   /** Said plainly wherever availability shows - hero, file card, contact. */
   availability: 'Open to software engineering, data and ML roles, and to contract work.',
 
-  tagline: 'Building full-stack systems that make a difference',
+  tagline: 'Full-stack web, data analysis and machine learning',
 
   /**
    * The hero framing line. Read the projects in this repo end to end and the
@@ -39,19 +39,18 @@ export const profile = {
    * a slogan rather than as a description of how the work is done.
    */
   thesis:
-    'A recurring theme in my work is verification: building systems that can check ' +
-    'their own output and report where they are uncertain.',
+    'Most of my projects have a layer of verification: code that checks the ' +
+    "system's output and flags the cases it could not confirm.",
 
   /**
    * The hero proof line. Every claim here is drawn from the work-experience and
    * project data in this repo - keep it that way.
    */
   proof:
-    'Working across full-stack web, data analysis and machine learning from Port of ' +
-    'Spain. Recent work includes multi-agent AI systems built on LangGraph and ' +
-    'Pinecone, a fraud-detection study reported with bootstrap confidence intervals ' +
-    'and cost curves rather than one accuracy score, and a document extraction ' +
-    'pipeline combining OCR and computer vision.',
+    'I work on full-stack web apps, data analysis and machine learning from Port of ' +
+    'Spain. Recent work includes multi-agent systems built with LangGraph and Pinecone, a ' +
+    'fraud-detection study reported with bootstrap confidence intervals and cost ' +
+    'curves, and a document extraction pipeline that combines OCR with computer vision.',
 
   /**
    * Names the ledger below as examples of the framing line above it. Without
@@ -83,17 +82,17 @@ export const profile = {
     {
       id: 'handbooks-parser',
       name: 'handbooks-parser',
-      claim: 'A separate audit script re-reads the source PDFs independently of the parser.',
+      claim: 'A separate audit script reads the source PDFs again and compares them with the parser output.',
     },
     {
       id: 'fraud-detection',
       name: 'fraud-analysis',
-      claim: 'The alert threshold comes from a cost function, not from maximising accuracy.',
+      claim: 'The alert threshold is set by a cost function that weighs missed fraud against false alerts.',
     },
     {
       id: 'bi-automatic-reporting',
       name: 'bi-reporting',
-      claim: 'An eval harness with a hallucination canary fixture gates prompt changes.',
+      claim: 'Prompt changes have to pass an eval harness, including a canary test for hallucinations.',
     },
   ],
 

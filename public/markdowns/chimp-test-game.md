@@ -2,7 +2,7 @@
 
 ## Overview
 
-A cognitive memory training game suite built with **React 19**, **TypeScript**, and **Vite**. Inspired by the classic "Chimp Test" working memory experiment, this project features two distinct game modes with progressive difficulty, configurable challenge settings, and a Supabase-powered real-time leaderboard.
+Two memory games built with **React 19**, **TypeScript** and **Vite**, based on the "Chimp Test" working memory experiment. Each game gets harder as you level up, has configurable difficulty settings, and posts scores to a real-time leaderboard on Supabase.
 
 **Repository:** [https://github.com/firepenguindisopanda/game-test-chimp](https://github.com/firepenguindisopanda/game-test-chimp)
 
@@ -12,20 +12,20 @@ A cognitive memory training game suite built with **React 19**, **TypeScript**, 
 
 ### Chimp Test
 
-The classic working memory challenge. Numbered tiles are briefly revealed on a 6×6 grid before being hidden. Your task: click the tiles in ascending numerical order from memory. Each successful level adds a new tile, ramping up the challenge.
+Numbered tiles are shown briefly on a 6×6 grid and then hidden. You click the tiles in ascending order from memory, and each level you clear adds another tile.
 
-- **Beginner Mode:** Tiles remain visible until you're ready, perfect for practice
-- **Advanced Mode:** Tiles auto-hide after a configurable view time (3s/5s/7s), adding time pressure
-- **Super Advanced Mode:** Timed view + random number gaps (tiles use non-sequential numbers), requiring stronger concentration
+- **Beginner Mode:** Tiles stay visible until you start clicking, which suits practice
+- **Advanced Mode:** Tiles hide automatically after a configurable view time (3s/5s/7s)
+- **Super Advanced Mode:** Timed view + random number gaps (tiles use non-sequential numbers)
 
 ### Visual Memory Test
 
-A grid of tiles briefly highlights positions you must memorize and recall. After the showing phase, the grid may rotate 90° to 180°, requiring you to track positions through spatial transformation.
+The grid briefly highlights a set of positions for you to memorize and then click. After the highlights disappear, the grid may rotate 90° to 180°, so you have to track where the positions moved.
 
-- **Beginner Mode:** No rotation, pure position recall
+- **Beginner Mode:** No rotation, position recall only
 - **Advanced Mode:** Grid rotates 1 to 2 steps (90° to 180°) after hiding tiles
 - **Super Advanced Mode:** Rotation + timed viewing + 90-second recall timer
-- Dynamic grid sizing: starts at 3×3, grows every 2 levels (3×3 to 4×4 to 5×5 to 6×6 to 7×7+)
+- Grid size: starts at 3×3, grows every 2 levels (3×3 to 4×4 to 5×5 to 6×6 to 7×7+)
 - Retry system: 2 retries per level before the level drops back by 1
 
 ---
@@ -48,7 +48,7 @@ A grid of tiles briefly highlights positions you must memorize and recall. After
 ## Architecture
 
 ### State Management
-Both games use `useReducer` for state management with well-defined action types:
+Both games manage state with `useReducer` and a fixed set of action types:
 
 ```
 ChimpTest State:
@@ -60,11 +60,11 @@ VisualMemory State:
 ```
 
 ### Audio System
-The game features a comprehensive audio feedback system:
-- **Singleton `AudioManager`** manages all sound playback with volume/mute controls
+Game events trigger sound effects:
+- **Singleton `AudioManager`** handles all sound playback, with volume/mute controls
 - **`InteractionManager`** maps game events (tile click, wrong guess, level clear, game over) to specific sound effects
 - 100+ **Warcraft II**-inspired unit acknowledgment and selection sounds from Alliance and Horde factions
-- Graceful degradation: audio failures (autoplay policy, 404s) are caught silently; the game never breaks
+- Audio failures (autoplay policy, 404s) are caught and ignored, so a missing sound never stops the game
 
 ### Database (Supabase)
 A unified `game_scores` table stores scores for both games with:
@@ -77,15 +77,15 @@ A unified `game_scores` table stores scores for both games with:
 
 ## Key Features
 
-- **Dual Game Modes:** Two distinct memory challenges in one app
-- **Progressive Difficulty:** Each level gets harder; the game tracks your best performance
-- **Configurable Challenge:** Three mode tiers + adjustable view times let you customize the difficulty
-- **Real-time Leaderboard:** Supabase-powered global rankings with personal score history and mode filtering
-- **Spatial Rotation Mechanic:** Unique grid rotation in Visual Memory Test adds a spatial reasoning dimension
-- **Rich Audio Feedback:** 100+ Warcraft-themed sounds create an engaging, game-like atmosphere
-- **Responsive Design:** Works on desktop and mobile with touch-friendly tile interactions
+- **Two games:** Chimp Test and Visual Memory Test in one app
+- **Progressive difficulty:** Each level gets harder, and the game records your best result
+- **Configurable difficulty:** Three mode tiers + adjustable view times
+- **Real-time leaderboard:** Global rankings on Supabase, with personal score history and filtering by mode
+- **Grid rotation:** The Visual Memory Test rotates the grid, which adds spatial reasoning to the recall task
+- **Audio feedback:** 100+ Warcraft-themed sounds
+- **Responsive layout:** Works on desktop and mobile, with touch-friendly tiles
 - **Accessible:** Keyboard-navigable cards, ARIA labels on tiles, focus management, and screen reader support
-- **Typesafe:** Full TypeScript strict mode with exhaustive union types for game actions
+- **Typesafe:** TypeScript strict mode, with exhaustive union types for game actions
 
 ---
 

@@ -18,7 +18,7 @@ const AndroidPortfolio = () => {
       description="Mobile work in Kotlin and Jetpack Compose."
       categories={CATEGORIES}
       surface="android"
-      emptyMessage="Android work is in progress, and nothing here is far enough along to be worth your time yet. The full-stack and machine learning pages have the shipped projects."
+      emptyMessage="My Android projects are still in progress, so there is nothing to show here yet. The full-stack and machine learning pages have finished projects."
     />
   );
 };

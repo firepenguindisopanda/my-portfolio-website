@@ -26,11 +26,11 @@ export const clientFiles = [
   {
     id: 'programme-finder',
     sector: 'Higher education: a regional university',
-    title: 'Which degrees can I study? Answered for every applicant',
+    title: 'A programme finder for university applicants',
     period: 'Since 2022',
     points: [
       'Main contributor to the university\'s public programme finder, where applicants enter their secondary school subjects and see the degrees they qualify for: its app, admin dashboard and API.',
-      'Kept it current and observable: framework upgrades across several versions, staging and production deploys from CI, a move to GA4, error monitoring with Sentry, and accessibility work on the subject picker and programme pages.',
+      'Kept it up to date and monitored: framework upgrades across several versions, staging and production deploys from CI, a move to GA4, error monitoring with Sentry, and accessibility work on the subject picker and programme pages.',
       'Built the careers data behind each programme, with scripts that generate and normalise job data, and extended the qualification engine\'s parser and tests.',
     ],
     stack: ['Angular', 'Angular Material', 'Node.js', 'Neo4j', 'Firebase', 'GitHub Actions', 'Sentry', 'Python'],

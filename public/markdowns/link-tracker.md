@@ -1,10 +1,10 @@
-# Link Tracker: 100+ Browser Tabs Into a Queue That Shrinks
+# Link Tracker: 100+ Browser Tabs Turned Into a Reading Queue
 
 ## Overview
 
-A self-owned Windows tool for one specific habit: keeping a hundred tabs open "to read later". One keystroke in Chrome or Edge saves tabs and closes them. A keyboard-first desktop app then gives every saved link a decision (**Queue**, **Reference** or **Drop**), and the Queue is meant to get *shorter*.
+A Windows tool I built for my own habit of keeping a hundred tabs open "to read later". One keystroke in Chrome or Edge saves tabs and closes them. A keyboard-first desktop app then asks for a decision on every saved link (**Queue**, **Reference** or **Drop**), and the Queue is meant to get *shorter*.
 
-Everything lives in **one local SQLite file**. No account, no server, no cloud.
+Everything is stored in **one local SQLite file**, with no account, server or cloud service.
 
 ![Link Tracker's Queue view: six queued links, oldest first, with video lengths on the right. The selected talk shows its channel, its length, where playback stopped and how much is left, its thumbnail, and the triage buttons with their keys.](/portfolio_data/link_tracker/queue.webp)
 
@@ -22,17 +22,17 @@ Everything lives in **one local SQLite file**. No account, no server, no cloud.
 
 ---
 
-## The problem was never storage
+## What my open tabs showed
 
 Before writing anything, I dumped my open tabs to text. Two dumps held **164 entries but only 99 unique pages** (the same video open in three tabs, the same article in two windows), and **34 of the 99 were YouTube videos**.
 
-That set the design. A bookmark manager would have stored all 164 faithfully and changed nothing. What was missing was a *decision* per link, and a place that made keeping a link cost something. So every link enters an **Inbox**, and the only ways out are:
+A bookmark manager would have stored all 164 and changed nothing. What I needed was a *decision* on each link, and a place where keeping a link cost something. So every link enters an **Inbox**, and the only ways out are:
 
-- **Q** (Queue): I will actually do this.
+- **Q** (Queue): I will do this.
 - **R** (Reference): worth keeping, not a to-do.
 - **D** (Drop): close it without guilt.
 
-Links are never hard-deleted. Dropped and archived links stay in the file, and saving one again brings it back to the Inbox. So dropping is safe, which is what makes people willing to do it.
+Links are never hard-deleted. Dropped and archived links stay in the file, and saving one again brings it back to the Inbox. Because nothing is lost, dropping a link is low-risk, and that makes it easier to do.
 
 ---
 
@@ -54,60 +54,60 @@ Links are never hard-deleted. Dropped and archived links stay in the file, and s
  └──────────────┘
 ```
 
-Seven projects in the solution, with a dependency rule that keeps saving fast: `Core ← Data ← Cli / App / Host`, and **the host never references the YouTube or link-checking projects**, so a save never waits on the network.
+The solution has seven projects. The dependency rule is `Core ← Data ← Cli / App / Host`, and **the host never references the YouTube or link-checking projects**, so a save never waits on the network.
 
 ---
 
-## The interesting problems
+## Design problems
 
-### Why native messaging and not a local server
+### Native messaging instead of a local server
 
-A browser extension cannot write files, so something on the machine has to. The obvious answer (a little HTTP server on localhost) means an open port, a process that has to be running, and an authentication story. Native messaging has none of those: the browser starts `LinkTracker.Host.exe` for one message, talks to it over stdin/stdout with 4-byte length-prefixed JSON, and **only the extension IDs listed in the host's manifest can connect at all**. It also works when the app is closed.
+A browser extension cannot write files, so something else on the machine has to. A small HTTP server on localhost would mean an open port, a process that has to be running, and some way to authenticate. Native messaging needs none of those. The browser starts `LinkTracker.Host.exe` for one message, talks to it over stdin/stdout with 4-byte length-prefixed JSON, and **only the extension IDs listed in the host's manifest can connect at all**. It also works when the app is closed.
 
-The gotcha that shapes the host: **stdout belongs to the protocol.** A single stray log line corrupts the message stream, so logging goes to a file and nothing else is allowed near stdout. Serialization is source-generated to keep the start-up of a process that lives for one message short.
+In the host, **stdout belongs to the protocol.** A single stray log line corrupts the message stream, so logging goes to a file and nothing else writes to stdout. Serialization is source-generated to keep start-up short, since the process lives for one message.
 
 ### Save-and-close is a race
 
-"Save these tabs, then close them" sounds like two steps. It is actually a race: between sending the save and hearing back, a tab can navigate somewhere else, or the user can close it themselves. Closing it anyway would lose a page that was never saved.
+"Save these tabs, then close them" contains a race. Between sending the save and getting the reply, a tab can navigate somewhere else, or the user can close it themselves. Closing it anyway could lose a page that was never saved.
 
 So the rule, which lives in one pure function in the extension (`planClose`) with its own tests, is that a tab closes only if:
 
 1. the host's reply says **its** link was stored (one result per link, in order; a reply that does not line up one-to-one with the request closes nothing), **and**
 2. when the window is **read again after the reply**, that tab still shows the same page and is not loading.
 
-Pinned tabs and pages that are not web links always stay. If the save would empty the window, a new tab opens first so the browser does not quit. And each save is **one transaction**: if the host fails, nothing was written and nothing closes.
+Pinned tabs and pages that are not web links always stay. If the save would empty the window, a new tab opens first so the browser does not quit. Each save is also **one transaction**, so if the host fails, nothing is written and nothing closes.
 
 ### One link, many URLs
 
-The same YouTube video arrives as `watch?v=`, `youtu.be/`, `/shorts/` and `/embed/`, usually with tracking parameters attached. Identity is a normalized URL with a `UNIQUE` constraint: all four video forms become `youtube:<id>`, `utm_*`, `fbclid`, `gclid` and `si` are stripped, and a `t=` timestamp becomes a **resume point** on the existing link instead of a second link. That is how 164 tab entries became 99 rows on the first real import: 99 added, 65 merged, none skipped.
+The same YouTube video arrives as `watch?v=`, `youtu.be/`, `/shorts/` and `/embed/`, usually with tracking parameters attached. Identity is a normalized URL with a `UNIQUE` constraint: all four video forms become `youtube:<id>`, `utm_*`, `fbclid`, `gclid` and `si` are stripped, and a `t=` timestamp becomes a **resume point** on the existing link instead of a second link. On the first real import, this turned 164 tab entries into 99 rows: 99 added, 65 merged, none skipped.
 
 ### Reading the video player without breaking it
 
-When a YouTube tab is saved, the extension reads where playback stopped and how long the video is, so Enter in the app reopens it at that point. That means injecting code into someone else's page, so it is done carefully: a function is injected **only at save time**, into the extension's isolated world, all reads share a one-second limit, nothing is read while an ad is playing, and a live stream reports no length rather than a wrong one. Optional data fails soft: a save never fails because the player could not be read.
+When a YouTube tab is saved, the extension reads where playback stopped and how long the video is, so Enter in the app reopens it at that point. That means injecting code into someone else's page, so the limits are tight: a function is injected **only at save time**, into the extension's isolated world; all reads share a one-second limit; nothing is read while an ad is playing; and a live stream is stored with no length instead of a wrong one. This data is optional, so if the player cannot be read, the save still goes through.
 
-### A queue has to shrink
+### Keeping the queue short
 
-A queue that only grows is a bookmark folder. Two features push the other way:
+Two features work against a queue that only grows:
 
-- **"I have N minutes"** (the **M** key) picks the **oldest** queued video whose remaining time fits. Deliberately not a knapsack optimiser: predictable beats clever when you are deciding what to watch.
+- **"I have N minutes"** (the **M** key) picks the **oldest** queued video whose remaining time fits. I chose this over a knapsack optimiser so the pick is predictable when deciding what to watch.
 - **"Still want this?"** appears once a day with the three links that have waited longest. **Keep** sends a link to the back of the line (a `reviewed_at` date, kept separate from when its status last changed), **X** marks it done, **D** drops it.
 
-Inbox links nobody has touched in 30 days (configurable, 1-365) are archived at start-up, not deleted.
+Inbox links nobody has touched in 30 days (configurable, 1-365) are archived (not deleted) at start-up.
 
-### Link checking that never cries wolf
+### Checking for dead links
 
-The piece in progress: finding links that have died. The failure mode to design against is not a missed dead link, it is **my own outage looking like link rot**: a laptop on bad Wi-Fi would otherwise mark half the database dead in one run. So:
+This part is in progress: finding links that have died. A missed dead link matters less than **my own outage looking like link rot**, since a laptop on bad Wi-Fi could otherwise mark half the database dead in one run. The rules are:
 
 - every check sorts into one of **six outcomes**, and a link is only **gone** after **three failed checks over at least seven days**;
 - if the first five checks of a run all fail to connect, **the run writes nothing**;
 - requests are serial and polite (500 ms apart, 2 s apart on the same site, a 15 s timeout, an honest User-Agent) and use `ResponseHeadersRead` so a body is never downloaded;
-- YouTube videos are checked through the Data API, after measuring that oEmbed answers **400, not 404**, for a deleted video.
+- YouTube videos are checked through the Data API, after I measured that oEmbed returns **400** (not 404) for a deleted video.
 
 The rules, the classifier, the checker and the `linktracker check` command are built and tested; wiring it into the app is next.
 
 ---
 
-## Measured, not assumed
+## Performance
 
 | What | Result |
 |---|---|
@@ -117,13 +117,13 @@ The rules, the classifier, the checker and the `linktracker check` command are b
 | Host: save 1 link / 200 links | 232-245 ms / 255-265 ms median |
 | Real browser: 1 tab / a 53-tab window | 414 ms / 1,245 ms |
 
-The 1,000 links come from a script that writes the same synthetic dump every time, so the numbers can be re-run rather than remembered.
+The 1,000 links come from a script that writes the same synthetic dump every time, so the measurements can be repeated.
 
 ---
 
 ## How it was built
 
-Every decision has an **ADR**, 25 of them, from "single local SQLite file" to "never let my own failures look like link rot". Every module has a **spec** whose acceptance criteria are numbered, and **every test is named after the criterion it proves** (`L16_…`, `R2_…`), so a failing test points straight at the promise it broke. Along the way I broke code on purpose to confirm the right test failed: making a timeout count as "gone", for instance, fails the liveness test written for exactly that case.
+Each decision is recorded in an **ADR**, 25 of them, from "single local SQLite file" to "never let my own failures look like link rot". Each module has a **spec** with numbered acceptance criteria, and **every test is named after the criterion it proves** (`L16_…`, `R2_…`), so a failing test shows which criterion broke. I also broke code on purpose to confirm the right test failed. For example, making a timeout count as "gone" fails the liveness test written for that case.
 
 ## Status
 

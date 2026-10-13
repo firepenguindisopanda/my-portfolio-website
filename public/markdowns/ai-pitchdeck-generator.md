@@ -2,66 +2,63 @@
 
 ## Overview
 
-A sophisticated AI-powered platform designed to streamline the creation of professional pitch decks. Built with a robust NestJS backend and a modern Next.js frontend, this application leverages Generative AI (via NVIDIA's API) to automatically generate slide content, structure, and speaker notes based on user prompts. It features a comprehensive deck management system, real-time editing, version control, and PDF export capabilities.
-
-**Frontend Repository:** [GitHub link]  
-**Backend Repository:** [GitHub link]
+A web app for drafting pitch decks. The user describes the deck in a prompt, and a NestJS backend sends it to a generative model through NVIDIA's API, which returns the slide structure, slide content and speaker notes. The frontend is built with Next.js, and the app also has deck management, real-time editing, version control and PDF export.
 
 ---
 
 ## Tech Stack
 
 ### Backend
-- **NestJS**: Progressive Node.js framework for building efficient, scalable server-side applications
+- **NestJS**: Node.js server framework
 - **PostgreSQL & TypeORM**: Relational database with object-relational mapping
 - **OpenAI SDK (NVIDIA API)**: Integration with LLMs (e.g., Google Gemma) for content generation
-- **Passport & JWT**: Secure authentication strategy
+- **Passport & JWT**: Authentication
 - **PDFKit**: Programmatic PDF generation
-- **Socket.io**: Real-time bidirectional event-based communication
+- **Socket.io**: Real-time events in both directions between client and server
 - **Pino**: Structured logging
-- **Docker**: Containerization for consistent development and deployment environments
+- **Docker**: Containers for development and deployment
 
 ### Frontend
 - **Next.js 16** (App Router): React framework with server-side rendering and static site generation
-- **TypeScript**: Type-safe development
-- **Tailwind CSS 4**: Utility-first styling with modern CSS features
-- **TanStack Query**: Powerful asynchronous state management
+- **TypeScript**: Type checking
+- **Tailwind CSS 4**: Utility-first styling
+- **TanStack Query**: Asynchronous state management
 - **TanStack Form & Zod**: Type-safe form validation
 - **@dnd-kit**: Drag-and-drop interface for slide reordering
-- **Lucide React**: Consistent icon set
+- **Lucide React**: Icons
 
 ### External APIs
-- **NVIDIA NIM API**: Access to high-performance AI models like `google/gemma-3-1b-it`
+- **NVIDIA NIM API**: Hosted models such as `google/gemma-3-1b-it`
 
 ---
 
 ## Key Features
 
 ### Authentication & Security
-- Secure user registration and login flows
+- User registration and login
 - JWT-based session management
 - Password hashing with bcrypt
-- Rate limiting via `@nestjs/throttler` to prevent abuse
-- Helmet middleware for setting secure HTTP headers
+- Rate limiting via `@nestjs/throttler` to limit abuse
+- Helmet middleware to set security-related HTTP headers
 
-### AI-Powered Content Generation
+### Content Generation
 - **Prompt-to-Deck:** Generates complete pitch deck structures from a single text description
-- **Smart Slide Content:** Automatically populates titles, bullet points, and speaker notes
-- **Model Flexibility:** Configurable to use different LLMs via NVIDIA's API
+- **Slide Content:** Fills in titles, bullet points and speaker notes
+- **Model Choice:** The model is set in configuration and can be any LLM available through NVIDIA's API
 
 ### Deck Management
-- **Dashboard:** Centralized view of all user pitch decks
+- **Dashboard:** Lists all of the user's pitch decks
 - **CRUD Operations:** Create, read, update, and delete decks
 - **Status Tracking:** Manage decks through 'Draft' and 'Published' states
 - **Versioning:** Automatic snapshots of deck versions (`PitchDeckVersion`) to track history
 
 ### Slide Editor
 - **Rich Text Editing:** Edit slide content and speaker notes
-- **Drag-and-Drop Reordering:** Intuitive interface to rearrange slides
+- **Drag-and-Drop Reordering:** Rearrange slides by dragging them
 - **Image Support:** Associate images with slides (URL-based)
 
 ### Export & Output
-- **PDF Generation:** Export completed decks to professional PDF format
+- **PDF Generation:** Export a finished deck to PDF
 - **JSON Snapshots:** Store and retrieve structured data of deck versions
 
 ---
@@ -103,15 +100,15 @@ Historical snapshots for version control:
 ## Architecture Highlights
 
 ### Modular Backend Structure
-The NestJS application is organized into domain-specific modules for better maintainability:
+The NestJS application is split into modules by domain:
 - `AiGenModule`: Handles interaction with external AI services
 - `PitchdecksModule` & `SlidesModule`: Core business logic for deck management
-- `AuthModule`: Encapsulates security logic
+- `AuthModule`: Authentication logic
 - `DatabaseModule`: Manages connections and migrations
 
 ### Monorepo Setup
-- **Turborepo:** High-performance build system managing the frontend (`apps/web`) and shared packages
-- **Shared Config:** Centralized TypeScript and ESLint configurations
+- **Turborepo:** Build system for the frontend (`apps/web`) and shared packages
+- **Shared Config:** One set of TypeScript and ESLint configurations
 
 ### Service-Repository Pattern
 - **Controllers:** Handle HTTP requests and validation
@@ -182,15 +179,15 @@ The backend provides a Swagger UI for interactive API documentation (typically a
 
 ### Challenge 1: AI Response Structuring
 **Problem:** LLMs output unstructured text, but the application needs structured JSON for slides.
-**Solution:** Implemented robust prompt engineering and parsing logic within `AiGenService` to enforce a strict JSON schema output from the NVIDIA API, ensuring generated content maps correctly to `Slide` entities.
+**Solution:** `AiGenService` prompts the model through the NVIDIA API for output in a strict JSON schema and parses the reply against it, so generated content maps onto `Slide` entities.
 
 ### Challenge 2: Version Control for Complex Data
-**Problem:** Tracking changes in a deck with multiple slides and properties is complex.
-**Solution:** Utilized the `PitchDeckVersion` entity with a `jsonb` column in PostgreSQL. This allows storing complete snapshots of the deck's state efficiently without complex join tables for history.
+**Problem:** A deck has many slides and properties, so tracking its changes is awkward.
+**Solution:** Each version is a `PitchDeckVersion` entity with a `jsonb` column in PostgreSQL that holds a complete snapshot of the deck's state, so history needs no extra join tables.
 
 ### Challenge 3: Real-time Slide Reordering
-**Problem:** Reordering slides needs to be snappy on the frontend and consistent on the backend.
-**Solution:** Used `@dnd-kit` for a smooth frontend experience and a batch update endpoint on the backend to update `order` fields transactionally.
+**Problem:** Reordering slides had to feel fast on the frontend and stay consistent on the backend.
+**Solution:** `@dnd-kit` handles dragging on the frontend, and a batch update endpoint on the backend updates the `order` fields in one transaction.
 
 ---
 
@@ -211,7 +208,3 @@ The backend provides a Swagger UI for interactive API documentation (typically a
 **GitHub:** [\[GitHub Profile\]](https://github.com/firepenguindisopanda?tab=repositories)  
 **LinkedIn:** [[LinkedIn](https://www.linkedin.com/in/nicholas-smith-933125148/)]  
 **Portfolio:** [\[Portfolio URL\]](https://portfolio-website-11217.web.app/)
-
----
-
-*Built with modern web technologies*

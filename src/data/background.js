@@ -23,9 +23,9 @@ export const education = [
  * palette, so the stronger version is the only version.
  */
 export const bio = [
-  `I've always been pulled toward the same question from two different directions: why do people and systems behave the way they do? On one side, that's led me into software engineering, machine learning, and AI, where the question becomes technical: how can you model reasoning, prediction, and decision-making in code? On the other, it's led me into sociology, anthropology, psychology, and philosophy, where the question stays human: how do people construct meaning, form communities, and make choices?`,
-  `I don't see those as separate interests so much as one continuous investigation. It's what draws me to the psychology of interface design: not just whether something looks polished, but whether it matches how a real person's attention, memory, and expectations actually work as they move through a product.`,
-  `I bring the same curiosity home in smaller, more hands-on ways, tinkering with Raspberry Pis and IoT devices, wiring up little systems just to watch software reach into the physical world. It's the same instinct as everything else I do: take something abstract, understand it deeply enough to rebuild it, and make it work.`,
+  `Most of what interests me comes back to one question: why do people and systems behave the way they do? In software engineering, machine learning and AI, that becomes a technical problem of modelling prediction and decision-making in code. I also read sociology, anthropology, psychology and philosophy, where the same question is about how people make meaning, form communities and make choices.`,
+  `The two sides overlap more than they seem to. It's why I care about the psychology of interface design: how a screen fits the way people's attention, memory and expectations work as they move through a product, as well as how it looks.`,
+  `At home I tinker with Raspberry Pis and IoT devices, wiring up small systems to see software control something physical. I like taking an idea apart until I understand it well enough to build it again myself.`,
 ];
 
 /** The three short notes that sat beside the bio. */
@@ -37,12 +37,12 @@ export const notes = [
     body: 'I mentor with the WiDS Datathon, and I tutor students privately in their UWI courses. Earlier, as a part-time tutor at UWI DCIT, I ran sessions on version control, design patterns and CI/CD for students on their first real projects.',
   },
   {
-    title: 'I argue with my own results',
-    body: 'The ML write-ups here compare methods rather than report one number: permutation importance against Gini, precision-recall against the ROC curve that flatters it. Where two methods disagree, the disagreement is the finding.',
+    title: 'I check results more than one way',
+    body: 'My ML write-ups compare methods side by side: permutation importance next to Gini importance, and precision-recall next to the ROC curve, which looks better than it should on imbalanced data. When two methods disagree, I report where and why.',
   },
   {
     title: 'I still practise the fundamentals',
-    body: 'Data structures and algorithms, kept sharp on Codewars, LeetCode and Codeforces. The profiles are public if you want to see the work rather than the claim.',
+    body: 'I keep up data structures and algorithms practice on Codewars, LeetCode and Codeforces, and the profiles are public.',
     links: [
       { label: 'Codewars', href: profile.links.codewars },
       { label: 'LeetCode', href: profile.links.leetcode },

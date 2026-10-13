@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-Starbucks sends promotional offers to mobile app users, but customer response varies significantly. Not all customers respond to the same offers, leading to wasted ad spend and missed opportunities. This project aims to **optimize offer targeting** by identifying customer segments, predicting offer completion, and building a recommendation system, all validated with rigorous statistical methodology.
+Starbucks sends promotional offers to mobile app users, and customers respond to them very differently. Sending everyone the same offers wastes ad spend and misses customers who would have responded to something else. I set out to **improve offer targeting** by finding customer segments, predicting which offers get completed and building a recommendation system on top, with statistical tests behind each step.
 
 **Key Business Questions:**
 1. How do customer offer response rates vary across demographics?
@@ -49,7 +49,7 @@ The simulated Starbucks Rewards app data contains **306,534 events** from **17,0
 
 ![Offer Funnel](/portfolio_data/starbucks/plots/offer_funnel.webp)
 
-The offer engagement funnel shows a clear drop-off from receipt to completion:
+Engagement drops at each stage from receipt to completion:
 
 | Stage | Count | Conversion |
 |-------|-------|------------|
@@ -86,7 +86,7 @@ This suggests customers prefer offers with more time to complete, even if the sp
 
 ### Statistical Hypothesis Testing
 
-Beyond descriptive statistics, the improved analysis pipeline includes rigorous statistical testing:
+I also ran hypothesis tests on the main comparisons:
 
 | Test | Comparison | p-value | Effect Size | Interpretation |
 |-----|-----------|---------|-------------|----------------|
@@ -111,7 +111,7 @@ Beyond descriptive statistics, the improved analysis pipeline includes rigorous 
 
 ### Cohort Analysis (by Membership Year)
 
-Earlier join cohorts (2013-2016) show higher completion rates (~44-59%) compared to recent joiners (2018: 28%), suggesting engagement increases with tenure, or that earlier cohorts had more favorable offer conditions.
+Customers who joined earlier (2013 to 2016) complete more offers (about 44 to 59%) than those who joined in 2018 (28%). Either engagement grows with tenure, or the earlier cohorts had more favourable offer conditions.
 
 ### Channel Effectiveness
 
@@ -122,13 +122,13 @@ Earlier join cohorts (2013-2016) show higher completion rates (~44-59%) compared
 | **Social** | 93.3% | 49.3% | 47.7% |
 | **Web** | 72.7% | 87.7% | 49.0% |
 
-Social and mobile channels drive the highest view rates; social+web combo yields the highest completion rates.
+Offers sent through social and mobile are viewed most often, and the social plus web combination has the highest completion rates.
 
 ---
 
 ## Feature Engineering
 
-Created **55 customer features** (+ 75 interaction features) from demographic and behavioral data:
+I built **55 customer features** (plus 75 interaction features) from demographic and behavioural data:
 
 **Demographic (18 features):** Age imputation, income imputation, missing flags, one-hot encoded gender, tenure calculations, categorical bins
 
@@ -138,7 +138,7 @@ Created **55 customer features** (+ 75 interaction features) from demographic an
 - Rate metrics: view rate, completion rate, view-to-completion rate
 
 **RFM & Time-Decay Features:**
-- Recency, frequency, monetary (RFM score via quintile-based)
+- Recency, frequency, monetary (RFM score built from quintiles)
 - spend_last_7d, spend_last_14d, spend_trend
 - offer_recency_days, avg_time_to_view, avg_time_to_complete
 - **CLV Proxy:** trans_total × (1 + completion_rate)
@@ -147,7 +147,7 @@ Created **55 customer features** (+ 75 interaction features) from demographic an
 
 **Offer Features (11 features):** One-hot encoded offer types, channel flags (email, mobile, social, web), interaction terms (difficulty × reward, reward per day, difficulty per day)
 
-These month-long features are the right way to describe a customer for segmentation. They are the wrong input for predicting whether one particular offer will be completed, because they count what happened after that offer was sent. The predictive model below uses its own send-level features for that reason.
+These features summarise a customer's whole month, which suits segmentation. They cannot be used to predict whether one particular offer will be completed, because they count what happened after that offer was sent, so the predictive model below uses its own send-level features.
 
 ---
 
@@ -155,7 +155,7 @@ These month-long features are the right way to describe a customer for segmentat
 
 ### Methodology
 
-K-Means clustering was applied to 32 standardized features (demographic + behavioral). Optimal k was determined using silhouette scores, Calinski-Harabasz index, Davies-Bouldin index, gap statistic, and **stability analysis (Adjusted Rand Index across 5 random seeds)**.
+I ran K-Means on 32 standardised features (demographic and behavioural) and chose k using silhouette scores, Calinski-Harabasz index, Davies-Bouldin index, gap statistic, and **stability analysis (Adjusted Rand Index across 5 random seeds)**.
 
 ### Cluster Optimization Metrics
 
@@ -166,9 +166,9 @@ K-Means clustering was applied to 32 standardized features (demographic + behavi
 | **4** | 380,418 | 0.147 | 2,436.1 | 1.94 | Within 1 SE |
 | 5 | 355,198 | 0.165 | 2,258.4 | 2.01 | - |
 
-**Why k=4 despite k=3 having higher silhouette:** The k=4 solution reveals a **business-critical distinction** between Discount Seekers and BOGO Advocates that k=3 collapses into one group. The recommendation system built on k=4 (+7.9% lift) validates this choice empirically, and the stability analysis (mean ARI **0.76** across resamples, standard deviation 0.19, lowest 0.60) shows the clusters are moderately stable.
+**Why k=4 when k=3 has the higher silhouette:** k=4 separates Discount Seekers from BOGO Advocates, which k=3 merges into one group, and that split decides which offer each of those customers gets. The recommendation system built on k=4 gave a +7.9% lift, and the stability analysis (mean ARI **0.76** across resamples, standard deviation 0.19, lowest 0.60) shows the clusters are moderately stable.
 
-The k=3 silhouette (0.170) is also only 0.023 higher than k=4; both indicate weak separation typical of behavioral data. The clusters serve as **directional guides**, not hard rules.
+The k=3 silhouette (0.170) is only 0.023 higher than k=4's, and both indicate the weak separation usual in behavioural data. I treat the clusters as **directional guides** for targeting.
 
 ### Segment Profiles
 
@@ -190,7 +190,7 @@ The k=3 silhouette (0.170) is also only 0.023 higher than k=4; both indicate wea
 - **Demographics:** Age=57.0, Income=$72K, 54% Female
 - **Behavior:** Highest transaction activity ($180.80 avg spend), **87.1% BOGO completion rate**
 - **CLV Proxy (12-mo):** $2,170 | **Offer ROI: 7.4x**
-- **Recommendation:** Prioritize BOGO offers; they are your highest-value segment
+- **Recommendation:** Prioritize BOGO offers; this is the highest-value segment
 
 #### Passive Browsers (33.9%, 5,765 customers)
 - **Demographics:** Age=51.3, Income=$57K, 71% Male
@@ -202,7 +202,7 @@ The k=3 silhouette (0.170) is also only 0.023 higher than k=4; both indicate wea
 
 ### Business Metric Validation
 
-Segments were validated against business metrics to confirm practical relevance:
+I checked each segment against business metrics:
 
 | Segment | Revenue/Customer | Offer ROI | Churn Risk | Business Viability |
 |---------|----------------|-----------|------------|-------------------|
@@ -213,9 +213,9 @@ Segments were validated against business metrics to confirm practical relevance:
 
 > **53.3% of customers (Discount Seekers + BOGO Advocates) generate 85.6% of total revenue.**
 
-### Candid Assessment of Clustering Quality
+### Clustering Quality
 
-The silhouette score of 0.147 (k=4) indicates **weak separation**: clusters overlap. This is expected for behavioral data where customer segments have fuzzy boundaries. The stability analysis (mean ARI 0.76, lowest 0.60) says most of the structure recurs across resamples, but not all of it, so the segment boundaries should be treated as soft. The clusters serve as **directional guides** for targeting, and the recommendation system includes secondary offer types for this reason.
+The silhouette score of 0.147 (k=4) indicates **weak separation**, meaning the clusters overlap. That is common in behavioural data, where customer groups have fuzzy edges. In the stability analysis (mean ARI 0.76, lowest 0.60) most of the structure recurs across resamples, though some of it does not, so the segment boundaries are soft. That is why the recommendation system includes secondary offer types.
 
 ---
 
@@ -223,18 +223,18 @@ The silhouette score of 0.147 (k=4) indicates **weak separation**: clusters over
 
 ### The question
 
-When a BOGO or discount offer is sent, will this customer complete it within the offer's validity window? That is the decision a targeting system faces, so every feature has to be something known at the moment of sending.
+The model predicts whether a customer will complete a BOGO or discount offer within its validity window, at the point the offer is sent. A targeting system makes its decision at that moment, so every feature has to be something known when the offer goes out.
 
 ### What the first version got wrong
 
-The first version of this model scored an AUC of **0.994**, and its own 5-fold cross-validation said 0.908. That gap was the clue. Four things were inflating it:
+The first version of this model scored an AUC of **0.994**, while its own 5-fold cross-validation gave 0.908. I looked into that gap and found these problems inflating the score:
 
-1. **Rows that never happened.** It crossed every customer with all ten offers, 170,000 rows, most of them offers the customer never received, including informational offers that cannot be completed at all. Predicting 0 for those is trivial.
-2. **No window.** The target was "ever completed this offer", not "completed within the offer's validity window".
+1. **Rows that never happened.** It crossed every customer with all ten offers, 170,000 rows, most of them offers the customer never received, including informational offers that cannot be completed at all, and predicting 0 for those is trivial.
+2. **No window.** The target was "ever completed this offer", with no limit to the offer's validity window.
 3. **Features from the future.** Its strongest feature was whether the offer was viewed by email, which only happens after the send, and it used completion counts over the whole month, the offer being predicted included.
 4. **A random split.** Rows were split at random, so each customer's other offers sat in both the training and the test set.
 
-### The honest setup
+### The setup I report
 
 - **One row per offer actually sent:** 61,042 BOGO and discount sends. A completion is credited to the latest send of that offer whose window contains it, so an offer received twice counts as two sends.
 - **Censored sends dropped:** 10,236 sends whose validity window runs past the last hour of data (714) are excluded, because whether they would have completed is unknown. That leaves **50,806 sends to 16,804 customers**, 54.4% completed.
@@ -244,7 +244,7 @@ The first version of this model scored an AUC of **0.994**, and its own 5-fold c
 
 ### Taking the leaks out, one at a time
 
-Same model (histogram gradient boosting), same sends, 5-fold cross-validation at each step:
+Each step uses the same model (histogram gradient boosting), the same sends and 5-fold cross-validation:
 
 | Step | AUC |
 |---|---|
@@ -252,11 +252,11 @@ Same model (histogram gradient boosting), same sends, 5-fold cross-validation at
 | One row per real send, still with month-long completion counts and the viewed flag | 0.934 |
 | Viewed flag removed | 0.931 |
 | Month-long counts replaced by history before the send | 0.866 |
-| Customers kept apart across folds (the honest setup) | **0.865** |
+| Customers kept apart across folds (the setup I report) | **0.865** |
 
 ![Taking the leaks out](/portfolio_data/starbucks/plots/offer_response_ladder.webp)
 
-Most of the inflation came from two places: the rows that never happened (0.994 to 0.934) and the month-long completion counts (0.931 to 0.866). Once the features are honest, keeping customers apart costs almost nothing, which is a good sign that the model is not memorising people.
+Most of the inflation came from the rows that never happened (0.994 to 0.934) and the month-long completion counts (0.931 to 0.866). With send-time features in place, keeping customers apart costs almost nothing (0.866 to 0.865), which suggests the model is not memorising individual customers.
 
 ### Results on customers the model never saw
 
@@ -268,11 +268,11 @@ Most of the inflation came from two places: the rows that never happened (0.994 
 | XGBoost | 0.864 (sd 0.005) | 0.865 | 0.857 to 0.873 | 0.148 |
 | **Histogram gradient boosting** | **0.865 (sd 0.005)** | **0.865** | **0.857 to 0.873** | **0.148** |
 
-The interval resamples customers, not rows. At a 0.5 threshold the best model has precision 0.797, recall 0.822 and F1 0.809. Trained only on the first three send waves (hours 0 to 336), it scores **0.878** on the later three, so it holds up forward in time.
+The 95% interval is a bootstrap over customers. At a 0.5 threshold the best model has precision 0.797, recall 0.822 and F1 0.809. When trained only on the first three send waves (hours 0 to 336), it scores **0.878** on the later three, so it holds up forward in time.
 
 ![Calibration on held-out customers](/portfolio_data/starbucks/plots/offer_response_calibration.webp)
 
-The probabilities can be taken at face value: across ten bins of held-out sends, the share that completed tracks the predicted probability closely (for example 0.52 completed where 0.52 was predicted). That matters more than AUC here, because a targeting rule spends money in proportion to those probabilities.
+The probabilities are well calibrated. Across ten bins of held-out sends, the share that completed tracks the predicted probability closely (for example, 0.52 completed where 0.52 was predicted). For targeting this matters more than AUC, because a targeting rule spends money in proportion to those probabilities.
 
 ### What the model relies on
 
@@ -287,7 +287,7 @@ Permutation importance on the held-out customers (AUC lost when the feature is s
 | Age | 0.018 |
 | Number of channels the offer goes out on | 0.014 |
 
-In this simulated data an offer completes when the customer spends past its difficulty within the window, whether or not they looked at it, so past spending and the means to spend lead. Offer terms alone reach only 0.605; knowing the customer is what the model is for.
+In this simulated data an offer counts as completed when the customer spends past its difficulty within the window, whether or not they viewed it, so features about past spending and the means to spend rank highest. Offer terms alone reach only 0.605, so most of the model's signal comes from what it knows about the customer.
 
 ---
 
@@ -310,11 +310,11 @@ In this simulated data an offer completes when the customer spends past its diff
 - **Discount:** Negative effect (-1.9%), customers spend less on discounted items (intuitive)
 - **Informational:** No direct effect (expected for awareness-only offers)
 
-**Critical Nuance:** All statistically significant results have **negligible effect sizes** (Cohen's d < 0.02). This is common with large samples (N > 100K): even tiny differences become statistically significant. **The real business impact lies in offer completion rates (up to 89%), not per-transaction amount lift.**
+**Caveat:** All the statistically significant results have **negligible effect sizes** (Cohen's d < 0.02). With samples this large (N > 100K), even tiny differences reach significance. **The business impact is in offer completion rates (up to 89%); the lift in per-transaction amount is too small to matter.**
 
 ### Propensity Score Matching (PSM)
 
-To address selection bias, nearest-neighbor PSM was performed using logistic regression on age, income, gender, and tenure:
+To reduce selection bias, I ran nearest-neighbour PSM with propensity scores from a logistic regression on age, income, gender and tenure:
 
 | Offer Type | Naive ATE | Matched ATE | Matched Pairs | Balance Improvement |
 |-----------|-----------|-------------|---------------|-------------------|
@@ -326,7 +326,7 @@ To address selection bias, nearest-neighbor PSM was performed using logistic reg
 
 ### Heterogeneous Treatment Effects by Segment
 
-ATE varies meaningfully by segment:
+ATE varies by segment:
 
 | Segment | Best Offer | ATE for Best | ATE for Worst |
 |---------|-----------|-------------|---------------|
@@ -335,11 +335,11 @@ ATE varies meaningfully by segment:
 | BOGO Advocates | Informational | +$1.30 | -$0.53 (discount) |
 | Passive Browsers | Informational | **+$2.34** | **-$2.90 (BOGO)** |
 
-> Segment-specific ATEs reinforce the recommendation strategy: informational offers are the safest bet for low-engagement segments, while BOGO Advocates and Discount Seekers respond best to their matched offer types.
+> Informational offers have the highest estimated effect in every segment. The matched offers cannot be tested this way: every Discount Seeker received a discount, and only 2 BOGO Advocates went without a BOGO, so neither has a control group. The discount and BOGO recommendations for those two segments rest on their completion rates (89.2% and 87.1%), not on these estimates.
 
 ### A/B Test Simulation Framework
 
-To validate the recommendation system in production:
+I sized the A/B test needed to validate the recommendation system in production:
 
 | Parameter | Value |
 |-----------|-------|
@@ -348,7 +348,7 @@ To validate the recommendation system in production:
 | Absolute lift | 3.5 pp |
 | Required sample per group | **3,277** |
 | Required total | 6,554 |
-| **Feasible?** | **yes Yes** (17K customers available) |
+| **Feasible?** | **Yes** (17K customers available) |
 | Empirical power (at n=3,277) | **0.80** |
 | Recommended duration | **30+ days** |
 
@@ -360,7 +360,7 @@ To validate the recommendation system in production:
 
 ### Rule-Based System Design
 
-Using the 4 customer segments, we derived simple targeting rules:
+From the 4 customer segments I wrote simple targeting rules:
 
 | Segment | Primary Offer | Rationale | Secondary Offer |
 |---------|--------------|-----------|-----------------|
@@ -378,7 +378,7 @@ Using the 4 customer segments, we derived simple targeting rules:
 | Random Targeting (baseline) | 43.5% | - |
 | **Rule-Based Targeting** | **47.0%** | **+7.9%** |
 
-The rule-based system achieves a **+7.9% lift** in offer completion rates over random targeting. The +10% target was not fully met due to large low-engagement segments (Unengaged Unknowns + Passive Browsers = 46.7% of customers).
+The rules lift offer completion by **+7.9%** over random targeting. That falls short of the +10% target because the two low-engagement segments (Unengaged Unknowns and Passive Browsers) make up 46.7% of customers.
 
 ### Business Impact
 
@@ -390,7 +390,7 @@ The rule-based system achieves a **+7.9% lift** in offer completion rates over r
 
 - **+7.9% increase** in offer completion rates
 - **85.6% of revenue** concentrated in 2 of 4 segments; targeted spend reduces waste on unresponsive segments
-- **Scalable:** Simple rules can be implemented in production without complex model inference
+- **Scalable:** the rules run in production with no model inference
 
 ---
 
@@ -429,16 +429,16 @@ The rule-based system achieves a **+7.9% lift** in offer completion rates over r
 
 ## Key Insights
 
-1. **4 distinct customer segments** (Unengaged Unknowns, Discount Seekers, BOGO Advocates, Passive Browsers) with clear offer preferences and validated business metrics
-2. **An honest model beats an impressive one**: the first version's 0.994 AUC came from rows that never happened and features from after the send; rebuilt at send time it scores **0.865** on customers it never saw (0.878 forward in time), with well-calibrated probabilities
-3. **Past spending predicts completion, offer terms alone barely do**: average spend before the send, tenure and income lead the importance ranking; offer terms on their own reach only 0.605
-4. **Customer segments drive 85.6% of revenue**: 53.3% of customers (Discount Seekers + BOGO Advocates) generate the vast majority of revenue
-5. **Simple rule-based recommendations provide +7.9% lift** over random targeting, validated with A/B test simulation (power=0.80, feasible at n=3,277/group)
-6. **Causal analysis reveals differential impacts**: BOGO offers drive +$0.24/transaction, discounts reduce by -$0.25; all effect sizes are statistically significant but negligible (Cohen's d < 0.02)
-7. **Statistical rigor improves credibility**: hypothesis tests, bootstrap CIs, effect sizes, propensity score matching, and heterogeneous treatment effects paint a complete picture
-8. **Clustering quality is modest**: silhouette 0.147 and mean stability ARI 0.76, so segments are useful directions rather than hard boundaries
-9. **Missing demographics (12.8%)** form their own segment with low engagement, a common real-world challenge solvable with data collection incentives
-10. **The recommendation gap** (+7.9% vs +10% target) is driven by large low-engagement segments; future work on re-engagement strategies could close this gap
+1. **4 customer segments** (Unengaged Unknowns, Discount Seekers, BOGO Advocates, Passive Browsers), each with a clear offer preference and checked against business metrics
+2. **The first model's 0.994 AUC was leakage**: it came from rows that never happened and features from after the send. Rebuilt at send time, the model scores **0.865** on customers it never saw (0.878 forward in time), with well-calibrated probabilities
+3. **Past spending is the strongest predictor**: average spend before the send, tenure and income lead the importance ranking, while offer terms on their own reach only 0.605
+4. **Two segments bring in 85.6% of revenue**: Discount Seekers and BOGO Advocates, 53.3% of customers
+5. **Rule-based recommendations give a +7.9% lift** over random targeting; the A/B test simulation shows a live test is feasible at n=3,277 per group with power 0.80
+6. **Offer types differ in causal effect**: BOGO offers add +$0.24 per transaction and discounts change it by -$0.25; these effects are statistically significant but negligible in size (Cohen's d < 0.02)
+7. **Statistical testing**: hypothesis tests, bootstrap CIs, effect sizes, propensity score matching and heterogeneous treatment effects sit alongside the descriptive statistics
+8. **Clustering quality is modest**: silhouette 0.147 and mean stability ARI 0.76, so the segments work as directional guides with soft boundaries
+9. **Missing demographics (12.8%)** form their own low-engagement segment, a common problem in real data that data collection incentives could address
+10. **The recommendation gap** (+7.9% vs +10% target) comes from the large low-engagement segments; future re-engagement work on those segments could close it
 
 ---
 
