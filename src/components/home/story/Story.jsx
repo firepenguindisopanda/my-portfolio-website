@@ -8,8 +8,6 @@ import { captureReadingPlace, registerMotionAnchor, restoreReadingPlace } from '
 import { gsap, gsapEnabled, ScrollTrigger, useGSAP } from '../../../utilities/gsapSetup';
 import { CaseStudyLink, OutLinks } from '../links';
 import { buildChapters, money } from './storyFigures';
-import { emitPanda } from '../../panda/pandaBus';
-import { StoryClerk } from '../../panda/LazyScenes';
 
 /**
  * Four cases: the work told as stories where messy input becomes checked
@@ -227,7 +225,6 @@ const Story = () => {
             stageAt(t);
             const c = caseAt(t);
             show(c);
-            emitPanda('case', { i: c, p: (t - figAt[c]) / figLen[c] });
             starts.forEach((s, i) => railFill(i, (t - s) / (ends[i] - s)));
           };
           master.eventCallback('onUpdate', sync);
@@ -405,7 +402,6 @@ const Story = () => {
       </div>
 
       <div className="chapters">
-        <StoryClerk />
         {chapters.map((ch, i) => {
           const p = ch.project;
           const id = `case-${p.id}`;

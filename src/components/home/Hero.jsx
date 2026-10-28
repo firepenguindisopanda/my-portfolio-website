@@ -11,7 +11,6 @@ import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { canHover, gsap, gsapEnabled, useGSAP } from '../../utilities/gsapSetup';
 import { CaseStudyLink, EXT, NewTab, Arrow, splitTitle } from './links';
 import { DownIcon, ExternalIcon, TurnIcon } from '../site/icons';
-import { HeroPeek } from '../panda/LazyScenes';
 
 /**
  * The case file's cover: the name, the thesis, and a file card with the one
@@ -230,7 +229,6 @@ const Hero = ({ onSeeWork }) => {
                   <TurnIcon />
                   {turned ? 'Back to the photo' : 'Turn the card over'}
                 </button>
-                <HeroPeek />
               </figure>
             </div>
           </div>

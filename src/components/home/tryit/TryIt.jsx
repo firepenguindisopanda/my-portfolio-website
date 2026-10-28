@@ -3,7 +3,6 @@ import { projects } from '../../../data/projects';
 import ChimpDemo from './ChimpDemo';
 import TimetableDemo from './TimetableDemo';
 import TriageDemo from './TriageDemo';
-import { TryItNap } from '../../panda/LazyScenes';
 import '../../../styles/tryit.css';
 
 /**
@@ -39,7 +38,6 @@ const TryIt = () => (
         <ChimpDemo project={byId('chimp-test-game')} />
         <TimetableDemo project={byId('timetable-builder')} />
         <TriageDemo project={byId('link-tracker')} />
-        <TryItNap />
       </div>
     </div>
   </section>

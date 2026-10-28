@@ -100,16 +100,14 @@ describe('bundle and loading', () => {
     expect(staticGraph('pages/ProjectDetail.jsx')).toContain('components/ProjectVisuals/LinkTrackerVisual.jsx');
   });
 
-  it('keeps the panda off the first load: its scenes arrive in their own chunk', () => {
-    // The scenes are decorative, so no page waits for them. Pages reach only
-    // the lazy wrappers and the tiny event bus the sections report to.
-    const allowed = new Set(['components/panda/LazyScenes.jsx', 'components/panda/pandaBus.js']);
+  it('keeps the panda off the first load: the 404 scene arrives in its own chunk', () => {
+    // The home page has no panda at all; the 404 reaches only the lazy wrapper.
     ['index.jsx', 'pages/Home.jsx'].forEach((entry) => {
-      const panda = staticGraph(entry).filter((file) => file.startsWith('components/panda/') && !allowed.has(file));
+      const panda = staticGraph(entry).filter((file) => file.startsWith('components/panda/'));
       expect({ entry, panda }).toEqual({ entry, panda: [] });
     });
-    // Not vacuous: the home page does reach the wrappers.
-    expect(staticGraph('pages/Home.jsx')).toContain('components/panda/LazyScenes.jsx');
+    const notFound = staticGraph('pages/NotFound.jsx').filter((file) => file.startsWith('components/panda/'));
+    expect(notFound).toEqual(['components/panda/LazyScenes.jsx']);
   });
 
   it('fetches SplitText only when a heading is about to animate', () => {

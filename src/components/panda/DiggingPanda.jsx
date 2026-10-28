@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 import { gsap, gsapEnabled } from '../../utilities/gsapSetup';
 import PandaRig, { INK, POSES } from './PandaRig';
-import '../../styles/panda.css';
 
 /**
  * The 404: the panda is in the filing cabinet, digging through the open top

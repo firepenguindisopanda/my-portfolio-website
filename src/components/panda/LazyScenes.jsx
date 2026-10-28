@@ -1,14 +1,12 @@
 import React, { Suspense, lazy } from 'react';
 
 /**
- * The panda's scenes (PandaScenes), kept off the first load: the page renders
- * without them and each appears when their one shared chunk arrives. They are
- * decorative, so there is nothing to show while it loads.
+ * The 404's digging panda, kept off the first load: the page renders without
+ * it and the scene appears when its chunk arrives. It is decorative, so there
+ * is nothing to show while it loads.
  */
 
-const load = () => import('./PandaScenes');
-
-const lazyScene = (name, from = load) => {
+const lazyScene = (name, from) => {
   const Scene = lazy(() => from().then((m) => ({ default: m[name] })));
   const Loaded = () => (
     <Suspense fallback={null}>
@@ -19,9 +17,4 @@ const lazyScene = (name, from = load) => {
   return Loaded;
 };
 
-export const HeroPeek = lazyScene('HeroPeek');
-export const StoryClerk = lazyScene('StoryClerk');
-export const TryItNap = lazyScene('TryItNap');
-export const FooterNap = lazyScene('FooterNap');
-// Only the 404 needs this one, so it has a chunk of its own.
 export const DiggingPanda = lazyScene('DiggingPanda', () => import('./DiggingPanda'));
