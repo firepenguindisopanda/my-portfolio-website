@@ -42,7 +42,10 @@ const PageTransition = ({ children }) => {
         }
       );
     },
-    { scope: ref, dependencies: [location.pathname, prefersReducedMotion] }
+    // revertOnUpdate: this component outlives every route, so without it the
+    // one context kept each route's tween, and through its target every page
+    // already left (about 4,000 DOM nodes a visit).
+    { scope: ref, dependencies: [location.pathname, prefersReducedMotion], revertOnUpdate: true }
   );
 
   return (
