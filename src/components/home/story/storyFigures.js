@@ -49,7 +49,7 @@ const svg = (g) => `<svg ${VB}>${g}</svg>`;
 /* 1. timetable-builder: sessions taken from the real screenshot        */
 /* ------------------------------------------------------------------ */
 const SESS = [
-  { code: 'COMP 3603', type: 'Tutorial', day: 1, s: 8, e: 9, room: 'FST CSL 2' },
+  { code: 'COMP 3603', type: 'Tutorial', day: 1, s: 8, e: 9, room: 'FST CSL2' },
   { code: 'COMP 3602', type: 'Lecture', day: 1, s: 9, e: 10, room: 'FST 113' },
   { code: 'INFO 3600', type: 'Lab', day: 1, s: 10, e: 12, room: 'FST CSL1' },
   { code: 'COMP 3605', type: 'Lecture', day: 0, s: 11, e: 13, room: 'TCB 22' },
