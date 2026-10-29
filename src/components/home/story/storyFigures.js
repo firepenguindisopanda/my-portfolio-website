@@ -14,7 +14,8 @@ import { gsap, gsapEnabled } from '../../../utilities/gsapSetup';
  * the markup comes from the site's own data and goes through `esc`.
  *
  * Numbers are real and come from data, never retyped: the timetable sessions
- * are the ones in the timetable-builder screenshot, the fraud figures are
+ * are the ones in the timetable-builder screenshot plus one real single-PDF
+ * class from the same publication (see SESS), the fraud figures are
  * data/workedExample.js (itself checked against the analysis artifact by a
  * test), and the design path follows the idea-sprint case study's table of how
  * a design is made.
@@ -56,11 +57,15 @@ const SESS = [
   { code: 'COMP 3603', type: 'Lecture', day: 1, s: 12, e: 13, room: 'JFK LT' },
   { code: 'INFO 3600', type: 'Lecture', day: 3, s: 8, e: 10, room: 'FST C1' },
   { code: 'COMP 3602', type: 'Tutorial', day: 2, s: 14, e: 15, room: 'TCB 33' },
+  // Not in the screenshot: every session above is now confirmed by three PDFs,
+  // so the flag needs a real one-PDF class. This one (publication 14) is
+  // weekly, in person and in a free slot of the same week.
+  { code: 'CHEM 1570', type: 'Lecture', day: 2, s: 11, e: 12, room: 'FST C2' },
 ];
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const G1 = { x: 90, cw: 104, y: 80, rh: 50 };
-/** The one session confirmed by a single PDF - about 7% of sessions are. */
-const FLAG_I = 6;
+/** The one session confirmed by a single PDF - about 6% of sessions are. */
+const FLAG_I = 7;
 const sessLine = (s) => `${s.code} ${DAYS[s.day]} ${pad2(s.s)}:00-${pad2(s.e)}:00 ${s.room}`;
 const blockBox = (s) => ({ x: G1.x + s.day * G1.cw + 3, y: G1.y + (s.s - 8) * G1.rh + 2, w: G1.cw - 6, h: (s.e - s.s) * G1.rh - 4 });
 
