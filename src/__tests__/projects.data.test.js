@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { projects } from '../data/projects';
 import { staticRoutes, routeMeta } from '../data/routes';
+import { inCategories } from '../components/CategoryPage/CategoryPage';
 
 describe('Projects Data', () => {
   it('should have valid project entries', () => {
@@ -64,6 +65,19 @@ describe('Projects Data', () => {
     projectsWithCategory.forEach((project) => {
       expect(validCategories).toContain(project.category);
     });
+    // A second category a case study also belongs to, and only a real one.
+    projects.filter((p) => p.alsoIn).forEach((project) => {
+      project.alsoIn.forEach((c) => expect({ id: project.id, c, valid: validCategories.includes(c) }).toEqual({ id: project.id, c, valid: true }));
+      expect(project.alsoIn).not.toContain(project.category);
+    });
+  });
+
+  it('lists the Android apps on the Android page, Dual N-Back on the desktop one too', () => {
+    // The pages' own category lists (pages/AndroidPortfolio.jsx, DesktopPortfolio.jsx).
+    const on = (categories) => projects.filter((p) => inCategories(p, categories)).map((p) => p.id);
+    expect(on(['Mobile'])).toEqual(expect.arrayContaining(['dual-n-back', 'step-counter', 'sensor-dashboard']));
+    expect(on(['Desktop Tools'])).toContain('dual-n-back');
+    expect(on(['Desktop Tools'])).not.toContain('step-counter');
   });
 });
 

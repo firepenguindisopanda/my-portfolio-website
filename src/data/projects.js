@@ -1,4 +1,4 @@
-import { DataScience, PostgresqlIcon, NodejsIcon, Python, Flask, Angular, MaterialUi, ReactIcon, FirebaseIcon, Windows, Javascript } from '../components/SvgIcons';
+import { DataScience, PostgresqlIcon, NodejsIcon, Python, Flask, Angular, MaterialUi, ReactIcon, FirebaseIcon, Windows, Javascript, Android } from '../components/SvgIcons';
 import widsThumbnail from '../assets/wids_2023_datathon.webp';
 import pokemonDashboardProPic from '../assets/pokemon_dashboard_pro_pic.webp';
 import chimpShot from '../assets/screenshots/chimp-test-game.webp';
@@ -12,6 +12,9 @@ import timetableBuilderShot from '../assets/screenshots/timetable-builder.webp';
 import linkTrackerShot from '../assets/screenshots/link-tracker.webp';
 import folioShot from '../assets/screenshots/folio.webp';
 import pdfToolsShot from '../assets/screenshots/pdf-tools.webp';
+import dualNBackShot from '../assets/screenshots/dual-n-back.webp';
+import stepCounterShot from '../assets/screenshots/step-counter.webp';
+import sensorDashboardShot from '../assets/screenshots/sensor-dashboard.webp';
 
 export const projects = [
   {
@@ -549,7 +552,7 @@ export const projects = [
     // with the same four courses auto-placed: a dated teaching week, the My
     // week summary, colour-coded blocks with rooms, and that week's exam. It
     // is the page students actually use, so it is the one the card shows.
-    // storyFigures.js draws its sessions from these same courses.
+    // storyFigures.js draws these sessions too, plus one real single-PDF class.
     screenshot: timetableBuilderShot,
     title: 'Timetable Builder: UWI Timetable PDFs Into a Warehouse Students Plan From',
     shortDescription: 'Extracts UWI St. Augustine\'s CELCAT timetable PDFs (one per course, room and lecturer) into a PostgreSQL warehouse, and serves a course, room and lecturer explorer, a public JSON API, and a timetable builder that fills a week in from course codes and lets a student drag any class to another sitting, then subscribe to it from a phone calendar. It has loaded 14 publications of the timetable so far.',
@@ -724,6 +727,106 @@ export const projects = [
       'Link checking in progress: six outcomes, polite serial requests that never download a body, "gone" only after three failures over seven days, and an offline guard so a dead connection is never recorded as dead links',
       'Measured on a 1,000-link database: 157-232 ms start-up and a 1.3-1.7 ms median triage keystroke; a 53-tab window saves and closes in about 1.2 s in a real browser',
       '25 ADRs, 8 specs with numbered acceptance criteria, and tests named after the criterion they prove: xUnit v3 for .NET and the Node built-in runner for the extension',
+    ],
+  },
+  {
+    id: 'dual-n-back',
+    highlight: 'A working-memory trainer ported from Brain Workshop twice: to the desktop in Rust and Tauri, and to Android in Kotlin. Both play all 110 modes with the original\'s generation and scoring, and every deliberate change is written down. The two ports share no code; golden fixtures exported from Rust keep them identical, down to the random sequences.',
+    primaryTech: ['Rust', 'Tauri v2', 'Kotlin', 'Jetpack Compose'],
+    // The desktop Progress chart (the dev build's sample history, never real
+    // sessions) beside the phone's tutorial, both real screens.
+    screenshot: dualNBackShot,
+    title: 'Dual N-Back: A Brain Workshop Port for Desktop and Android',
+    shortDescription: 'Dual n-back trainer ported from Brain Workshop 4.8.1 to a Rust and Tauri desktop app and a native Kotlin Android app, with every trial, press and reaction time stored for statistics. GPL-3.0-or-later.',
+    description: 'Brain Workshop is a free dual n-back trainer written in Python. I ported it to the desktop in Rust and Tauri and to Android in Kotlin, both playing all 110 modes with the same trial generation, scoring and level progression. The rules came from reading the original line by line into a spec that marks each quirk; the port differs in 15 numbered, documented decisions (for example, Brain Workshop runs a "3.0 s" trial for 2.8 s, and the port runs what it reports) and keeps the rest for comparability. Sessions come from a seeded ChaCha8 generator, so any session can be rebuilt for replay, and a replay refuses to draw pictures if a stored stimulus disagrees with the rebuild. The desktop core is pure Rust with no IO, one crate writes all SQL to STRICT SQLite tables, and Tauri commands stay thin; the React UI never scores. Timing was measured: audio is scheduled at least 100 ms ahead and lands within 0.01 ms, and a two-stage timer cut lateness from about 8 ms to 2 ms or less. The Android app shares no code: golden JSON fixtures exported from Rust pin its Kotlin port, and the random generator is reproduced bit for bit. It imports the desktop database with a bundled SQLite, because Android 13\'s cannot read STRICT tables and would delete the file as corrupt. Statistics include d\' with the log-linear correction, response bias, and time-of-day and rest effects called clear only at Welch\'s z of 1.96 or more.',
+    category: 'Desktop Tools',
+    // One case study for both apps, so the Android page lists it too.
+    alsoIn: ['Mobile'],
+    technologies: ['Rust', 'Tauri v2', 'React 19', 'TypeScript', 'SQLite', 'Kotlin', 'Jetpack Compose', 'Room', 'WorkManager', 'Glance'],
+    thumbnail: null,
+    featured: true,
+    githubUrl: null,
+    liveUrl: null,
+    markdown: '/markdowns/dual-n-back.md',
+    evidence: 'Two ports with no shared code are held to one behaviour by golden JSON fixtures exported from the Rust core, with the random generator reproduced bit for bit, so the same seed gives the same session on desktop and phone.',
+    techIcons: [
+      { Icon: Windows, label: 'Desktop' },
+      { Icon: Android, label: 'Android' },
+    ],
+    tasks: [
+      'All 110 Brain Workshop modes with the original\'s trial generation, Brain Workshop and Jaeggi scoring and level progression, its quirks specified by line number',
+      '15 numbered, documented deviations (trial length, seeded generation, first press scored, pauses excluded from reaction times) and the rest kept for comparability',
+      'Seeded ChaCha8 sessions rebuilt for replay in 0.41 ms, with pictures withheld if any stored stimulus disagrees with the rebuild',
+      'Ports-and-adapters Rust workspace: pure rules crate, one crate for all SQL on STRICT tables, thin Tauri commands, and TypeScript types generated from Rust',
+      'Measured timing: drift-free onsets, audio scheduled 100 ms ahead and landing within 0.01 ms, timer lateness cut from about 8 ms to 2 ms or less',
+      'Statistics: d\' with the log-linear correction, response bias, within-session decline, and time-of-day and rest effects judged by Welch\'s z',
+      'Kotlin port pinned by golden JSON fixtures from Rust, with ChaCha8 and the rand crate\'s sampling reproduced bit for bit',
+      'One-way, one-transaction import of the desktop database on a bundled SQLite 3.50, matched by UUID',
+      'Phone timing: onsets within about 8 ms of schedule, display rate measured from vsync, Bluetooth latency recorded per session, and a Baseline Profile cutting cold start from 628 to 558 ms',
+      'Touch pads, haptics, reminders, a home-screen widget and Strict sessions with screen pinning; 117 Rust, 111 Vitest and over 400 JVM tests',
+    ],
+  },
+  {
+    id: 'step-counter',
+    highlight: 'An Android app that counts steps all day, with the app closed and across reboots, through a foreground service on the hardware step counter. It records walks as smoothed GPS routes on a street map, using location only between Start and Stop.',
+    primaryTech: ['Kotlin', 'Jetpack Compose', 'Room', 'MapLibre'],
+    // Today and History on the phone. The Walks screens are left out: they
+    // draw real routes.
+    screenshot: stepCounterShot,
+    title: 'Step Counter: All-Day Steps and Walk Routes on Android',
+    shortDescription: 'A Kotlin and Compose app that counts steps all day through a foreground service on the hardware step counter, and records walks as GPS routes on a MapLibre map. Built for one phone and installed from an APK.',
+    description: 'The phone\'s hardware step counter only counts while some app keeps it registered, and nothing else on the phone did, so the app runs a foreground service that registers it and holds no wake lock (WorkManager was ruled out because the counter would not count between samples). The counter is cumulative since boot, so each sample carries the boot count, and the accumulator handles a first sample, a reboot, two reboots in a row and a counter that goes backwards, each with a test. In a walk with the app closed it counted 92 of 100 hand-counted steps. Walks use the fused location provider every 2 seconds, drop fixes worse than 25 m or closer than 2 m, write in batches, and close at the last point if Android kills the app. The raw track\'s jitter added about 7% to the distance, so it is smoothed with a Kalman filter and a Rauch-Tung-Striebel pass; snapping to roads was ruled out for privacy. Maps use MapLibre and OpenFreeMap with no API key, and the app has no background-location permission.',
+    category: 'Mobile',
+    technologies: ['Kotlin', 'Jetpack Compose', 'Material 3', 'Room', 'MapLibre', 'Fused Location Provider', 'DataStore'],
+    thumbnail: null,
+    featured: true,
+    githubUrl: null,
+    liveUrl: null,
+    markdown: '/markdowns/step-counter.md',
+    evidence: 'Each sample carries the phone\'s boot count, and the accumulator has a test for a first sample, a reboot, two reboots in a row and a counter going backwards; a walk with the app closed counted 92 of 100 hand-counted steps.',
+    techIcons: [
+      { Icon: Android, label: 'Android' },
+    ],
+    tasks: [
+      'Foreground service on the hardware step counter with no wake lock, after confirming no other app kept the sensor registered',
+      'Reboot-safe accounting: a stored baseline and boot count per sample, with tests for reboots, double reboots and a counter going backwards',
+      'Throttled writes (one every 5 seconds) that lose nothing because the counter is cumulative',
+      'Walk recording with the fused location provider: 2-second fixes, a 25 m accuracy filter, a 2 m minimum distance and batched writes',
+      'Kalman filter and Rauch-Tung-Striebel smoothing of the track, with a raw and smoothed toggle; road snapping ruled out for privacy',
+      'MapLibre map with OpenFreeMap tiles and no API key; location only between Start and Stop, no background-location permission',
+      'Crash-safe migration from DataStore to Room in one transaction, checked against the real data on the phone',
+      'Compose screens for Today, Walks, History and Settings; 75 JVM tests and 4 on-device Room tests',
+    ],
+  },
+  {
+    id: 'sensor-dashboard',
+    highlight: 'Live readings from all 34 sensors on my phone, with charts and visuals (compass, bubble level, orientation cube), and full-rate recording to an on-phone database for CSV export. It has no internet permission.',
+    primaryTech: ['Kotlin', 'Jetpack Compose', 'Room', 'Android sensors'],
+    // Home, the magnetometer's compass and the accelerometer's bubble level,
+    // captured on the phone over adb.
+    screenshot: sensorDashboardShot,
+    title: 'Sensor Dashboard: Every Phone Sensor, Live and Recorded',
+    shortDescription: 'A Kotlin and Compose app that shows every sensor on the phone live and records any of them at up to 400 Hz to SQLite for CSV export. Fully offline.',
+    description: 'The app lists every sensor the phone reports (34 on a moto g 5G), each with a live sparkline, and opens any of them into a 10-second chart per axis with minimum, maximum, mean and the measured rate. Some get a picture of what they measure: an orientation cube, a compass, a bubble level, barometric altitude, a light bar and proximity. Recording uses the high-sampling-rate permission to go past Android\'s 200 Hz cap to 400 Hz; samples pass through a channel and are written every 500 ms in one transaction, because an insert per event at 400 Hz would make the UI stutter; a crash loses at most one batch. A 5-second recording of the real accelerometer kept every sample at 350 to 450 Hz. CSV goes through the system save dialog with no storage permission, uses a full stop for decimals in any language, and pages through the table 5,000 rows at a time. Sensors are read only while a screen is showing, and the app has no internet permission.',
+    category: 'Mobile',
+    technologies: ['Kotlin', 'Jetpack Compose', 'Material 3', 'Room', 'Kotlin coroutines', 'Android SensorManager'],
+    thumbnail: null,
+    featured: true,
+    githubUrl: null,
+    liveUrl: null,
+    markdown: '/markdowns/sensor-dashboard.md',
+    evidence: 'A 5-second recording of the real accelerometer kept every sample at 350 to 450 Hz, written in 500 ms batches in one transaction each, so a crash loses at most one batch.',
+    techIcons: [
+      { Icon: Android, label: 'Android' },
+    ],
+    tasks: [
+      'Every sensor the phone reports, grouped by category, with live sparklines and measured rates',
+      'Detail screens with a 10-second multi-axis chart, per-axis statistics and visuals: orientation cube, compass, bubble level, barometric altitude, light and proximity',
+      'Full-rate recording at up to 400 Hz with the high-sampling-rate permission, capped at 30 minutes',
+      'Batched writes every 500 ms through a channel on a background thread, one transaction per batch, so the UI stays smooth and a crash loses at most one batch',
+      'CSV export through the system save dialog, locale-safe decimals and paged reads, with no storage permission',
+      'No internet permission, no background service; sensors read only while a screen is visible',
+      '77 JVM tests and 6 on-device tests, including a real 5-second accelerometer recording',
     ],
   },
 ];

@@ -121,12 +121,16 @@ const Row = ({ project, surface }) => {
  * @param {string}   eyebrow      mono kicker above the title
  * @param {string}   title        page heading
  * @param {string}   description  one sentence on what this collection is
- * @param {string[]} categories   project categories to include, in data order
+ * @param {string[]} categories   project categories to include, in data order;
+ *                                a project's `alsoIn` list counts too, for one
+ *                                case study that spans two (Dual N-Back)
  * @param {string}   surface      analytics label for this route
  * @param {string}   emptyMessage shown when no project matches yet
  */
+export const inCategories = (p, categories) => categories.includes(p.category) || (p.alsoIn || []).some((c) => categories.includes(c));
+
 const CategoryPage = ({ eyebrow, title, description, categories, surface, emptyMessage }) => {
-  const projects = useMemo(() => allProjects.filter((p) => categories.includes(p.category)), [categories]);
+  const projects = useMemo(() => allProjects.filter((p) => inCategories(p, categories)), [categories]);
   useInkHeadings();
 
   return (
