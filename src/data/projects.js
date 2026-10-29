@@ -11,6 +11,7 @@ import fastapiMockerShot from '../assets/screenshots/fastapimocker.webp';
 import timetableBuilderShot from '../assets/screenshots/timetable-builder.webp';
 import linkTrackerShot from '../assets/screenshots/link-tracker.webp';
 import folioShot from '../assets/screenshots/folio.webp';
+import pdfToolsShot from '../assets/screenshots/pdf-tools.webp';
 
 export const projects = [
   {
@@ -649,34 +650,37 @@ export const projects = [
   },
   {
     id: 'pdf-tools',
-    highlight: 'Offline Tauri desktop app (Rust core, Angular 20 UI) that merges and splits PDFs by rebuilding the object graph, and cross-checks folders of PDF/DOCX claim forms for double-booked time slots.',
-    primaryTech: ['Rust', 'Tauri v2', 'Angular 20', 'lopdf'],
+    highlight: 'Offline Tauri desktop app (Rust core, Angular 20 UI) with seven tabs: merge, split, a page editor, metadata, form filling and signing, and a checker for double-booked claim forms. The editor changes text and pictures by editing the content stream itself, and proves each edit left the rest of the page alone.',
+    primaryTech: ['Rust', 'Tauri v2', 'Angular 20', 'Pdfium'],
+    // The Editor with a sample handout and three edits pending, opened from a
+    // neutral folder so no user path shows in the save box.
+    screenshot: pdfToolsShot,
     title: 'PDF Tools: Offline Desktop PDF Utility',
-    shortDescription: 'Cross-platform Tauri v2 desktop app with a Rust PDF engine and an Angular 20 UI. It merges and splits PDFs offline, and checks folders of PDF/DOCX claim forms for overlapping time-slot bookings.',
-    description: 'A PDF utility built as a native desktop app because the documents it handles (claim forms, invoices, internal reports) should not leave the machine. The Rust core uses lopdf to manipulate the PDF object graph directly: merging renumbers each source document\'s objects, copies everything except Catalog/Pages/Page, then rebuilds a fresh page tree with rewritten Parent pointers and a new Catalog root; splitting does the reverse. The third tool is a conflict detector: it extracts (date, course code, time range) entries from every PDF and DOCX in a folder and reports overlaps. This needed a fragment-reassembly pre-pass, because lopdf text extraction returns kerning-split fragments that no regex can match, and two parsing strategies tried in order: a strict inline pattern first, and a line-state-machine only when that finds nothing, so the fuzzy path cannot add entries to documents the strict one already handled. DOCX parsing uses no Word library: it unzips the file, streams word/document.xml with quick-xml and emits a newline per paragraph close.',
+    shortDescription: 'Tauri v2 desktop app with a Rust core and an Angular 20 UI for the paperwork of part-time teaching: merge, split, edit, clean metadata, fill and sign forms, and check claim forms for overlapping sessions. Nothing leaves the machine.',
+    description: 'A PDF utility built as a native desktop app because the documents it handles (claim forms, HR forms, internal reports) should not leave the machine. It uses two engines: lopdf for structure (page order, annotations, metadata, the save) and a bundled Pdfium build for what is drawn on a page. The Editor turns every action into a command in an undoable list and replays the list against the untouched original on save; the preview runs the same pipeline in memory, so it cannot show something the saved file will not contain. Pdfium rewrites a page\'s whole content stream to change an existing object, which turned CMYK pages black, so pictures are changed by repointing their resource names at small wrapper forms, and text by replacing only the bytes of the operators that drew the edited line. Each text edit is proven (other text unchanged, the new text present, the page rendering the same outside the edit) or the page is restored. The Metadata tab keeps the info dictionary and XMP in step and saves through a temp-file, verify, rename writer that the Editor shares. Pack fills and signs a semester\'s forms from JSON templates and never touches the originals, and Detect finds double-booked sessions across folders of PDF and DOCX claim forms.',
     category: 'Desktop Tools',
-    technologies: ['Rust', 'Tauri v2', 'Angular 20', 'TypeScript', 'lopdf', 'quick-xml', 'serde', 'regex'],
+    technologies: ['Rust', 'Tauri v2', 'Angular 20', 'TypeScript', 'lopdf', 'Pdfium (pdfium-render)', 'quick-xml', 'serde', 'regex'],
     thumbnail: null,
     featured: true,
     githubUrl: null,
     liveUrl: null,
     markdown: '/markdowns/pdf-tools.md',
-    evidence: 'Two parsing strategies run in a fixed order (strict inline regex first, a line state machine only when it finds nothing), so the fuzzy path cannot add entries to a document the strict one already handled.',
+    evidence: 'Every text edit is proven before it is kept: the other text objects unchanged in text and position, the edited line reading the new text, and the page rendering the same outside the edit. Otherwise the page is restored and the edit refused with a message.',
     techIcons: [
       { Icon: Angular, label: 'Angular' },
       { Icon: Windows, label: 'Desktop' },
     ],
     tasks: [
-      'Fully offline desktop app (no upload, no server, no account) shipped as a single native binary per platform via Tauri v2',
-      'PDF merge that rebuilds the object graph: per-document object renumbering, a fresh Pages tree with rewritten Parent pointers, and a new Catalog root',
-      'Three split methods (every N pages, explicit ranges, break-at-pages) with ranges clamped to the real page count and break points sorted, deduped and bounded',
-      'Claim form conflict detector reading both PDF and DOCX, extracting (date, course code, time range) entries and reporting overlapping bookings across files',
-      'Fragment-reassembly pre-pass that glues kerning-split text fragments back into lines, turning unparseable lopdf output into parseable input',
-      'Two parsing strategies tried in order (strict inline regex first, line state machine as fallback), so the fuzzy path cannot produce false entries',
-      'Half-open interval overlap detection over minutes-past-midnight with explicit 12am/12pm handling, grouping N-way clashes into one conflict rather than pairwise duplicates',
-      'Document logic kept free of Tauri dependencies so it is testable as plain Rust, with one AppError enum serializing straight to user-facing strings',
-      'Angular standalone components with lazy routes, modern @if/@for control flow, and Tauri capabilities scoped to dialog open/save only',
-      'Degraded-input handling throughout: missing or empty PDFs become warnings and are skipped, unparseable files become per-file errors instead of blanking the report',
+      'Fully offline desktop app (no upload, no server, no account) shipped as a native Windows installer via Tauri v2',
+      'Two-engine pipeline: Pdfium for what is drawn on a page, lopdf for page order, annotations, metadata and the save',
+      'Editor edits kept as an undoable command list replayed against the untouched original, with pages named by where they came from so a page move cannot misdirect an edit',
+      'Picture edits that never rewrite the page: each move, resize, replace or delete repoints the resource name at a wrapper form, which fixed CMYK pages turning black',
+      'Text edits that replace only the bytes of the operators that drew the line (read by a lexer that keeps each operator\'s byte range), then proven against a before-and-after render',
+      'Annotations written with their own appearance streams, so every viewer and printer draws them the same way',
+      'Metadata tab that keeps the info dictionary and XMP in step, keeps encryption, asks before breaking a signature, and saves through a temp-file, verify, rename writer',
+      'Pack fills and signs a semester of forms from one JSON template per form, writing new files beside originals it never modifies',
+      'Claim form conflict detector over PDF and DOCX, with a fragment-reassembly pre-pass and two parsing strategies tried in a fixed order',
+      'Document logic free of Tauri dependencies and tested as plain Rust: 274 tests',
     ],
   },
   {
