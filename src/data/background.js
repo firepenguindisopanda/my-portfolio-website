@@ -64,7 +64,7 @@ export const community = [
     period: '2022 to present',
     points: [
       'Wrote the training content the other mentors work from.',
-      'Mentored the team that placed 3rd in the 2024 local datathon, a team of four.',
+      'Competed on and mentored the team of four that placed 3rd in the 2024 local datathon.',
     ],
     links: [
       {
